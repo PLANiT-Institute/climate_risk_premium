@@ -1,0 +1,9 @@
+scenario,dispatch_penalty,retirement_years,carbon_price_2025,carbon_price_2030,carbon_price_2040,carbon_price_2050,carbon_scenario,description
+baseline,0.00,40,8,20,40,60,korea_ets_current,Baseline with conservative K-ETS trajectory (current policy inertia)
+moderate_transition,0.10,35,10,35,85,150,korea_ets_ndc,Moderate transition with K-ETS policy tightening
+aggressive_transition,0.25,25,15,80,180,280,korea_net_zero,NDC-aligned aggressive transition
+korea_ndc,0.15,30,15,80,180,280,korea_ets_ndc,Korea NDC scenario with coal phase-down
+net_zero_2050,0.20,25,20,110,260,450,korea_net_zero,Net Zero 2050 aligned with high carbon pricing
+delayed_transition,0.05,40,8,25,100,200,delayed_action,Delayed policy action then moderate catch-up
+high_ambition,0.30,20,40,185,420,600,high_ambition,1.5C aligned aggressive decarbonization
+no_carbon_baseline,0.00,40,0,0,0,0,no_policy,Hypothetical no carbon pricing (COUNTERFACTUAL ONLY)

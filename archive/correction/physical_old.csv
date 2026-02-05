@@ -1,0 +1,5 @@
+scenario,wildfire_outage_rate,drought_derate,cooling_temp_penalty,wildfire_frequency_increase,water_stress_index,water_availability_pct,description
+baseline,0.00,0.00,0.00,1.0,0.0,100.0,No physical climate impacts
+moderate_physical,0.02,0.03,0.02,1.5,0.3,90.0,RCP 4.5 - moderate warming
+high_physical,0.05,0.08,0.05,2.5,0.6,80.0,RCP 8.5 - high warming
+extreme_physical,0.10,0.15,0.08,4.0,0.8,60.0,Extreme scenario - compounded hazards

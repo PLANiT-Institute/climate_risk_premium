@@ -1,0 +1,13 @@
+{
+  "timestamp": 1770193813.438446,
+  "data": {
+    "hazard_type": "water_risk",
+    "scenario": "ssp585",
+    "year": 2050,
+    "asset": "\uc0bc\ucc99\ud654\ub825\ubc1c\uc804\uc18c",
+    "value": 0.005457175445133065,
+    "std": 0.007881757336375647,
+    "unit": "fraction",
+    "source": "physrisk"
+  }
+}

@@ -1,0 +1,20 @@
+parameter,value,unit,description
+capacity_mw,2000,MW,Installed capacity
+capacity_factor,0.50,ratio,Baseline capacity factor
+operating_years,40,years,Design operating lifetime
+heat_rate_mmbtu_mwh,9.5,MMBtu/MWh,Heat rate (thermal efficiency)
+emissions_tCO2_per_mwh,0.95,tCO2/MWh,Carbon emissions intensity
+power_price_per_mwh,80,USD/MWh,Average wholesale electricity price
+fuel_price_per_mmbtu,3.2,USD/MMBtu,Coal price
+fixed_opex_per_kw_year,42,USD/kW-yr,Fixed O&M costs
+variable_opex_per_mwh,4.5,USD/MWh,Variable O&M costs
+total_capex_million,3200,million USD,Total capital expenditure
+annual_capex_million,0,million USD,Annual sustaining capex (placeholder)
+base_outage_rate,0.03,ratio,Baseline forced outage rate
+discount_rate,0.08,ratio,Discount rate for NPV
+debt_fraction,0.70,ratio,Debt to total capital
+equity_fraction,0.30,ratio,Equity to total capital
+debt_interest_rate,0.05,ratio,Baseline debt interest rate
+debt_tenor_years,20,years,Debt maturity
+construction_years,3,years,Construction period
+cod_year,2017,year,Commercial operation date

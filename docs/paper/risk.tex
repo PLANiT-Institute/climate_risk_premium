@@ -1,0 +1,84 @@
+\documentclass[12pt, a4paper]{article}
+
+% --- PREAMBLE ---
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{amsmath}      % For math symbols like \ge and \le
+\usepackage{booktabs}     % For professional table lines (toprule, midrule, bottomrule)
+\usepackage{geometry}     % For setting page margins
+\usepackage{caption}      % For better control over table captions
+\usepackage{array}        % For table column formatting
+
+% Set page margins
+\geometry{margin=1in}
+
+% --- DOCUMENT ---
+\title{Credit Rating Mapping Grid for the Private Power Generation Industry}
+\author{Based on KIS (Korea Investors Service) Methodology}
+\date{} % No date
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This document outlines the quantitative 'Mapping Grid' used for the credit evaluation of companies in the Private Power Generation (IPP) industry. The criteria are based on the methodology provided by KIS (Korea Investors Service) and are categorized by rating (AAA to B).
+\end{abstract}
+
+\section{Business Stability and Profitability Metrics}
+This section covers metrics related to the company's scale (capacity) and operational profitability relative to its assets.
+
+\begin{table}[h!]
+\centering
+\caption{Business Stability \& Profitability Grid}
+\label{tab:business}
+\begin{tabular}{l c c c c c c}
+\toprule
+\textbf{Metric} & \textbf{AAA} & \textbf{AA} & \textbf{A} & \textbf{BBB} & \textbf{BB} & \textbf{B} \\
+\midrule
+Capacity (MW) & $\ge 2000$ & $\ge 800$ & $\ge 400$ & $\ge 100$ & $\ge 20$ & $< 20$ \\
+\addlinespace
+EBITDA/Fixed Assets (\%) & $\ge 15$ & $\ge 11$ & $\ge 8$ & $\ge 4$ & $\ge 1$ & $< 1$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Financial Stability Metrics}
+This section details the financial ratios used to assess cash flow coverage and leverage. These are divided into ratios where a higher value is better (Coverage) and ratios where a lower value is better (Leverage).
+
+\subsection{Coverage Ratios (Higher is Better)}
+\begin{table}[h!]
+\centering
+\caption{Cash Flow Coverage Ratios}
+\label{tab:coverage}
+\begin{tabular}{l c c c c c c}
+\toprule
+\textbf{Metric} & \textbf{AAA} & \textbf{AA} & \textbf{A} & \textbf{BBB} & \textbf{BB} & \textbf{B} \\
+\midrule
+EBITDA/Interest Expense (x) & $\ge 12$ & $\ge 6$ & $\ge 4$ & $\ge 2$ & $\ge 1$ & $< 1$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\subsection{Leverage Ratios (Lower is Better)}
+\begin{table}[h!]
+\centering
+\caption{Leverage Ratios}
+\label{tab:leverage}
+\begin{tabular}{l c c c c c c}
+\toprule
+\textbf{Metric} & \textbf{AAA} & \textbf{AA} & \textbf{A} & \textbf{BBB} & \textbf{BB} & \textbf{B} \\
+\midrule
+Net Debt/EBITDA (x) & $\le 1$ & $\le 4$ & $\le 7$ & $\le 10$ & $\le 12$ & $> 12$ \\
+\addlinespace
+Debt-to-Equity Ratio (\%)* & $\le 80$ & $\le 150$ & $\le 250$ & $\le 300$ & $\le 400$ & $> 400$ \\
+\addlinespace
+Debt-to-Assets Ratio (\%) & $\le 20$ & $\le 40$ & $\le 60$ & $\le 80$ & $\le 90$ & $> 90$ \\
+\bottomrule
+\end{tabular}
+\caption*{\small *Note: The term '부채비율' (Buchae Biyul) in Korean finance almost universally refers to Debt-to-Equity, not Debt-to-Capital. The high thresholds (e.g., >400\%) confirm this translation.}
+\end{table}
+
+\end{document}

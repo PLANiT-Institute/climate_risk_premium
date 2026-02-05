@@ -1,0 +1,4 @@
+hazard,source,n_events_at_location,total_events,max_intensity,intensity_unit,distance_km,years_covered,annual_frequency,outage_rate
+Wildfire,CLIMADA API (NASA FIRMS),6,20,310.4,MW (Fire Radiative Power),1.9911810485519468,20,0.3,8.219178082191781e-05
+Tropical Cyclone,CLIMADA API (IBTrACS),15,3890,48.8001070626933,m/s (wind speed),1.9911810485519468,40,0.375,0.0002054794520547945
+River Flood,CLIMADA API (ISIMIP RCP8.5 2030-2050),0,480,0.0,m (flood depth),1.9911810485519468,20,0.0,0.0

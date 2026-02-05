@@ -1,0 +1,8 @@
+year,scenario,wildfire_rate,flood_rate,tc_rate,slr_derate,total_outage,cf_reduction,downtime_hrs,sources
+2024,Baseline,0.0550%,0.0030%,0.0205%,0.0000%,0.0785%,0.0785%,6.9,Literature + CLIMADA baseline
+2030,RCP4.5,0.0660%,0.0033%,0.0215%,0.0110%,0.0908%,0.1017%,8.9,Verified multipliers applied
+2050,RCP4.5,0.0825%,0.0038%,0.0226%,0.0264%,0.1088%,0.1349%,11.8,Verified multipliers applied
+2100,RCP4.5,0.1100%,0.0045%,0.0236%,0.0550%,0.1381%,0.1924%,16.9,Verified multipliers applied
+2030,RCP8.5,0.0715%,0.0039%,0.0221%,0.0132%,0.0975%,0.1106%,9.7,Verified multipliers applied
+2050,RCP8.5,0.1100%,0.0044%,0.0236%,0.0396%,0.1380%,0.1770%,15.5,Verified multipliers applied
+2100,RCP8.5,0.2200%,0.0079%,0.0256%,0.1386%,0.2536%,0.3887%,34.0,Verified multipliers applied

@@ -1,0 +1,7 @@
+parameter,value,unit,description
+baseline_spread_bps,150,bps,Baseline debt spread over risk-free rate
+spread_slope_bps_per_pct,50,bps per %,Debt spread increase per 1% expected loss
+equity_slope_pct_per_pct,0.8,% per %,Equity return premium per 1% expected loss
+risk_free_rate,0.03,ratio,Risk-free rate (government bonds)
+min_dscr,1.25,ratio,Minimum debt service coverage ratio
+target_dscr,1.40,ratio,Target debt service coverage ratio

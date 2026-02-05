@@ -1,0 +1,13 @@
+{
+  "timestamp": 1770193885.608551,
+  "data": {
+    "hazard_type": "flood",
+    "scenario": "ssp585",
+    "year": 2040,
+    "asset": "\uc0bc\ucc99\ud654\ub825\ubc1c\uc804\uc18c",
+    "value": 0.010472506920957528,
+    "std": 0.0759660615697575,
+    "unit": "fraction",
+    "source": "physrisk"
+  }
+}

@@ -1,0 +1,9 @@
+plant_id,plant_name,owner,capacity_mw,plant_type,cooling_system,latitude,longitude,elevation_m,distance_coast_km,construction_year,replacement_cost_musd,annual_revenue_musd,source
+KR-CBP-001,Samcheok Blue Power,KOSPO,2100,coal_usc,once_through_sea,37.4404,129.1671,10.0,0.5,2017,4500,800,KEPCO Annual Report 2023
+KR-DJN-001,Dangjin Thermal,EWP,6040,coal_supercritical,once_through_sea,36.9310,126.6325,5.0,0.3,1999,8000,1200,KEPCO Statistics 2023
+KR-TAN-001,Taean Thermal,WP,6100,coal_supercritical,once_through_sea,36.7536,126.2642,8.0,0.2,1995,8200,1250,KEPCO Statistics 2023
+KR-BRY-001,Boryeong Thermal,KOMIPO,4000,coal_subcritical,once_through_sea,36.3588,126.4921,6.0,0.4,1983,5000,750,KEPCO Statistics 2023
+KR-HDG-001,Hadong Thermal,KOSPO,4000,coal_supercritical,once_through_sea,34.9344,127.8819,12.0,0.5,1997,5500,820,KEPCO Statistics 2023
+KR-YGW-001,Yeongheung Thermal,KOSEP,5080,coal_supercritical,once_through_sea,37.2417,126.4456,4.0,0.2,2004,7000,1050,KEPCO Statistics 2023
+KR-SIN-001,Sinseocheon Thermal,KOMIPO,2000,coal_supercritical,once_through_sea,36.4583,126.5167,7.0,0.3,2016,3500,520,KEPCO Statistics 2023
+KR-NEW-001,Samcheok Green Power,KOSPO,1040,gas_ccgt,cooling_tower_wet,37.4500,129.1700,15.0,1.0,2024,1200,180,KEPCO Transition Plan 2023

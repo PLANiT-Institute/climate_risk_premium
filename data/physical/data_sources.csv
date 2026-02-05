@@ -1,0 +1,8 @@
+hazard_type,primary_source,fallback_source,data_status,coverage_years,spatial_resolution,notes
+wildfire,CLIMADA WildFire + NASA FIRMS,Korea Forest Service statistics,literature_fallback,2001-2023,10km grid,CLIMADA requires installation; falls back to KFS annual statistics
+tropical_cyclone,CLIMADA TropCyclone + IBTrACS,KMA typhoon records,literature_fallback,1980-2023,track-based,IBTrACS via CLIMADA preferred; KMA records used for Korea-specific calibration
+river_flood,CLIMADA RiverFlood + ISIMIP,Plant elevation analysis,not_applicable,1971-2010,30m grid,Korean coal plants at 5-10m elevation; flood risk negligible. See flood_risk_notes.
+coastal_flood,CLIMADA CoastalFlood + GTSR,Plant elevation analysis,not_applicable,1979-present,coastal grid,Storm surge must exceed 10m to impact plants; extremely rare. See flood_risk_notes.
+drought,CLIMADA Drought + SPEI,KMA drought statistics,literature_fallback,1991-2020,station-based,Coastal plants use seawater cooling; drought impact limited to efficiency
+heat_stress,CLIMADA HeatWave + ERA5,KMA temperature records,literature_fallback,1991-2020,station-based,KMA station data used for Korea-specific heat wave definitions
+sea_level_rise,NASA/NOAA + IPCC AR6,IPCC AR6 WG1 Table 9.9,literature_only,projections to 2100,regional,No CLIMADA module; using IPCC regional projections for Korea

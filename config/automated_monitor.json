@@ -1,0 +1,135 @@
+{
+  "sources": [
+    {
+      "name": "MOTIE",
+      "url": "https://www.motie.go.kr/motie/ne/nes2/nes2131/nes213101.jsp",
+      "source_type": "government",
+      "update_frequency_hours": 12,
+      "selectors": ["press", "policy", "announcement", "전력수급기본계획"],
+      "parser_config": {
+        "title_selector": ".title, .headline, h1, h2, h3",
+        "content_selector": ".content, .description, p",
+        "date_selector": ".date, .time, .published, datetime",
+        "article_selector": "article, .news-item, .press-release, .announcement"
+      },
+      "language": "ko,en"
+    },
+    {
+      "name": "Climate Ministry",
+      "url": "https://www.me.go.kr/home/web/main.do",
+      "source_type": "government",
+      "update_frequency_hours": 6,
+      "selectors": ["climate", "renewable", "carbon", "기후", "재생에너지", "탄소"],
+      "parser_config": {
+        "title_selector": ".title, .headline",
+        "content_selector": ".content, .description",
+        "date_selector": ".date, .time",
+        "article_selector": ".article, .news-item"
+      },
+      "language": "ko,en"
+    },
+    {
+      "name": "Korea Herald Environment",
+      "url": "https://www.koreaherald.com/environment",
+      "source_type": "news",
+      "update_frequency_hours": 8,
+      "selectors": ["energy", "climate", "policy", "coal", "renewable"],
+      "parser_config": {
+        "title_selector": ".headline, h1, h2",
+        "content_selector": ".article-body, .content",
+        "date_selector": ".date, .time",
+        "article_selector": "article, .news-item"
+      },
+      "language": "en"
+    },
+    {
+      "name": "Korea Times Energy",
+      "url": "https://www.koreatimes.co.kr/www/index.asp?cat_cd=5",
+      "source_type": "news", 
+      "update_frequency_hours": 8,
+      "selectors": ["energy", "climate", "policy", "전력", "에너지"],
+      "parser_config": {
+        "title_selector": ".headline, h1, h2",
+        "content_selector": ".article-body, .content",
+        "date_selector": ".date, .time",
+        "article_selector": "article, .news-item"
+      },
+      "language": "en"
+    },
+    {
+      "name": "MOTIE RSS",
+      "url": "https://www.motie.go.kr/motie/ne/nes2/nes2131/nes213101.jsp",
+      "source_type": "rss",
+      "update_frequency_hours": 6,
+      "selectors": ["press", "policy", "announcement"],
+      "parser_config": {
+        "rss_fields": ["title", "description", "published", "link"]
+      },
+      "language": "ko,en"
+    }
+  ],
+  "monitoring": {
+    "enabled": true,
+    "check_interval_minutes": 60,
+    "max_retries": 3,
+    "timeout_seconds": 30,
+    "batch_size": 10,
+    "cache_duration_hours": 24
+  },
+  "keywords": {
+    "policy_types": {
+      "coal_phase_out": [
+        "coal phase-out", "coal phaseout", "석탄 폐지", "석탄 감축",
+        "powering past coal", "PPCA", "unabated coal", "coal retirement",
+        "coal-fired power plant", "발전소 폐쇄", "coal phase-down"
+      ],
+      "renewable_target": [
+        "renewable target", "renewable energy", "solar", "wind", 
+        "재생에너지", "태양광", "풍력", "100gw", "renewable deployment",
+        "clean energy", "clean power", "녹색에너지"
+      ],
+      "emissions_reduction": [
+        "emissions reduction", "carbon reduction", "nationally determined contribution",
+        "ndc", "온실가스 감축", "탄소 감축", "carbon neutrality", "2050",
+        "2030 target", "emissions target"
+      ],
+      "nuclear_expansion": [
+        "nuclear expansion", "nuclear power", "원자력", "신규 원전",
+        "smr", "small modular reactor", "nuclear deployment", "원전 확대"
+      ],
+      "carbon_pricing": [
+        "carbon pricing", "carbon tax", "emissions trading", "ets",
+        "탄소세", "탄소가격", "배출권거래제", "carbon market"
+      ],
+      "industrial_transition": [
+        "industrial transition", "green transformation", "kgx", "k-gx",
+        "industry decarbonization", "산업 전환", "녹색성장", "green industry"
+      ]
+    },
+    "impact_levels": {
+      "low": ["review", "study", "consideration", "제고", "검토", "proposal"],
+      "medium": ["plan", "target", "goal", "계획", "목표", "strategy", "roadmap"],
+      "high": ["commitment", "pledge", "agreement", "약속", "합의", "공약", "decision"],
+      "transformational": ["phase-out", "ban", "mandatory", "requirement", "의무화", "금지", "전면 폐지"]
+    }
+  },
+  "confidence_mapping": {
+    "high_confidence": ["commitment", "pledge", "약속", "공약", "decision", "결정"],
+    "medium_confidence": ["plan", "target", "goal", "계획", "목표", "strategy", "전략"],
+    "low_confidence": ["draft", "proposal", "제안", "초안", "consideration", "제고"]
+  },
+  "validation": {
+    "min_confidence_score": 0.6,
+    "min_consistency_score": 0.6,
+    "min_feasibility_score": 0.6,
+    "max_annual_dispatch_reduction": 0.15,
+    "reasonable_year_range": [2020, 2060],
+    "monotonic_dispatch_check": true
+  },
+  "caching": {
+    "announcements_cache_days": 90,
+    "validation_cache_hours": 24,
+    "impact_cache_hours": 6,
+    "max_cache_size": 1000
+  }
+}

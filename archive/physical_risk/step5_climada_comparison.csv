@@ -1,0 +1,10 @@
+source,hazard,annual_rate_percent,data_source,resolution,time_period,events_detected,notes
+CLIMADA,Wildfire,0.0082%,NASA FIRMS (MODIS/VIIRS),4.5 km,2001-2020,6 events in 20 years,Fire Radiative Power max 310 MW
+CLIMADA,Flood,0.0000%,ISIMIP / GloFAS,4.5 km,2030-2050 RCP8.5,0 events,Plant at 10m elevation - no riverine flood
+CLIMADA,Tropical_Cyclone,0.0205%,IBTrACS,4.5 km,1980-2020,15 events (5 damaging >30m/s),Max wind 48.8 m/s
+CLIMADA,TOTAL,0.0288%,Combined,4.5 km,Various,21 total events,Sum of all hazards
+Literature,Wildfire,0.0550%,Kim et al. (2025),Regional,1991-2020,451 fires/year Korea avg,Derived: includes transmission line impact
+Literature,Flood,0.0030%,Kang & Lee (2024),Site-specific,Projected,N/A,Derived: includes coastal storm surge
+Literature,Tropical_Cyclone,N/A,Not modeled,N/A,N/A,N/A,Literature does not include TC
+Literature,TOTAL,0.0580%,Combined,Various,Various,N/A,Sum of wildfire + flood only
+COMBINED,Recommended,0.0800%,Literature + CLIMADA TC,Combined,All periods,N/A,0.058% (lit) + 0.021% (CLIMADA TC) = 0.08%

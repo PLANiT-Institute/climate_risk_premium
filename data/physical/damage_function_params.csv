@@ -1,0 +1,7 @@
+hazard_type,function_type,threshold,i_half,exponent,max_damage,source,notes
+tropical_cyclone,sigmoid,25.7,74.7,3.0,1.0,Emanuel (2011) calibrated to US hurricanes,Consider Korea-specific recalibration
+wildfire,sigmoid,20.0,45.0,3.0,1.0,CLIMADA default + Korea Forest Service,FWI-based threshold
+river_flood,sigmoid,0.3,1.5,2.0,1.0,Huizinga et al. (2017) + CLIMADA,Depth-damage function
+coastal_flood,sigmoid,0.5,2.0,2.5,1.0,CLIMADA CoastalFlood,Storm surge + SLR
+drought,linear,1.0,2.0,1.0,0.3,Literature review (Wilhite 2000),SPI-based; max 30% derate
+heat_stress,piecewise,35.0,45.0,2.0,0.15,IEA power plant efficiency,Temperature-efficiency curve
