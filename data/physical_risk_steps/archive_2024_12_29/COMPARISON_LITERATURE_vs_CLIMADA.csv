@@ -1,0 +1,15 @@
+component,hazard,literature_value,literature_source,climada_value,climada_source,ratio,notes
+BASE_RISK,Wildfire,0.0550%,Kim et al. (2025),0.0082%,NASA FIRMS,0.15x,CLIMADA lower (fewer local events)
+BASE_RISK,Flood,0.0030%,Kang & Lee (2024),0.0000%,ISIMIP,0.00x,CLIMADA 0 (no riverine at 10m)
+BASE_RISK,TC,N/A,Not modeled,0.0205%,IBTrACS,N/A,Only in CLIMADA
+BASE_RISK,SLR_derate,0.22%/m,Van Vliet (2016),0.22%/m,Same source,1.00x,Same value used
+BASE_RISK,TOTAL,0.0580%,Wildfire+Flood,0.0287%,WF+Flood+TC,0.49x,Literature higher
+CLIMATE_2030_RCP85,Wildfire,1.30x,WWA (2025),N/A,Not available,N/A,CLIMADA lacks wildfire projections
+CLIMATE_2030_RCP85,Flood,1.29x,KSCCR (2024),ISIMIP2b,CLIMADA API,~1.2x,Similar range
+CLIMATE_2030_RCP85,TC,N/A,Not modeled,1.08x,Knutson (2020),N/A,Only in CLIMADA
+CLIMATE_2050_RCP85,Wildfire,2.00x,WWA (2025),N/A,Not available,N/A,CLIMADA lacks wildfire projections
+CLIMATE_2050_RCP85,Flood,1.46x,KSCCR (2024),ISIMIP2b,CLIMADA API,~1.3x,Similar range
+CLIMATE_2050_RCP85,TC,N/A,Not modeled,1.15x,Knutson (2020),N/A,Only in CLIMADA
+CLIMATE_2100_RCP85,Wildfire,4.00x,WWA (2025),N/A,Not available,N/A,CLIMADA lacks wildfire projections
+CLIMATE_2100_RCP85,Flood,2.64x,npj Clim (2025),ISIMIP2b,CLIMADA API,~2.0x,Literature higher
+CLIMATE_2100_RCP85,TC,N/A,Not modeled,1.25x,Knutson (2020),N/A,Only in CLIMADA

@@ -1,0 +1,8 @@
+year,scenario,wildfire_mult,flood_mult,tc_mult,slr_m,wildfire_source,flood_source,tc_source,slr_source
+2024,Baseline,1.00,1.00,1.00,0.00,Reference,Reference,Reference,Reference
+2030,RCP4.5,1.20,1.10,1.05,0.05,WWA (2025),KSCCR (2024),Knutson (2020) via CLIMADA,CMIP6
+2050,RCP4.5,1.50,1.25,1.10,0.12,WWA (2025),KSCCR (2024),Knutson (2020) via CLIMADA,CMIP6
+2100,RCP4.5,2.00,1.50,1.15,0.25,WWA (2025),KSCCR (2024),Knutson (2020) via CLIMADA,CMIP6 DOI:10.3390/atmos12010090
+2030,RCP8.5,1.30,1.29,1.08,0.06,WWA (2025),KSCCR (2024) +29%,Knutson (2020) via CLIMADA,CMIP6
+2050,RCP8.5,2.00,1.46,1.15,0.18,WWA (2025),KSCCR (2024) +46%,Knutson (2020) via CLIMADA,CMIP6
+2100,RCP8.5,4.00,2.64,1.25,0.63,WWA (2025),npj Clim (2025) 3.7x,Knutson (2020) DOI:10.1175/BAMS-D-18-0194.1,CMIP6 DOI:10.3390/atmos12010090

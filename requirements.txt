@@ -1,0 +1,34 @@
+# Core data science libraries
+numpy>=1.24.0
+pandas>=2.0.0
+scipy>=1.10.0
+
+# Financial calculations
+numpy-financial>=1.0.0
+
+# Data validation
+pydantic>=2.0.0
+
+# Visualization
+plotly>=5.14.0
+matplotlib>=3.7.0
+
+# Web application
+streamlit>=1.28.0
+
+# Jupyter notebooks
+jupyter>=1.0.0
+jupyterlab>=4.0.0
+ipykernel>=6.20.0
+
+# Testing
+pytest>=7.3.0
+pytest-cov>=4.0.0
+
+# Code quality (optional)
+black>=23.0.0
+flake8>=6.0.0
+mypy>=1.0.0
+
+# Development
+jupytext>=1.14.0

@@ -1,0 +1,8 @@
+metric,AAA,AA,A,BBB,BB,B,unit
+capacity_mw,2000,800,400,100,20,0,MW
+ebitda_to_fixed_assets,15,11,8,4,1,0,percent
+ebitda_to_interest,12,6,4,2,1,0,times
+net_debt_to_ebitda,1,4,7,10,12,999,times_lower_is_better
+debt_to_equity,80,150,250,300,400,999,percent_lower_is_better
+debt_to_assets,20,40,60,80,90,100,percent_lower_is_better
+spread_bps,50,100,150,250,400,600,bps

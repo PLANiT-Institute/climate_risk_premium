@@ -1,0 +1,29 @@
+param_name,value,unit,description
+capacity_mw,2100,MW,Total capacity (2 units x 1050MW)
+capacity_factor,0.85,decimal,Base load capacity factor
+efficiency,0.42,decimal,Ultra-supercritical efficiency
+fuel_cost_per_mwh,45.0,USD/MWh,Approximate coal cost
+variable_opex,5.0,USD/MWh,Variable O&M
+fixed_opex_per_kw,35.0,USD/kW-yr,Fixed O&M
+variable_opex_per_mwh,4.5,USD/MWh,Variable O&M per MWh (alternative)
+total_capex_million,4900,USD Million,Total project cost (4.9 Trillion KRW approx)
+construction_years,5,years,Construction duration
+debt_fraction,0.70,decimal,Estimated debt financing share
+equity_fraction,0.30,decimal,Estimated equity share
+debt_interest_rate,0.061,decimal,Recent bond yield (6.1%)
+debt_schedule_file,debt_repayment_schedule.csv,filename,Custom repayment profile
+debt_tenor_years,20,years,Loan repayment period (fallback)
+risk_free_rate,0.035,decimal,Korea 10Y Treasury
+market_risk_premium,0.06,decimal,Korea Equity Risk Premium
+beta,1.2,decimal,Utility sector beta (adjusted for coal risk)
+corporate_tax_rate,0.24,decimal,Korea Corporate Tax Rate
+tax_rate,0.24,decimal,Korea Corporate Tax Rate (alias)
+useful_life,30,years,Economic life
+operating_years,40,years,Total expected operating life
+depreciation_years,20,years,Depreciation schedule
+inflation_rate,0.02,decimal,Long-term inflation target
+power_price_per_mwh,80.0,USD/MWh,Wholesale electricity price
+heat_rate_mmbtu_mwh,9.5,MMBtu/MWh,Heat rate for coal plant
+fuel_price_per_mmbtu,3.2,USD/MMBtu,Coal fuel price
+emissions_tCO2_per_mwh,0.95,tCO2/MWh,Carbon emission intensity
+discount_rate,0.08,decimal,Project discount rate for NPV

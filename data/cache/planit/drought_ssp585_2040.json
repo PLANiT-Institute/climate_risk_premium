@@ -1,0 +1,13 @@
+{
+  "timestamp": 1770193772.324487,
+  "data": {
+    "hazard_type": "drought",
+    "scenario": "ssp585",
+    "year": 2040,
+    "asset": "\uc0bc\ucc99\ud654\ub825\ubc1c\uc804\uc18c",
+    "value": 0.007361111111111111,
+    "std": 0.06736769727252423,
+    "unit": "fraction",
+    "source": "physrisk"
+  }
+}

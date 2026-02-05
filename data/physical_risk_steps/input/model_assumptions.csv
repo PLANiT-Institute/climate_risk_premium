@@ -1,0 +1,10 @@
+parameter,value,unit,rationale,status
+outage_prob_wildfire,0.10,probability,Industry standard for fire impact on power infrastructure,ASSUMPTION
+outage_prob_tc,0.30,probability,Based on KEPCO grid vulnerability assessments,ASSUMPTION
+outage_duration_wildfire,24,hours,Industry standard restoration time,ASSUMPTION
+outage_duration_tc,48,hours,Industry standard for TC-related outages,ASSUMPTION
+outage_duration_flood,120,hours,Extended restoration for flood damage,ASSUMPTION
+outage_prob_flood,0.50,probability,High impact if flooding occurs,ASSUMPTION
+damaging_wind_threshold,30,m_per_s,TC winds causing power infrastructure damage,ASSUMPTION
+plant_elevation,10,meters,Samcheok Blue Power Plant elevation,VERIFIED
+hours_per_year,8760,hours,Standard calendar year,VERIFIED

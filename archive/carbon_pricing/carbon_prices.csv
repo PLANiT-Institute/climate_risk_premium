@@ -1,0 +1,66 @@
+scenario,year,price_usd,description,source
+korea_ets_current,2024,8,Current K-ETS price,KRX ETS market data
+korea_ets_current,2025,8,Stable - market oversupply,KRX ETS market data
+korea_ets_current,2026,10,Minor increase,Conservative extrapolation
+korea_ets_current,2027,12,Gradual increase,Conservative extrapolation
+korea_ets_current,2028,14,Gradual increase,Conservative extrapolation
+korea_ets_current,2029,16,Pre-2030 increase,Conservative extrapolation
+korea_ets_current,2030,20,Modest increase (below NDC),Conservative extrapolation
+korea_ets_current,2032,25,Post-2030 trajectory,Conservative extrapolation
+korea_ets_current,2035,35,Mid-term period,Conservative extrapolation
+korea_ets_current,2040,50,Conservative mid-century,Conservative extrapolation
+korea_ets_current,2045,60,Continued gradual growth,Conservative extrapolation
+korea_ets_current,2050,75,Well below net-zero level,Conservative extrapolation
+korea_ets_ndc,2024,8,Current K-ETS price,KRX ETS market data
+korea_ets_ndc,2025,12,Policy signal effect,Enhanced NDC analysis
+korea_ets_ndc,2026,18,Cap reduction accelerates,Enhanced NDC analysis
+korea_ets_ndc,2027,25,Tightening continues,Enhanced NDC analysis
+korea_ets_ndc,2028,33,Significant tightening,Enhanced NDC analysis
+korea_ets_ndc,2029,42,Pre-NDC push,Enhanced NDC analysis
+korea_ets_ndc,2030,55,NDC target year,Enhanced NDC analysis
+korea_ets_ndc,2032,70,Maintained elevated price,Enhanced NDC analysis
+korea_ets_ndc,2035,95,Continued increase,IEA NDC-consistent prices
+korea_ets_ndc,2040,130,Strong trajectory,IEA NDC-consistent prices
+korea_ets_ndc,2045,170,Approaching net-zero,IEA NDC-consistent prices
+korea_ets_ndc,2050,210,NDC-aligned neutrality,IEA NDC-consistent prices
+korea_net_zero,2024,8,Current K-ETS price,KRX ETS market data
+korea_net_zero,2025,15,Strong early signal,Korea Carbon Neutrality Scenario
+korea_net_zero,2026,25,Rapid increase,Korea Carbon Neutrality Scenario
+korea_net_zero,2027,38,Acceleration continues,Korea Carbon Neutrality Scenario
+korea_net_zero,2028,52,High ambition,Korea Carbon Neutrality Scenario
+korea_net_zero,2029,68,Pre-NDC peak,Korea Carbon Neutrality Scenario
+korea_net_zero,2030,85,NDC year - high price,Korea Carbon Neutrality Scenario
+korea_net_zero,2032,110,Post-NDC acceleration,IEA NZE Scenario
+korea_net_zero,2035,150,IEA NZE benchmark,IEA WEO 2023 NZE
+korea_net_zero,2040,200,High sustained price,IEA WEO 2023 NZE
+korea_net_zero,2045,270,Near-zero emissions,IEA WEO 2023 NZE
+korea_net_zero,2050,350,Full carbon neutrality,IEA WEO 2023 NZE
+delayed_action,2024,8,Current K-ETS price,KRX ETS market data
+delayed_action,2025,8,Policy paralysis,NGFS Delayed Transition
+delayed_action,2026,9,Minimal increase,NGFS Delayed Transition
+delayed_action,2027,10,Still delayed,NGFS Delayed Transition
+delayed_action,2028,12,Pre-shift period,NGFS Delayed Transition
+delayed_action,2029,18,Policy shift begins,NGFS Delayed Transition
+delayed_action,2030,35,Catch-up acceleration,NGFS Delayed Transition
+delayed_action,2032,60,Rapid increase,NGFS Delayed Transition
+delayed_action,2035,110,Aggressive catch-up,NGFS Delayed Transition
+delayed_action,2040,180,Higher than orderly,NGFS Delayed Transition
+delayed_action,2045,280,Very high catch-up,NGFS Delayed Transition
+delayed_action,2050,380,Net-zero despite delay,NGFS Delayed Transition
+high_ambition,2024,15,Immediate increase,IPCC 1.5C pathways
+high_ambition,2025,30,Strong early signal,IPCC 1.5C pathways
+high_ambition,2026,50,Rapid scaling,IPCC 1.5C pathways
+high_ambition,2027,70,Continued acceleration,IPCC 1.5C pathways
+high_ambition,2028,95,High ambition,IPCC 1.5C pathways
+high_ambition,2029,120,Pre-NDC peak,IPCC 1.5C pathways
+high_ambition,2030,150,Very high for 1.5C,IPCC 1.5C pathways
+high_ambition,2032,190,Post-NDC sustained,IEA WEO 2023 NZE high
+high_ambition,2035,260,Peak carbon price,IEA WEO 2023 NZE high
+high_ambition,2040,350,Very high sustained,IEA WEO 2023 NZE high
+high_ambition,2045,450,Near full decarbonization,IEA WEO 2023 NZE high
+high_ambition,2050,550,1.5C aligned neutrality,IEA WEO 2023 NZE high
+no_policy,2024,0,No carbon pricing,Hypothetical counterfactual
+no_policy,2025,0,No carbon pricing,Hypothetical counterfactual
+no_policy,2030,0,No carbon pricing,Hypothetical counterfactual
+no_policy,2040,0,No carbon pricing,Hypothetical counterfactual
+no_policy,2050,0,No carbon pricing,Hypothetical counterfactual

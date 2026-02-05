@@ -1,0 +1,8 @@
+year,scenario,wildfire_multiplier,flood_multiplier,tc_multiplier,slr_meters,wildfire_source,flood_source,tc_source,slr_source
+2024,Baseline,1.00,1.00,1.00,0.00,Reference baseline,Reference baseline,Reference baseline,Reference baseline
+2030,SSP2-4.5,1.20,1.10,1.05,0.05,WWA (2025) interpolated,Yeongsan Basin interpolated,Knutson et al. (2020) via CLIMADA,CMIP6 linear interpolation
+2050,SSP2-4.5,1.50,1.25,1.10,0.12,WWA (2025) interpolated,Yeongsan Basin +31.7%,Knutson et al. (2020) via CLIMADA,CMIP6 linear interpolation
+2100,SSP2-4.5,2.00,1.50,1.15,0.25,WWA (2025) current attribution,Conservative SSP2-4.5,Knutson et al. (2020) RCP4.5,CMIP6: 0.15-0.35m | DOI:10.3390/atmos12010090
+2030,SSP5-8.5,1.30,1.29,1.08,0.06,WWA (2025) interpolated,KSCCR (2024) +29% early,Knutson et al. (2020) via CLIMADA,CMIP6 linear interpolation
+2050,SSP5-8.5,2.00,1.46,1.15,0.18,WWA (2025) 2x current,KSCCR (2024) +46% mid | DOI:jccr.re.kr,Knutson et al. (2020) via CLIMADA,CMIP6 linear interpolation
+2100,SSP5-8.5,4.00,2.64,1.25,0.63,WWA (2025) 2x×2x=4x,npj Clim (2025) 3.7x freq | DOI:10.1038/s41612-025-01067-z,Knutson et al. (2020) RCP8.5 | DOI:10.1175/BAMS-D-18-0194.1,CMIP6: 0.50-0.76m | DOI:10.3390/atmos12010090

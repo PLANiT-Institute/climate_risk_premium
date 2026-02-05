@@ -1,0 +1,5 @@
+scenario,dispatch_penalty,retirement_years,carbon_price_2025,carbon_price_2030,carbon_price_2040,carbon_price_2050,description
+baseline,0.00,40,0,0,0,0,Business as usual - no climate policy
+moderate_transition,0.10,35,10,25,60,100,Moderate decarbonization - NDC aligned
+aggressive_transition,0.25,25,20,50,120,200,Aggressive decarbonization - Net Zero 2050 aligned
+korea_ndc,0.15,30,15,35,80,150,Korea NDC scenario with coal phase-down

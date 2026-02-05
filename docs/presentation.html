@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Climate Risk Premium - Samcheok Case Study</title>
+
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/reset.min.css">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/reveal.min.css">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/theme/white.min.css">
+
+		<!-- Theme used for syntax highlighted code -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/plugin/highlight/monokai.min.css">
+        
+        <style>
+            .reveal h1, .reveal h2, .reveal h3 { text-transform: none; }
+            .reveal section p { font-size: 0.8em; }
+            .reveal ul { font-size: 0.8em; }
+            .highlight { color: #e74c3c; font-weight: bold; }
+        </style>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+                <!-- Slide 1 -->
+				<section>
+					<h2>Quantifying Climate Risk Premium</h2>
+					<h3>A Case Study of Samcheok Blue Power</h3>
+					<p><small>Risk-Efficiency Theory of Corporate Decarbonization</small></p>
+				</section>
+
+                <!-- Slide 2 -->
+				<section>
+					<h3>The Challenge</h3>
+                    <ul>
+                        <li><strong>Unpriced Risks</strong>: Infrastructure projects face significant climate risks often ignored by traditional models.</li>
+                        <li><strong>Transition Risks</strong>:
+                            <ul>
+                                <li>Carbon taxes & pricing.</li>
+                                <li>Early retirement policies (Coal Phase-out).</li>
+                                <li>Policy shifts (e.g., 11th Basic Plan).</li>
+                            </ul>
+                        </li>
+                        <li><strong>Physical Risks</strong>:
+                            <ul>
+                                <li>Wildfires disrupting transmission.</li>
+                                <li>Droughts affecting cooling water availability.</li>
+                                <li>Efficiency losses due to heat stress.</li>
+                            </ul>
+                        </li>
+                    </ul>
+				</section>
+
+                <!-- Slide 3 -->
+                <section>
+                    <h3>Our Solution</h3>
+                    <p><strong>A Modular, Data-Driven Financial Analysis Tool</strong></p>
+                    <ul>
+                        <li><strong>Quantifies Climate Risk Premium (CRP)</strong>: Translates qualitative risks into quantitative financial impacts.</li>
+                        <li><strong>Holistic Modeling</strong>: Integrates both transition and physical risks.</li>
+                        <li><strong>Actionable Insights</strong>: Outputs impacts on NPV, IRR, and Credit Ratings.</li>
+                        <li><strong>Risk-Adjusted Valuation</strong>: Enables smarter investment and divestment decisions.</li>
+                    </ul>
+                </section>
+
+                <!-- Slide 4 -->
+                <section>
+                    <h3>Methodology</h3>
+                    <div style="text-align: left; background: #f0f2f5; padding: 20px; border-radius: 10px;">
+                        <p><strong>1. Inputs</strong>: Plant Parameters, Scenarios, Financing Data.</p>
+                        <p>⬇️</p>
+                        <p><strong>2. Risk Engine</strong>: Applies penalties (Carbon Tax, Derating) & Adjusts Cash Flows.</p>
+                        <p>⬇️</p>
+                        <p><strong>3. Outputs</strong>: Financial Metrics (NPV, IRR) & Risk Metrics (CRP, Expected Loss).</p>
+                    </div>
+                </section>
+
+                <!-- Slide 5 -->
+                <section>
+                    <h3>Case Study: Samcheok Blue Power</h3>
+                    <ul>
+                        <li><strong>Asset</strong>: 2,100 MW Ultra-Supercritical Coal Power Plant.</li>
+                        <li><strong>Significance</strong>: The last coal plant built in South Korea.</li>
+                        <li><strong>Status</strong>: Commercial Operation started in 2024.</li>
+                        <li><strong>Investment</strong>: ~4.9 Trillion KRW.</li>
+                        <li><strong>Key Risk</strong>: <span class="highlight">Stranded Asset Risk</span> due to accelerated coal phase-out targets (e.g., 2040).</li>
+                    </ul>
+                </section>
+
+                <!-- Slide 6 -->
+                <section>
+                    <h3>Scenario Analysis</h3>
+                    <p>We model multiple futures to bound the risk:</p>
+                    <ul>
+                        <li><strong>Baseline</strong>: Business as usual (No climate impact).</li>
+                        <li><strong>Transition Scenarios</strong>:
+                            <ul>
+                                <li><em>Moderate</em>: Aligned with current NDCs.</li>
+                                <li><em>Aggressive</em>: Net Zero 2050 (High Carbon Price, Early Retirement).</li>
+                            </ul>
+                        </li>
+                        <li><strong>Physical Scenarios</strong>:
+                            <ul>
+                                <li><em>Moderate</em>: RCP 4.5.</li>
+                                <li><em>High</em>: RCP 8.5 (Extreme weather events).</li>
+                            </ul>
+                        </li>
+                        <li><strong>Combined</strong>: Worst-case "Perfect Storm".</li>
+                    </ul>
+                </section>
+
+                <!-- Slide 7 -->
+                <section>
+                    <h3>Key Findings: Financial Impact</h3>
+                    <ul>
+                        <li><strong>NPV Erosion</strong>: Significant value destruction in Aggressive Transition scenarios.</li>
+                        <li><strong>Cost of Capital</strong>: Climate Risk Premium (CRP) spikes, increasing financing costs.</li>
+                        <li><strong>Credit Rating Migration</strong>:
+                            <ul>
+                                <li>Quantitative assessment using KIS methodology.</li>
+                                <li>Potential downgrades (e.g., AA- &rarr; A or BBB).</li>
+                                <li>Risk of falling below Investment Grade.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </section>
+
+                <!-- Slide 8 -->
+                <section>
+                    <h3>Interactive Dashboard</h3>
+                    <p>Our Streamlit-based application allows stakeholders to:</p>
+                    <ul>
+                        <li><strong>Simulate Scenarios</strong>: Real-time adjustment of risk parameters.</li>
+                        <li><strong>Visualize Impacts</strong>: Cash Flow Waterfalls, Capacity Factor Trajectories, NPV Comparisons.</li>
+                        <li><strong>Deep Dive</strong>: Drill down into specific financial years and metrics.</li>
+                    </ul>
+                </section>
+
+                <!-- Slide 9 -->
+                <section>
+                    <h3>Conclusion</h3>
+                    <ul>
+                        <li><strong>Climate Risk is Financial Risk</strong>.</li>
+                        <li>Ignoring these factors leads to mispricing of assets and capital.</li>
+                        <li>Our model provides the <strong>rigorous, quantitative framework</strong> needed for:
+                            <ul>
+                                <li>Accurate Asset Valuation.</li>
+                                <li>Strategic Decarbonization Planning.</li>
+                                <li>Resilient Portfolio Management.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </section>
+			</div>
+		</div>
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/reveal.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/plugin/notes/notes.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/plugin/markdown/markdown.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/plugin/highlight/highlight.min.js"></script>
+		<script>
+			// More info about initialization & config:
+			// - https://revealjs.com/initialization/
+			// - https://revealjs.com/config/
+			Reveal.initialize({
+				hash: true,
+                controls: true,
+                progress: true,
+                center: true,
+
+				// Learn about plugins: https://revealjs.com/plugins/
+				plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ]
+			});
+		</script>
+	</body>
+</html>

@@ -1,0 +1,43 @@
+hazard_type,scenario,year,climate_factor,lower_bound,upper_bound,source
+wildfire,RCP4.5,2030,1.15,1.10,1.20,Korea Forest Service Climate Assessment (2021)
+wildfire,RCP4.5,2050,1.35,1.25,1.45,Korea Forest Service Climate Assessment (2021)
+wildfire,RCP4.5,2100,1.60,1.40,1.80,Korea Forest Service Climate Assessment (2021)
+wildfire,RCP8.5,2030,1.20,1.15,1.25,Korea Forest Service Climate Assessment (2021)
+wildfire,RCP8.5,2050,1.50,1.35,1.65,Korea Forest Service Climate Assessment (2021)
+wildfire,RCP8.5,2100,2.20,1.80,2.60,Korea Forest Service Climate Assessment (2021)
+tropical_cyclone,RCP4.5,2030,1.05,1.00,1.10,Knutson et al. (2020) Nature Climate Change
+tropical_cyclone,RCP4.5,2050,1.10,1.05,1.15,Knutson et al. (2020) Nature Climate Change
+tropical_cyclone,RCP4.5,2100,1.20,1.10,1.30,Knutson et al. (2020) Nature Climate Change
+tropical_cyclone,RCP8.5,2030,1.08,1.03,1.13,Knutson et al. (2020) Nature Climate Change
+tropical_cyclone,RCP8.5,2050,1.15,1.08,1.22,Knutson et al. (2020) Nature Climate Change
+tropical_cyclone,RCP8.5,2100,1.35,1.20,1.50,Knutson et al. (2020) Nature Climate Change
+river_flood,RCP4.5,2030,1.10,1.05,1.15,Hirabayashi et al. (2013) Nature Climate Change
+river_flood,RCP4.5,2050,1.20,1.10,1.30,Hirabayashi et al. (2013) Nature Climate Change
+river_flood,RCP4.5,2100,1.35,1.20,1.50,Hirabayashi et al. (2013) Nature Climate Change
+river_flood,RCP8.5,2030,1.15,1.08,1.22,Hirabayashi et al. (2013) Nature Climate Change
+river_flood,RCP8.5,2050,1.30,1.18,1.42,Hirabayashi et al. (2013) Nature Climate Change
+river_flood,RCP8.5,2100,1.60,1.35,1.85,Hirabayashi et al. (2013) Nature Climate Change
+coastal_flood,RCP4.5,2030,1.08,1.04,1.12,KHOA Sea Level Report (2021)
+coastal_flood,RCP4.5,2050,1.18,1.10,1.26,KHOA Sea Level Report (2021)
+coastal_flood,RCP4.5,2100,1.40,1.25,1.55,KHOA Sea Level Report (2021)
+coastal_flood,RCP8.5,2030,1.10,1.05,1.15,KHOA Sea Level Report (2021)
+coastal_flood,RCP8.5,2050,1.25,1.15,1.35,KHOA Sea Level Report (2021)
+coastal_flood,RCP8.5,2100,1.70,1.45,1.95,KHOA Sea Level Report (2021)
+drought,RCP4.5,2030,1.08,1.03,1.13,KMA Drought Assessment (2020)
+drought,RCP4.5,2050,1.18,1.10,1.26,KMA Drought Assessment (2020)
+drought,RCP4.5,2100,1.30,1.18,1.42,KMA Drought Assessment (2020)
+drought,RCP8.5,2030,1.12,1.06,1.18,KMA Drought Assessment (2020)
+drought,RCP8.5,2050,1.28,1.18,1.38,KMA Drought Assessment (2020)
+drought,RCP8.5,2100,1.55,1.35,1.75,KMA Drought Assessment (2020)
+heat_stress,RCP4.5,2030,1.25,1.15,1.35,KMA Climate Projections (2020)
+heat_stress,RCP4.5,2050,1.65,1.45,1.85,KMA Climate Projections (2020)
+heat_stress,RCP4.5,2100,2.10,1.80,2.40,KMA Climate Projections (2020)
+heat_stress,RCP8.5,2030,1.35,1.25,1.45,KMA Climate Projections (2020)
+heat_stress,RCP8.5,2050,2.00,1.75,2.25,KMA Climate Projections (2020)
+heat_stress,RCP8.5,2100,3.50,2.80,4.20,KMA Climate Projections (2020)
+sea_level_rise,RCP4.5,2030,0.08,0.05,0.11,IPCC AR6 + KHOA (2021)
+sea_level_rise,RCP4.5,2050,0.20,0.14,0.26,IPCC AR6 + KHOA (2021)
+sea_level_rise,RCP4.5,2100,0.50,0.35,0.65,IPCC AR6 + KHOA (2021)
+sea_level_rise,RCP8.5,2030,0.10,0.07,0.13,IPCC AR6 + KHOA (2021)
+sea_level_rise,RCP8.5,2050,0.27,0.19,0.35,IPCC AR6 + KHOA (2021)
+sea_level_rise,RCP8.5,2100,0.77,0.55,1.00,IPCC AR6 + KHOA (2021)
