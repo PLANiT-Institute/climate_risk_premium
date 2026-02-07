@@ -108,7 +108,8 @@ class CRPModelRunner:
         self.base_dir = Path(base_dir)
         self.dataset = load_inputs(self.base_dir)
         self.power_plans = load_korea_power_plan_scenarios(self.base_dir / "data/raw/korea_power_plan.csv")
-        # Use literature_hazards.csv (has correct schema), fall back to climada_hazards.csv
+        # Load CLIMADA hazard scenarios from literature_hazards.csv (Korea-specific values)
+        # Sources: Kim et al 2025, Kang & Lee 2024, WWA 2025, KSCCR 2024, CMIP6
         hazards_path = self.base_dir / "data/raw/literature_hazards.csv"
         if not hazards_path.exists():
             hazards_path = self.base_dir / "data/raw/climada_hazards.csv"

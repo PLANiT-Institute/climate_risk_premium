@@ -321,11 +321,7 @@ For a single power plant with independent hazards, 1.1-1.25x is more appropriate
 
 ## 9. References
 
-<<<<<<< HEAD
-All citations have been verified.
-=======
 All citations have been verified as of December 2024.
->>>>>>> 7b1507166a09149c835e7a055a114db44cb2809e
 
 1. **Zscheischler, J., Westra, S., van den Hurk, B.J.J.M., et al. (2018)**. Future climate risk from compound events. *Nature Climate Change*, 8(6), 469-477.
    - DOI: https://doi.org/10.1038/s41558-018-0156-3
@@ -357,16 +353,6 @@ All citations have been verified as of December 2024.
 
 ## Citation Verification Log
 
-<<<<<<< HEAD
-| Source | Verification Method | Corrections Made |
-|--------|---------------------|------------------|
-| Zscheischler et al. (2018) | Nature journal, DOI confirmed | Full author list added |
-| Bressan et al. (2024) | Nature Comms, DOI confirmed | Author corrected from "Luo" |
-| NCA5 (2023) | US Government website | None |
-| NGFS (2023) | Official NGFS website | None |
-| npj Natural Hazards (2025) | Nature journal, DOI confirmed | None |
-| Zscheischler et al. (2020) | Nature journal, DOI confirmed | None |
-=======
 | Source | Verification Method | Date Verified | Corrections Made |
 |--------|---------------------|---------------|------------------|
 | Zscheischler et al. (2018) | Nature journal, DOI confirmed | Dec 2024 | Full author list added |
@@ -375,7 +361,6 @@ All citations have been verified as of December 2024.
 | NGFS (2023) | Official NGFS website | Dec 2024 | None |
 | npj Natural Hazards (2025) | Nature journal, DOI confirmed | Dec 2024 | None |
 | Zscheischler et al. (2020) | Nature journal, DOI confirmed | Dec 2024 | None |
->>>>>>> 7b1507166a09149c835e7a055a114db44cb2809e
 
 ---
 
@@ -385,11 +370,8 @@ All citations have been verified as of December 2024.
 
 ---
 
-<<<<<<< HEAD
-=======
 *Document created: December 2024*
 *Last updated: February 2026 - 2024-2025 Literature Integration*
->>>>>>> 7b1507166a09149c835e7a055a114db44cb2809e
 *Part of: Physical Risk Module Review - Step 7*
 
 ---

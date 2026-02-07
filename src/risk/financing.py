@@ -58,7 +58,7 @@ def map_expected_loss_to_spreads(
     expected_loss_pct: float,
     npv_loss: float,
     params: Dict[str, Any],
-    rating_spread_bps: float = None
+    rating_spread_bps: Optional[float] = None
 ) -> FinancingImpact:
     """
     Map expected loss to financing cost impacts (debt spreads, equity premiums).

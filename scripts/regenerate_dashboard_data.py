@@ -124,32 +124,11 @@ def main():
     print("   Done.")
     print()
 
-    # Define 9 scenarios with enhanced 11th plan where applicable
-    scenarios = [
-        # Baseline (no transition risk, no physical risk)
-        {"name": "baseline", "transition": "baseline", "physical": "baseline"},
-        # Transition risk scenarios (with enhanced 11th plan)
-        {"name": "moderate_transition", "transition": "moderate_transition", "physical": "baseline", "use_enhanced": True},
-        {"name": "aggressive_transition", "transition": "aggressive_transition", "physical": "baseline", "use_enhanced": True},
-        # Physical risk scenarios
-        {"name": "moderate_physical", "transition": "baseline", "physical": "moderate_physical"},
-        {"name": "high_physical", "transition": "baseline", "physical": "high_physical"},
-        # Combined scenarios (with enhanced 11th plan)
-        {"name": "combined_moderate", "transition": "moderate_transition", "physical": "moderate_physical", "use_enhanced": True},
-        {"name": "combined_aggressive", "transition": "aggressive_transition", "physical": "high_physical", "use_enhanced": True},
-        # Additional scenarios
-        {"name": "low_demand", "transition": "baseline", "physical": "baseline", "market": "low_demand"},
-        {"name": "severe_drought", "transition": "baseline", "physical": "severe_drought", "market": "baseline"},
-    ]
-
-    print(f"2. Running {len(scenarios)} scenarios...")
-    for s in scenarios:
-        enhanced = " (Enhanced 11th Plan)" if s.get("use_enhanced") else ""
-        print(f"   - {s['name']}: transition={s['transition']}, physical={s.get('physical', 'baseline')}{enhanced}")
-    print()
-
-    # Run scenarios
-    results = runner.run_multi_scenario(scenarios)
+    # Use all 11 default scenarios (includes enhanced 11th plan)
+    print("2. Running all 11 default scenarios...")
+    results = runner.run_multi_scenario()
+    for name in results:
+        print(f"   - {name}")
     print("   All scenarios completed.")
     print()
 

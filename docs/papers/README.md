@@ -11,11 +11,7 @@
 | 3 | `Lee_2025_ScientificReports_Wildfire.pdf` | Lee et al. (2025) Scientific Reports | 10.1038/s41598-025-15508-5 | Downloaded |
 | 4 | `Bressan_2024_NatureComms_AssetRisk.pdf` | Bressan et al. (2024) Nature Comms | 10.1038/s41467-024-48820-1 | Downloaded |
 
-<<<<<<< HEAD
 ### Climate Factor Papers
-=======
-### Climate Factor Papers (NEW - December 2024)
->>>>>>> 7b1507166a09149c835e7a055a114db44cb2809e
 
 | # | File | Citation | DOI | Status |
 |---|------|----------|-----|--------|
@@ -120,8 +116,5 @@
 - `../CLIMATE_FACTORS_VERIFICATION.md` - Summary of all verification work
 
 ---
-<<<<<<< HEAD
-=======
 
 *Last Updated: December 28, 2024*
->>>>>>> 7b1507166a09149c835e7a055a114db44cb2809e
