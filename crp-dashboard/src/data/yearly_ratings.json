@@ -242,194 +242,362 @@
   {
     "scenario": "moderate_transition",
     "year": 2025,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.902,
+    "rating": "BBB"
   },
   {
     "scenario": "moderate_transition",
     "year": 2026,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.902,
+    "rating": "BBB"
   },
   {
     "scenario": "moderate_transition",
     "year": 2027,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.902,
+    "rating": "BBB"
   },
   {
     "scenario": "moderate_transition",
     "year": 2028,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.902,
+    "rating": "BBB"
   },
   {
     "scenario": "moderate_transition",
     "year": 2029,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.902,
+    "rating": "BBB"
   },
   {
     "scenario": "moderate_transition",
     "year": 2030,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.902,
+    "rating": "BBB"
   },
   {
     "scenario": "moderate_transition",
     "year": 2031,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.902,
+    "rating": "BBB"
   },
   {
     "scenario": "moderate_transition",
     "year": 2032,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.902,
+    "rating": "BBB"
   },
   {
     "scenario": "moderate_transition",
     "year": 2033,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.902,
+    "rating": "BBB"
   },
   {
     "scenario": "moderate_transition",
     "year": 2034,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.902,
+    "rating": "BBB"
   },
   {
     "scenario": "moderate_transition",
     "year": 2035,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.902,
+    "rating": "BBB"
   },
   {
     "scenario": "moderate_transition",
     "year": 2036,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.902,
+    "rating": "BBB"
   },
   {
     "scenario": "moderate_transition",
     "year": 2037,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.902,
+    "rating": "BBB"
   },
   {
     "scenario": "moderate_transition",
     "year": 2038,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.902,
+    "rating": "BBB"
   },
   {
     "scenario": "moderate_transition",
     "year": 2039,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.902,
+    "rating": "BBB"
   },
   {
     "scenario": "moderate_transition",
     "year": 2040,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.902,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "moderate_transition",
+    "year": 2041,
+    "dscr": 1.902,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "moderate_transition",
+    "year": 2042,
+    "dscr": 1.902,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "moderate_transition",
+    "year": 2043,
+    "dscr": 1.902,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "moderate_transition",
+    "year": 2044,
+    "dscr": 1.902,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "moderate_transition",
+    "year": 2045,
+    "dscr": 1.902,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "moderate_transition",
+    "year": 2046,
+    "dscr": 1.902,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "moderate_transition",
+    "year": 2047,
+    "dscr": 1.902,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "moderate_transition",
+    "year": 2048,
+    "dscr": 1.902,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "moderate_transition",
+    "year": 2049,
+    "dscr": 1.902,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "moderate_transition",
+    "year": 2050,
+    "dscr": 1.902,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "moderate_transition",
+    "year": 2051,
+    "dscr": 1.902,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "moderate_transition",
+    "year": 2052,
+    "dscr": 1.902,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "moderate_transition",
+    "year": 2053,
+    "dscr": 1.902,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "moderate_transition",
+    "year": 2054,
+    "dscr": 1.902,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "moderate_transition",
+    "year": 2055,
+    "dscr": 1.902,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "moderate_transition",
+    "year": 2056,
+    "dscr": 1.902,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "moderate_transition",
+    "year": 2057,
+    "dscr": 1.902,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "moderate_transition",
+    "year": 2058,
+    "dscr": 1.902,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "moderate_transition",
+    "year": 2059,
+    "dscr": 1.902,
+    "rating": "BBB"
   },
   {
     "scenario": "aggressive_transition",
     "year": 2025,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.525,
+    "rating": "BBB"
   },
   {
     "scenario": "aggressive_transition",
     "year": 2026,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.525,
+    "rating": "BBB"
   },
   {
     "scenario": "aggressive_transition",
     "year": 2027,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.525,
+    "rating": "BBB"
   },
   {
     "scenario": "aggressive_transition",
     "year": 2028,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.525,
+    "rating": "BBB"
   },
   {
     "scenario": "aggressive_transition",
     "year": 2029,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.525,
+    "rating": "BBB"
   },
   {
     "scenario": "aggressive_transition",
     "year": 2030,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.525,
+    "rating": "BBB"
   },
   {
     "scenario": "aggressive_transition",
     "year": 2031,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.525,
+    "rating": "BBB"
   },
   {
     "scenario": "aggressive_transition",
     "year": 2032,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.525,
+    "rating": "BBB"
   },
   {
     "scenario": "aggressive_transition",
     "year": 2033,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.525,
+    "rating": "BBB"
   },
   {
     "scenario": "aggressive_transition",
     "year": 2034,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.525,
+    "rating": "BBB"
   },
   {
     "scenario": "aggressive_transition",
     "year": 2035,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.525,
+    "rating": "BBB"
   },
   {
     "scenario": "aggressive_transition",
     "year": 2036,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.525,
+    "rating": "BBB"
   },
   {
     "scenario": "aggressive_transition",
     "year": 2037,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.525,
+    "rating": "BBB"
   },
   {
     "scenario": "aggressive_transition",
     "year": 2038,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.525,
+    "rating": "BBB"
   },
   {
     "scenario": "aggressive_transition",
     "year": 2039,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.525,
+    "rating": "BBB"
   },
   {
     "scenario": "aggressive_transition",
     "year": 2040,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.525,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "aggressive_transition",
+    "year": 2041,
+    "dscr": 1.525,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "aggressive_transition",
+    "year": 2042,
+    "dscr": 1.525,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "aggressive_transition",
+    "year": 2043,
+    "dscr": 1.525,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "aggressive_transition",
+    "year": 2044,
+    "dscr": 1.525,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "aggressive_transition",
+    "year": 2045,
+    "dscr": 1.525,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "aggressive_transition",
+    "year": 2046,
+    "dscr": 1.525,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "aggressive_transition",
+    "year": 2047,
+    "dscr": 1.525,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "aggressive_transition",
+    "year": 2048,
+    "dscr": 1.525,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "aggressive_transition",
+    "year": 2049,
+    "dscr": 1.525,
+    "rating": "BBB"
   },
   {
     "scenario": "moderate_physical",
@@ -914,194 +1082,362 @@
   {
     "scenario": "combined_moderate",
     "year": 2025,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.901,
+    "rating": "BBB"
   },
   {
     "scenario": "combined_moderate",
     "year": 2026,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.901,
+    "rating": "BBB"
   },
   {
     "scenario": "combined_moderate",
     "year": 2027,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.901,
+    "rating": "BBB"
   },
   {
     "scenario": "combined_moderate",
     "year": 2028,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.901,
+    "rating": "BBB"
   },
   {
     "scenario": "combined_moderate",
     "year": 2029,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.901,
+    "rating": "BBB"
   },
   {
     "scenario": "combined_moderate",
     "year": 2030,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.901,
+    "rating": "BBB"
   },
   {
     "scenario": "combined_moderate",
     "year": 2031,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.901,
+    "rating": "BBB"
   },
   {
     "scenario": "combined_moderate",
     "year": 2032,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.901,
+    "rating": "BBB"
   },
   {
     "scenario": "combined_moderate",
     "year": 2033,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.901,
+    "rating": "BBB"
   },
   {
     "scenario": "combined_moderate",
     "year": 2034,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.901,
+    "rating": "BBB"
   },
   {
     "scenario": "combined_moderate",
     "year": 2035,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.901,
+    "rating": "BBB"
   },
   {
     "scenario": "combined_moderate",
     "year": 2036,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.901,
+    "rating": "BBB"
   },
   {
     "scenario": "combined_moderate",
     "year": 2037,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.901,
+    "rating": "BBB"
   },
   {
     "scenario": "combined_moderate",
     "year": 2038,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.901,
+    "rating": "BBB"
   },
   {
     "scenario": "combined_moderate",
     "year": 2039,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.901,
+    "rating": "BBB"
   },
   {
     "scenario": "combined_moderate",
     "year": 2040,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.901,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "combined_moderate",
+    "year": 2041,
+    "dscr": 1.901,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "combined_moderate",
+    "year": 2042,
+    "dscr": 1.901,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "combined_moderate",
+    "year": 2043,
+    "dscr": 1.901,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "combined_moderate",
+    "year": 2044,
+    "dscr": 1.901,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "combined_moderate",
+    "year": 2045,
+    "dscr": 1.901,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "combined_moderate",
+    "year": 2046,
+    "dscr": 1.901,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "combined_moderate",
+    "year": 2047,
+    "dscr": 1.901,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "combined_moderate",
+    "year": 2048,
+    "dscr": 1.901,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "combined_moderate",
+    "year": 2049,
+    "dscr": 1.901,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "combined_moderate",
+    "year": 2050,
+    "dscr": 1.901,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "combined_moderate",
+    "year": 2051,
+    "dscr": 1.901,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "combined_moderate",
+    "year": 2052,
+    "dscr": 1.901,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "combined_moderate",
+    "year": 2053,
+    "dscr": 1.901,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "combined_moderate",
+    "year": 2054,
+    "dscr": 1.901,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "combined_moderate",
+    "year": 2055,
+    "dscr": 1.901,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "combined_moderate",
+    "year": 2056,
+    "dscr": 1.901,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "combined_moderate",
+    "year": 2057,
+    "dscr": 1.901,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "combined_moderate",
+    "year": 2058,
+    "dscr": 1.901,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "combined_moderate",
+    "year": 2059,
+    "dscr": 1.901,
+    "rating": "BBB"
   },
   {
     "scenario": "combined_aggressive",
     "year": 2025,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.524,
+    "rating": "BBB"
   },
   {
     "scenario": "combined_aggressive",
     "year": 2026,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.524,
+    "rating": "BBB"
   },
   {
     "scenario": "combined_aggressive",
     "year": 2027,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.524,
+    "rating": "BBB"
   },
   {
     "scenario": "combined_aggressive",
     "year": 2028,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.524,
+    "rating": "BBB"
   },
   {
     "scenario": "combined_aggressive",
     "year": 2029,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.524,
+    "rating": "BBB"
   },
   {
     "scenario": "combined_aggressive",
     "year": 2030,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.524,
+    "rating": "BBB"
   },
   {
     "scenario": "combined_aggressive",
     "year": 2031,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.524,
+    "rating": "BBB"
   },
   {
     "scenario": "combined_aggressive",
     "year": 2032,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.524,
+    "rating": "BBB"
   },
   {
     "scenario": "combined_aggressive",
     "year": 2033,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.524,
+    "rating": "BBB"
   },
   {
     "scenario": "combined_aggressive",
     "year": 2034,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.524,
+    "rating": "BBB"
   },
   {
     "scenario": "combined_aggressive",
     "year": 2035,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.524,
+    "rating": "BBB"
   },
   {
     "scenario": "combined_aggressive",
     "year": 2036,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.524,
+    "rating": "BBB"
   },
   {
     "scenario": "combined_aggressive",
     "year": 2037,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.524,
+    "rating": "BBB"
   },
   {
     "scenario": "combined_aggressive",
     "year": 2038,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.524,
+    "rating": "BBB"
   },
   {
     "scenario": "combined_aggressive",
     "year": 2039,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.524,
+    "rating": "BBB"
   },
   {
     "scenario": "combined_aggressive",
     "year": 2040,
-    "dscr": 0.593,
-    "rating": "CCC"
+    "dscr": 1.524,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "combined_aggressive",
+    "year": 2041,
+    "dscr": 1.524,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "combined_aggressive",
+    "year": 2042,
+    "dscr": 1.524,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "combined_aggressive",
+    "year": 2043,
+    "dscr": 1.524,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "combined_aggressive",
+    "year": 2044,
+    "dscr": 1.524,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "combined_aggressive",
+    "year": 2045,
+    "dscr": 1.524,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "combined_aggressive",
+    "year": 2046,
+    "dscr": 1.524,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "combined_aggressive",
+    "year": 2047,
+    "dscr": 1.524,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "combined_aggressive",
+    "year": 2048,
+    "dscr": 1.524,
+    "rating": "BBB"
+  },
+  {
+    "scenario": "combined_aggressive",
+    "year": 2049,
+    "dscr": 1.524,
+    "rating": "BBB"
   },
   {
     "scenario": "low_demand",
@@ -1582,5 +1918,197 @@
     "year": 2064,
     "dscr": 2.147,
     "rating": "A"
+  },
+  {
+    "scenario": "enhanced_11th_plan",
+    "year": 2025,
+    "dscr": 0.593,
+    "rating": "CCC"
+  },
+  {
+    "scenario": "enhanced_11th_plan",
+    "year": 2026,
+    "dscr": 0.593,
+    "rating": "CCC"
+  },
+  {
+    "scenario": "enhanced_11th_plan",
+    "year": 2027,
+    "dscr": 0.593,
+    "rating": "CCC"
+  },
+  {
+    "scenario": "enhanced_11th_plan",
+    "year": 2028,
+    "dscr": 0.593,
+    "rating": "CCC"
+  },
+  {
+    "scenario": "enhanced_11th_plan",
+    "year": 2029,
+    "dscr": 0.593,
+    "rating": "CCC"
+  },
+  {
+    "scenario": "enhanced_11th_plan",
+    "year": 2030,
+    "dscr": 0.593,
+    "rating": "CCC"
+  },
+  {
+    "scenario": "enhanced_11th_plan",
+    "year": 2031,
+    "dscr": 0.593,
+    "rating": "CCC"
+  },
+  {
+    "scenario": "enhanced_11th_plan",
+    "year": 2032,
+    "dscr": 0.593,
+    "rating": "CCC"
+  },
+  {
+    "scenario": "enhanced_11th_plan",
+    "year": 2033,
+    "dscr": 0.593,
+    "rating": "CCC"
+  },
+  {
+    "scenario": "enhanced_11th_plan",
+    "year": 2034,
+    "dscr": 0.593,
+    "rating": "CCC"
+  },
+  {
+    "scenario": "enhanced_11th_plan",
+    "year": 2035,
+    "dscr": 0.593,
+    "rating": "CCC"
+  },
+  {
+    "scenario": "enhanced_11th_plan",
+    "year": 2036,
+    "dscr": 0.593,
+    "rating": "CCC"
+  },
+  {
+    "scenario": "enhanced_11th_plan",
+    "year": 2037,
+    "dscr": 0.593,
+    "rating": "CCC"
+  },
+  {
+    "scenario": "enhanced_11th_plan",
+    "year": 2038,
+    "dscr": 0.593,
+    "rating": "CCC"
+  },
+  {
+    "scenario": "enhanced_11th_plan",
+    "year": 2039,
+    "dscr": 0.593,
+    "rating": "CCC"
+  },
+  {
+    "scenario": "enhanced_11th_plan",
+    "year": 2040,
+    "dscr": 0.593,
+    "rating": "CCC"
+  },
+  {
+    "scenario": "enhanced_combined",
+    "year": 2025,
+    "dscr": 0.593,
+    "rating": "CCC"
+  },
+  {
+    "scenario": "enhanced_combined",
+    "year": 2026,
+    "dscr": 0.593,
+    "rating": "CCC"
+  },
+  {
+    "scenario": "enhanced_combined",
+    "year": 2027,
+    "dscr": 0.593,
+    "rating": "CCC"
+  },
+  {
+    "scenario": "enhanced_combined",
+    "year": 2028,
+    "dscr": 0.593,
+    "rating": "CCC"
+  },
+  {
+    "scenario": "enhanced_combined",
+    "year": 2029,
+    "dscr": 0.593,
+    "rating": "CCC"
+  },
+  {
+    "scenario": "enhanced_combined",
+    "year": 2030,
+    "dscr": 0.593,
+    "rating": "CCC"
+  },
+  {
+    "scenario": "enhanced_combined",
+    "year": 2031,
+    "dscr": 0.593,
+    "rating": "CCC"
+  },
+  {
+    "scenario": "enhanced_combined",
+    "year": 2032,
+    "dscr": 0.593,
+    "rating": "CCC"
+  },
+  {
+    "scenario": "enhanced_combined",
+    "year": 2033,
+    "dscr": 0.593,
+    "rating": "CCC"
+  },
+  {
+    "scenario": "enhanced_combined",
+    "year": 2034,
+    "dscr": 0.593,
+    "rating": "CCC"
+  },
+  {
+    "scenario": "enhanced_combined",
+    "year": 2035,
+    "dscr": 0.593,
+    "rating": "CCC"
+  },
+  {
+    "scenario": "enhanced_combined",
+    "year": 2036,
+    "dscr": 0.593,
+    "rating": "CCC"
+  },
+  {
+    "scenario": "enhanced_combined",
+    "year": 2037,
+    "dscr": 0.593,
+    "rating": "CCC"
+  },
+  {
+    "scenario": "enhanced_combined",
+    "year": 2038,
+    "dscr": 0.593,
+    "rating": "CCC"
+  },
+  {
+    "scenario": "enhanced_combined",
+    "year": 2039,
+    "dscr": 0.593,
+    "rating": "CCC"
+  },
+  {
+    "scenario": "enhanced_combined",
+    "year": 2040,
+    "dscr": 0.593,
+    "rating": "CCC"
   }
 ]
