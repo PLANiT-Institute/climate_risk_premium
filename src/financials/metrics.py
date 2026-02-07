@@ -1,6 +1,7 @@
 """
 Financial metrics: NPV, IRR, DSCR, LLCR for project finance analysis.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -14,6 +15,7 @@ from src.financials.cashflow import CashFlowTimeSeries
 @dataclass
 class FinancialMetrics:
     """Project finance metrics."""
+
     npv: float
     irr: float
     avg_dscr: float
@@ -35,6 +37,7 @@ class FinancialMetrics:
 @dataclass
 class DebtStructure:
     """Debt financing structure."""
+
     debt_amount: float
     interest_rate: float
     tenor_years: int
@@ -44,10 +47,7 @@ class DebtStructure:
 
 
 def calculate_debt_service(
-    total_capex: float,
-    debt_fraction: float,
-    interest_rate: float,
-    tenor_years: int
+    total_capex: float, debt_fraction: float, interest_rate: float, tenor_years: int
 ) -> DebtStructure:
     """
     Calculate debt service schedule for project finance.
@@ -89,7 +89,6 @@ def calculate_metrics(
     total_capex = float(plant_params.get("total_capex_million", 3200)) * 1e6
     discount_rate = float(plant_params.get("discount_rate", 0.08))
     debt_fraction = float(plant_params.get("debt_fraction", 0.70))
-    equity_fraction = float(plant_params.get("equity_fraction", 0.30))
     debt_interest = float(plant_params.get("debt_interest_rate", 0.05))
     debt_tenor = int(plant_params.get("debt_tenor_years", 20))
 
@@ -115,7 +114,7 @@ def calculate_metrics(
     # Only calculate for years where debt is outstanding
     n_debt_years = min(debt_tenor, len(cashflows.ebitda))
     dscr = np.zeros(n_debt_years)
-    
+
     # Use Tax-Adjusted Cash Flow Available for Debt Service (CFADS)
     # CFADS = EBITDA - Tax (paid) - Capex + Working Capital Changes
     # For simplicity, often DSCR uses EBITDA / Debt Service in early stage models,
@@ -124,11 +123,11 @@ def calculate_metrics(
     # Wait, Net Income = EBIT - Interest - Tax.
     # So Net Income + Interest + Depreciation = EBITDA - Tax.
     # So CFADS = EBITDA - Tax.
-    
+
     # Calculate Tax from cashflows if available, else 0
-    tax_paid = getattr(cashflows, 'tax_expense', np.zeros(len(cashflows.ebitda)))
+    tax_paid = getattr(cashflows, "tax_expense", np.zeros(len(cashflows.ebitda)))
     cfads = cashflows.ebitda - tax_paid - cashflows.capex
-    
+
     for i in range(n_debt_years):
         if debt_struct.annual_debt_service > 0:
             dscr[i] = cfads[i] / debt_struct.annual_debt_service
@@ -155,7 +154,7 @@ def calculate_metrics(
     return FinancialMetrics(
         npv=npv,
         irr=irr if not np.isnan(irr) else 0.0,
-        avg_dscr=avg_dscr,
+        avg_dscr=float(avg_dscr),
         min_dscr=min_dscr,
         llcr=llcr,
         payback_years=payback_years,

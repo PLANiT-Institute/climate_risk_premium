@@ -55,6 +55,8 @@ export default function ShapleyDecomposition({
   const highPhys = find("high_physical");
   const combMod = find("combined_moderate");
   const combAgg = find("combined_aggressive");
+  const enh11th = find("enhanced_11th_plan");
+  const enhComb = find("enhanced_combined");
 
   if (!baseline) return null;
 
@@ -94,6 +96,23 @@ export default function ShapleyDecomposition({
     });
   }
 
+  // Enhanced 11th Plan combination
+  if (enh11th && highPhys && enhComb) {
+    const s = computeShapley(
+      baseline.crp_bps,
+      enh11th.crp_bps,
+      highPhys.crp_bps,
+      enhComb.crp_bps
+    );
+    results.push({
+      label: "Enhanced 11th Plan",
+      transition: s.transition,
+      physical: s.physical,
+      interaction: s.interaction,
+      total: enhComb.crp_bps - baseline.crp_bps,
+    });
+  }
+
   // NPV decomposition too
   const npvResults: ShapleyResult[] = [];
   if (modTrans && modPhys && combMod) {
@@ -124,6 +143,21 @@ export default function ShapleyDecomposition({
       physical: s.physical,
       interaction: s.interaction,
       total: combAgg.npv_million - baseline.npv_million,
+    });
+  }
+  if (enh11th && highPhys && enhComb) {
+    const s = computeShapley(
+      baseline.npv_million,
+      enh11th.npv_million,
+      highPhys.npv_million,
+      enhComb.npv_million
+    );
+    npvResults.push({
+      label: "Enhanced 11th Plan",
+      transition: s.transition,
+      physical: s.physical,
+      interaction: s.interaction,
+      total: enhComb.npv_million - baseline.npv_million,
     });
   }
 

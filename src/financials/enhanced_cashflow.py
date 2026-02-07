@@ -10,11 +10,12 @@ Implements comprehensive cash flow modeling with:
 Uses the standard compute_cashflows_timeseries() engine with enhanced
 transition adjustments layered on top.
 """
+
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Any
+from dataclasses import dataclass
+from typing import Dict, Optional, Any
 
 import numpy as np
 
@@ -27,7 +28,6 @@ from src.risk.enhanced_transition import (
 from src.scenarios import TransitionScenario, MarketScenario
 from src.scenarios.enhanced_korea_power_plan import (
     EnhancedKoreaPowerPlan,
-    create_enhanced_11th_plan,
 )
 
 logger = logging.getLogger(__name__)
@@ -72,23 +72,23 @@ class EnhancedCashFlowAnalysis:
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary representation."""
         return {
-            'enhanced_adjustments': (
+            "enhanced_adjustments": (
                 self.enhanced_adjustments.to_dict() if self.enhanced_adjustments else {}
             ),
-            'baseline_cashflows': (
+            "baseline_cashflows": (
                 self.baseline_cashflows.to_dict() if self.baseline_cashflows is not None else {}
             ),
-            'policy_adjusted_cashflows': (
+            "policy_adjusted_cashflows": (
                 self.policy_adjusted_cashflows.to_dict()
                 if self.policy_adjusted_cashflows is not None
                 else {}
             ),
-            'aggregate_impacts': {
-                'baseline_npv': self.baseline_npv,
-                'adjusted_npv': self.adjusted_npv,
-                'total_carbon_costs': self.total_carbon_costs,
-                'financing_impact_bps': self.financing_impact_bps,
-                'transition_risk_premium_pct': self.transition_risk_premium_pct,
+            "aggregate_impacts": {
+                "baseline_npv": self.baseline_npv,
+                "adjusted_npv": self.adjusted_npv,
+                "total_carbon_costs": self.total_carbon_costs,
+                "financing_impact_bps": self.financing_impact_bps,
+                "transition_risk_premium_pct": self.transition_risk_premium_pct,
             },
         }
 
@@ -230,15 +230,17 @@ def analyze_policy_transition_timeline(
     Returns:
         Dictionary with timeline analysis
     """
-    capacity_mw = float(plant_params.get('capacity_mw', 1000))
-    baseline_cf = float(plant_params.get('capacity_factor', 0.50))
-    power_price = float(plant_params.get('power_price_per_mwh', 50.0))
-    heat_rate = float(plant_params.get('heat_rate', 0.33))
+    capacity_mw = float(plant_params.get("capacity_mw", 1000))
+    baseline_cf = float(plant_params.get("capacity_factor", 0.50))
+    power_price = float(plant_params.get("power_price_per_mwh", 50.0))
+    heat_rate = float(plant_params.get("heat_rate", 0.33))
 
     policy_effective_year = enhanced_plan.effective_date
-    cod_year = plant_params.get('cod_year', 2024)
+    cod_year = plant_params.get("cod_year", 2024)
     pre_transition_years = max(0, policy_effective_year - cod_year)
-    post_transition_years = enhanced_plan.coal_schedule.complete_phase_out_year - policy_effective_year
+    post_transition_years = (
+        enhanced_plan.coal_schedule.complete_phase_out_year - policy_effective_year
+    )
 
     timeline_analysis: Dict[str, Any] = {}
 
@@ -257,21 +259,23 @@ def analyze_policy_transition_timeline(
         policy_revenue = policy_generation * power_price
         revenue_loss = policy_revenue - baseline_revenue
 
-        timeline_analysis[f'year_{year}'] = {
-            'capacity_factor_baseline': baseline_cf,
-            'capacity_factor_policy': policy_cf,
-            'generation_difference_mwh': policy_generation - baseline_generation,
-            'revenue_loss_usd': revenue_loss,
-            'carbon_cost_usd': carbon_cost,
-            'policy_transition_phase': 'pre-transition' if year < policy_effective_year else 'post-transition',
+        timeline_analysis[f"year_{year}"] = {
+            "capacity_factor_baseline": baseline_cf,
+            "capacity_factor_policy": policy_cf,
+            "generation_difference_mwh": policy_generation - baseline_generation,
+            "revenue_loss_usd": revenue_loss,
+            "carbon_cost_usd": carbon_cost,
+            "policy_transition_phase": (
+                "pre-transition" if year < policy_effective_year else "post-transition"
+            ),
         }
 
-    timeline_analysis['policy_summary'] = {
-        'effective_year': policy_effective_year,
-        'pre_transition_years': pre_transition_years,
-        'post_transition_years': post_transition_years,
-        'coal_phase_out_complete': enhanced_plan.coal_schedule.complete_phase_out_year,
-        'phase_out_acceleration_pct': 42.0,
+    timeline_analysis["policy_summary"] = {
+        "effective_year": policy_effective_year,
+        "pre_transition_years": pre_transition_years,
+        "post_transition_years": post_transition_years,
+        "coal_phase_out_complete": enhanced_plan.coal_schedule.complete_phase_out_year,
+        "phase_out_acceleration_pct": 42.0,
     }
 
     return timeline_analysis

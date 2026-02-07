@@ -1,37 +1,40 @@
 # Climate Risk Premium Model - Results Summary
 
-**Analysis Date**: November 2025
+**Analysis Date**: February 2026 (Updated)
 **Subject**: Samcheok Blue Power Plant (2.1 GW Ultra-Supercritical Coal)
-**Analysis Period**: 2024-2054 (30-year project life)
+**Analysis Period**: 2024-2064 (40-year project life)
+**Physical Risk Data**: Korea-specific (Kim et al 2025, Kang & Lee 2024, WWA 2025, KSCCR 2024, CMIP6)
 
 ---
 
 ## Executive Summary
 
-The Climate Risk Premium (CRP) model demonstrates that the Samcheok Blue Power plant faces severe stranded asset risk, primarily driven by **government policy** rather than physical climate change. Under realistic transition scenarios aligned with Korea's 10th Power Supply Plan, the project's NPV swings from **+$2.9 billion** (baseline) to **-$8.4 billion** (combined aggressive scenario)—a value destruction of **390%**.
+The Climate Risk Premium (CRP) model demonstrates that the Samcheok Blue Power plant faces significant stranded asset risk, primarily driven by **government policy and enhanced coal phase-out plans** rather than physical climate change. Under realistic transition scenarios, the project's NPV swings from **+$3,098M** (baseline) to **-$3,000M** (enhanced 11th plan)--a value destruction driven by dispatch reduction and carbon pricing.
 
 ### Key Finding
 
-> **Government policy—not physical climate change—is the primary driver of coal asset stranding in Korea.**
-> Transition scenarios reduce NPV by **251-375%**, while physical climate risks reduce NPV by only **33-59%**.
+> **Government policy--not physical climate change--is the primary driver of coal asset stranding in Korea.**
+> Physical risk scenarios show minimal NPV impact (~$3-5M, <0.2% of baseline) using Korea-specific hazard data, while transition scenarios reduce NPV by 34-197%.
 
 ---
 
 ## Scenario Analysis Results
 
-### NPV and Financial Metrics
+### NPV and Financial Metrics (Korea-Corrected, Feb 2026)
 
-| Scenario | NPV ($M) | Change vs Baseline | IRR | Min DSCR | Overall Rating | CRP (bps) |
-|----------|----------|-------------------|-----|----------|----------------|-----------|
-| **Baseline** | 2,898 | — | 11.7% | 1.81× | A | — |
-| **Moderate Transition** | -4,381 | -251% | 0% | -1.39× | B | 3,880 |
-| **Aggressive Transition** | -7,964 | -375% | 0% | -4.37× | B | 5,635 |
-| **Moderate Physical** | 1,718 | -41% | 10.0% | 1.58× | A | 578 |
-| **High Physical** | 738 | -75% | 8.6% | 1.42× | A | 1,058 |
-| **Combined Moderate** | -5,002 | -273% | 0% | -1.60× | B | 4,184 |
-| **Combined Aggressive** | -8,411 | -390% | 0% | -4.32× | B | 5,854 |
-| **Low Demand** | 325 | -89% | 7.9% | 1.13× | BBB | 1,331 |
-| **Severe Drought** | -1,501 | -152% | 4.7% | 0.84× | BBB | 2,225 |
+| Scenario | NPV ($M) | Change vs Baseline | IRR | Min DSCR | Overall Rating |
+|----------|----------|-------------------|-----|----------|----------------|
+| **Baseline** | 3,098 | -- | 12.0% | 1.86x | AA |
+| **Moderate Transition** | 2,034 | -34% | 10.6% | 1.65x | -- |
+| **Aggressive Transition** | -75 | -102% | 7.0% | 1.33x | -- |
+| **Moderate Physical** | 3,095 | -0.1% | 12.0% | 1.85x | AA |
+| **High Physical** | 3,093 | -0.2% | 12.0% | 1.85x | AA |
+| **Combined Moderate** | 2,031 | -34% | 10.6% | 1.65x | -- |
+| **Combined Aggressive** | -78 | -103% | 7.0% | 1.33x | -- |
+| **Low Demand** | 494 | -84% | 8.2% | 1.17x | BBB |
+| **Severe Drought** | 3,099 | 0% | 12.0% | 1.86x | AA |
+| **Enhanced 11th Plan** | -2,999 | -197% | -8.1% | 0.07x | CC |
+| **Enhanced Combined** | -3,000 | -197% | -8.1% | 0.07x | CC |
 
 ### Credit Rating Migration
 
@@ -102,25 +105,27 @@ The Climate Risk Premium (CRP) model demonstrates that the Samcheok Blue Power p
 
 ---
 
-## Physical Risk Analysis (CLIMADA)
+## Physical Risk Analysis (Korea-Specific Literature)
 
 ### Hazard Impact Summary
 
 | Hazard | Baseline Impact | RCP 4.5 (2050) | RCP 8.5 (2050) | Source |
 |--------|-----------------|----------------|----------------|--------|
-| Wildfire Outage Rate | 1.2%/yr | 1.8%/yr | 2.5%/yr | ERA5-Land FWI |
-| Flood Outage Rate | 0.2%/yr | 0.3%/yr | 0.35%/yr | GLOFAS |
-| SLR Capacity Derate | 0% | 1.9% | 3.0% | IPCC AR6 |
-| **Total CF Impact** | **1.4%** | **4.0%** | **5.85%** | Combined |
+| Wildfire Outage Rate | 0.055%/yr | 0.083%/yr | 0.110%/yr | Kim et al 2025 + WWA 2025 |
+| Flood Outage Rate | 0.003%/yr | 0.004%/yr | 0.004%/yr | Kang & Lee 2024 + KSCCR 2024 |
+| SLR Capacity Derate | 0% | 0.026% | 0.040% | CMIP6 |
+| Compound Multiplier | 1.0x | 1.05x | 1.10x | Zscheischler 2018 |
+| **Total CF Impact** | **0.058%** | **0.12%** | **0.16%** | Combined |
 
-### Physical Risk NPV Sensitivity
+**Note**: Previous versions used California (CAISO) data (wildfire 1.2%, flood 0.2%) which overstated physical risk by 18-333x. Korea-specific values show that physical risk is minimal for this asset, consistent with Korea's lower wildfire and flood exposure relative to California.
 
-| CF Impact Level | NPV ($M) | NPV Change | Revenue Loss ($M/yr) |
-|-----------------|----------|------------|---------------------|
-| 1.4% (Baseline) | 2,750 | -5% | 20 |
-| 4.0% (RCP 4.5) | 1,718 | -41% | 59 |
-| 5.85% (RCP 8.5) | 738 | -75% | 86 |
-| 8.6% (Extreme) | -500 | -117% | 126 |
+### Physical Risk NPV Impact
+
+| Scenario | Outage Rate | NPV ($M) | NPV Delta vs Baseline |
+|----------|-------------|----------|----------------------|
+| Baseline (Korea) | 0.058% | 3,098 | -- |
+| Moderate Physical (RCP4.5 2040) | 0.078% | 3,095 | -$3M |
+| High Physical (RCP8.5 2040) | 0.10% | 3,093 | -$5M |
 
 ---
 
@@ -221,10 +226,12 @@ Policy Dispatch Reduction → ↓Revenue → ↓EBITDA → ↓DSCR
 
 | File | Description | Records |
 |------|-------------|---------|
-| `scenario_comparison.csv` | Full scenario results | 9 scenarios |
-| `credit_ratings.csv` | Credit rating details | 9 scenarios |
-| `cashflow_*.csv` | Year-by-year cash flows | 30 years each |
+| `scenario_comparison.csv` | Full scenario results | 11 scenarios |
+| `credit_ratings.csv` | Credit rating details | 11 scenarios |
+| `model_results_DEPRECATED_caiso_params.csv` | **DEPRECATED** - Old yearly cashflow from src/models/api.py pipeline. Uses California CAISO physical risk parameters (wildfire=1.2%, flood=0.2%) which are NOT Korea-specific. Retained for reference only. | 1 scenario, 41 years |
+
+Authoritative results are in `data/processed/` and `crp-dashboard/src/data/`.
 
 ---
 
-*Generated by CRP Model v2.0 - November 2025*
+*Generated by CRP Model v3.0 - February 2026 (Korea-corrected physical risk data)*

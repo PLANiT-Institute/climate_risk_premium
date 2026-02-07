@@ -10,10 +10,11 @@ Reference:
 - Moody's Global Infrastructure Finance Rating Methodology (2021)
 - S&P Project Finance Rating Criteria (2022)
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, Optional
 from enum import Enum
 
 
@@ -28,16 +29,17 @@ class Rating(Enum):
     This extended scale allows proper differentiation when entities have
     negative EBITDA or severe financial distress.
     """
-    AAA = 1   # Prime
-    AA = 2    # High Grade
-    A = 3     # Upper Medium Grade
-    BBB = 4   # Lower Medium Grade (lowest investment grade)
-    BB = 5    # Non-Investment Speculative
-    B = 6     # Highly Speculative
-    CCC = 7   # Substantial Risk
-    CC = 8    # Very High Risk / Default imminent
-    C = 9     # Near Default
-    D = 10    # In Default
+
+    AAA = 1  # Prime
+    AA = 2  # High Grade
+    A = 3  # Upper Medium Grade
+    BBB = 4  # Lower Medium Grade (lowest investment grade)
+    BB = 5  # Non-Investment Speculative
+    B = 6  # Highly Speculative
+    CCC = 7  # Substantial Risk
+    CC = 8  # Very High Risk / Default imminent
+    C = 9  # Near Default
+    D = 10  # In Default
 
     def __str__(self):
         return self.name
@@ -57,10 +59,10 @@ class Rating(Enum):
             Rating.BBB: 250,
             Rating.BB: 400,
             Rating.B: 600,
-            Rating.CCC: 900,    # Substantial risk - typical CCC bond spread
-            Rating.CC: 1500,   # Very high risk - distressed debt territory
-            Rating.C: 2500,    # Near default - deep distress
-            Rating.D: 5000,    # Default - recovery value pricing
+            Rating.CCC: 900,  # Substantial risk - typical CCC bond spread
+            Rating.CC: 1500,  # Very high risk - distressed debt territory
+            Rating.C: 2500,  # Near default - deep distress
+            Rating.D: 5000,  # Default - recovery value pricing
         }
         return spread_map[self]
 
@@ -88,6 +90,7 @@ class RatingMetrics:
     Extended to include DSCR (Debt Service Coverage Ratio) which is the
     standard metric for project finance credit assessment.
     """
+
     # Business Stability & Profitability
     capacity_mw: float
     ebitda_to_fixed_assets: float  # percentage
@@ -109,6 +112,7 @@ class RatingMetrics:
 @dataclass
 class RatingAssessment:
     """Credit rating assessment result."""
+
     overall_rating: Rating
     component_ratings: Dict[str, Rating]
     metrics: RatingMetrics
@@ -245,15 +249,15 @@ def rate_dscr(dscr: float) -> Rating:
     if dscr >= 2.5:
         return Rating.AAA  # Very strong coverage
     elif dscr >= 2.0:
-        return Rating.AA   # Strong coverage
+        return Rating.AA  # Strong coverage
     elif dscr >= 1.6:
-        return Rating.A    # Good coverage
+        return Rating.A  # Good coverage
     elif dscr >= 1.3:
         return Rating.BBB  # Adequate - investment grade minimum
     elif dscr >= 1.1:
-        return Rating.BB   # Weak but serviceable
+        return Rating.BB  # Weak but serviceable
     else:
-        return Rating.B    # Marginal - high risk
+        return Rating.B  # Marginal - high risk
 
 
 def rate_net_debt_leverage(net_debt_to_ebitda: float, is_ebitda_negative: bool = False) -> Rating:
@@ -350,19 +354,18 @@ def assess_credit_rating(metrics: RatingMetrics) -> RatingAssessment:
     # Weighted average approach for project finance
     # DSCR is most important (standard project finance practice)
     weights = {
-        "capacity": 0.05,        # Business scale
-        "profitability": 0.10,   # Operating efficiency
-        "coverage": 0.15,        # Interest coverage
-        "dscr": 0.35,            # PRIMARY: Debt service coverage
+        "capacity": 0.05,  # Business scale
+        "profitability": 0.10,  # Operating efficiency
+        "coverage": 0.15,  # Interest coverage
+        "dscr": 0.35,  # PRIMARY: Debt service coverage
         "net_debt_leverage": 0.15,  # Leverage
-        "equity_leverage": 0.10,    # Capital structure
-        "asset_leverage": 0.10,     # Balance sheet strength
+        "equity_leverage": 0.10,  # Capital structure
+        "asset_leverage": 0.10,  # Balance sheet strength
     }
 
     # Calculate weighted score
     weighted_score = sum(
-        component_ratings[metric].value * weight
-        for metric, weight in weights.items()
+        component_ratings[metric].value * weight for metric, weight in weights.items()
     )
 
     # Round to nearest rating
@@ -371,7 +374,9 @@ def assess_credit_rating(metrics: RatingMetrics) -> RatingAssessment:
 
     # Distress override: if any critical metric is in distress, ensure rating reflects it
     critical_metrics = ["dscr", "coverage", "profitability"]
-    distress_ratings = [component_ratings[m] for m in critical_metrics if component_ratings[m].value >= 7]
+    distress_ratings = [
+        component_ratings[m] for m in critical_metrics if component_ratings[m].value >= 7
+    ]
 
     if distress_ratings:
         # At least one critical metric is distressed
@@ -439,7 +444,7 @@ def calculate_rating_metrics_from_financials(
     if interest_expense > 0:
         ebitda_to_interest = ebitda / interest_expense
     else:
-        ebitda_to_interest = 999 if ebitda >= 0 else -999
+        ebitda_to_interest = 999.0 if ebitda >= 0 else -999.0
 
     # Net Debt / EBITDA - handle negative EBITDA case
     net_debt = total_debt - cash_and_equivalents
@@ -452,7 +457,7 @@ def calculate_rating_metrics_from_financials(
         net_debt_to_ebitda = 999.0
 
     # Leverage ratios - standard calculation
-    debt_to_equity = (total_debt / total_equity * 100) if total_equity > 0 else 999
+    debt_to_equity = (total_debt / total_equity * 100) if total_equity > 0 else 999.0
     debt_to_assets = (total_debt / total_assets * 100) if total_assets > 0 else 100
 
     # DSCR calculation - primary metric for project finance
@@ -465,14 +470,17 @@ def calculate_rating_metrics_from_financials(
             calculated_dscr = cfads / total_debt_service
         else:
             # Use EBITDA as proxy for CFADS (simplified)
-            calculated_dscr = ebitda / total_debt_service if ebitda > 0 else ebitda / total_debt_service
+            calculated_dscr = (
+                ebitda / total_debt_service if ebitda > 0 else ebitda / total_debt_service
+            )
     elif interest_expense > 0:
         # Use proper annuity formula: PMT = P * r(1+r)^n / ((1+r)^n - 1)
         # Estimate from interest expense: P ≈ interest / rate, typical rate ~5%, tenor ~20yr
         estimated_rate = 0.05
         estimated_tenor = 20
-        annuity_factor = (estimated_rate * (1 + estimated_rate) ** estimated_tenor) / \
-                         ((1 + estimated_rate) ** estimated_tenor - 1)
+        annuity_factor = (estimated_rate * (1 + estimated_rate) ** estimated_tenor) / (
+            (1 + estimated_rate) ** estimated_tenor - 1
+        )
         estimated_principal = interest_expense / estimated_rate
         estimated_debt_service = estimated_principal * annuity_factor
         calculated_dscr = ebitda / estimated_debt_service if estimated_debt_service > 0 else 0
@@ -503,7 +511,9 @@ def rating_migration_analysis(
     Returns dictionary with migration details and impact.
     """
     notch_change = risk_rating.overall_rating.value - baseline_rating.overall_rating.value
-    spread_change = risk_rating.overall_rating.to_spread_bps() - baseline_rating.overall_rating.to_spread_bps()
+    spread_change = (
+        risk_rating.overall_rating.to_spread_bps() - baseline_rating.overall_rating.to_spread_bps()
+    )
 
     if notch_change == 0:
         migration = "No Change"

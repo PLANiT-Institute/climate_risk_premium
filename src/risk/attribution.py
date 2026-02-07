@@ -9,6 +9,7 @@ Decomposes the combined Climate Risk Premium into:
 Reference: Shapley, L.S. (1953). "A Value for n-Person Games."
 For two players, the Shapley value has a closed-form solution.
 """
+
 from __future__ import annotations
 
 
@@ -58,9 +59,7 @@ def decompose_risk_shapley(
     )
 
     # Interaction: non-additive residual
-    interaction = (
-        combined_crp - transition_only_crp - physical_only_crp + baseline_crp
-    )
+    interaction = combined_crp - transition_only_crp - physical_only_crp + baseline_crp
 
     return {
         "transition_contribution_bps": transition_contribution,
