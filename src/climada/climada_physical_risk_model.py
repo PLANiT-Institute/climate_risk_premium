@@ -9,10 +9,7 @@ This model reads ALL inputs from CSV files:
 Run: python -m src.climada.climada_physical_risk_model
 
 Version: 2.0 (CSV-based pipeline)
-<<<<<<< HEAD
-=======
 Date: December 29, 2024
->>>>>>> 7b1507166a09149c835e7a055a114db44cb2809e
 """
 from __future__ import annotations
 

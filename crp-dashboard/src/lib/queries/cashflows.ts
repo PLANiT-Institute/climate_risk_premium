@@ -39,6 +39,7 @@ export async function getAllCashflows(): Promise<Record<string, CashflowRow[]>> 
     "no_carbon_baseline", "baseline", "moderate_transition",
     "aggressive_transition", "moderate_physical", "high_physical",
     "combined_moderate", "combined_aggressive", "low_demand", "severe_drought",
+    "enhanced_11th_plan", "enhanced_combined",
   ];
   const result: Record<string, CashflowRow[]> = {};
   await Promise.all(

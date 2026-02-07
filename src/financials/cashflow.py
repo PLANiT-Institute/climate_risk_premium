@@ -8,18 +8,19 @@ Supports:
 
 Note: Carbon pricing has been archived. This model focuses on dispatch and physical risks.
 """
+
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Dict, Any, List, Optional, TYPE_CHECKING
 import numpy as np
-
-logger = logging.getLogger(__name__)
+import numpy_financial as npf
 
 from src.risk import TransitionAdjustments, PhysicalAdjustments
 from src.scenarios import TransitionScenario, MarketScenario
-import numpy_financial as npf
+
+logger = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
     from src.risk.physical import YearlyPhysicalAdjustments
@@ -29,6 +30,7 @@ if TYPE_CHECKING:
 @dataclass
 class CashFlowTimeSeries:
     """Time-series cash flow projections."""
+
     years: np.ndarray
     revenue: np.ndarray
     fuel_costs: np.ndarray
@@ -45,9 +47,9 @@ class CashFlowTimeSeries:
     capex: np.ndarray
     free_cash_flow: np.ndarray
     capacity_factor: np.ndarray
-    carbon_costs: np.ndarray = None  # K-ETS carbon costs ($)
+    carbon_costs: np.ndarray = field(default=None)  # type: ignore[arg-type]
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if self.carbon_costs is None:
             self.carbon_costs = np.zeros_like(self.years, dtype=float)
 
@@ -81,8 +83,8 @@ def compute_cashflows_timeseries(
     physical_adj: PhysicalAdjustments,
     market_scenario: MarketScenario | None = None,
     start_year: int = 2025,
-    yearly_physical_adj: Optional['YearlyPhysicalAdjustments'] = None,
-    yearly_transition_adj: Optional['YearlyTransitionAdjustments'] = None,
+    yearly_physical_adj: Optional["YearlyPhysicalAdjustments"] = None,
+    yearly_transition_adj: Optional["YearlyTransitionAdjustments"] = None,
 ) -> CashFlowTimeSeries:
     """
     Compute annual cash flows over the plant's operating life.
@@ -108,7 +110,9 @@ def compute_cashflows_timeseries(
     price = float(plant_params["power_price_per_mwh"])
     heat_rate = float(plant_params["heat_rate_mmbtu_mwh"])
     fuel_price = float(plant_params["fuel_price_per_mmbtu"])
-    fixed_opex_per_kw = float(plant_params.get("fixed_opex_per_kw_year", plant_params.get("fixed_opex_per_kw", 35.0)))
+    fixed_opex_per_kw = float(
+        plant_params.get("fixed_opex_per_kw_year", plant_params.get("fixed_opex_per_kw", 35.0))
+    )
     variable_opex_per_mwh = float(plant_params["variable_opex_per_mwh"])
 
     # Financial params for concretization
@@ -126,42 +130,43 @@ def compute_cashflows_timeseries(
     # === PHYSICAL RISK: Get year-by-year or static adjustments ===
     if yearly_physical_adj is not None:
         # Dynamic year-by-year physical risks (climate change progression)
-        outage_rates = np.array([
-            yearly_physical_adj.get_adjustment_for_year(int(y)).outage_rate
-            for y in years
-        ])
-        capacity_derates = np.array([
-            yearly_physical_adj.get_adjustment_for_year(int(y)).capacity_derate
-            for y in years
-        ])
-        efficiency_losses = np.array([
-            yearly_physical_adj.get_adjustment_for_year(int(y)).efficiency_loss
-            for y in years
-        ])
-        water_constraints = np.array([
-            yearly_physical_adj.get_adjustment_for_year(int(y)).water_constrained_capacity
-            for y in years
-        ])
+        outage_rates = np.array(
+            [yearly_physical_adj.get_adjustment_for_year(int(y)).outage_rate for y in years]
+        )
+        capacity_derates = np.array(
+            [yearly_physical_adj.get_adjustment_for_year(int(y)).capacity_derate for y in years]
+        )
+        efficiency_losses = np.array(
+            [yearly_physical_adj.get_adjustment_for_year(int(y)).efficiency_loss for y in years]
+        )
+        water_constraints = np.array(
+            [
+                yearly_physical_adj.get_adjustment_for_year(int(y)).water_constrained_capacity
+                for y in years
+            ]
+        )
     else:
         # Static physical risks (same for all years)
         outage_rates = np.full(n_years, physical_adj.outage_rate)
         capacity_derates = np.full(n_years, physical_adj.capacity_derate)
         efficiency_losses = np.full(n_years, physical_adj.efficiency_loss)
-        water_constraints = np.full(n_years, getattr(physical_adj, "water_constrained_capacity", 1.0))
+        water_constraints = np.full(
+            n_years, getattr(physical_adj, "water_constrained_capacity", 1.0)
+        )
 
     # === CAPACITY FACTOR CALCULATION ===
     if yearly_transition_adj is not None:
         # Year-by-year CF from enhanced transition trajectory
-        base_cf_series = np.array([
-            yearly_transition_adj.get_cf_for_year(int(y)) for y in years
-        ])
+        base_cf_series = np.array([yearly_transition_adj.get_cf_for_year(int(y)) for y in years])
     else:
         base_cf = transition_adj.capacity_factor
         base_cf_series = np.full(n_years, base_cf)
 
     # Apply Market Demand factor if market scenario exists
     if market_scenario:
-        demand_factors = np.array([market_scenario.get_demand_factor(year, start_year) for year in years])
+        demand_factors = np.array(
+            [market_scenario.get_demand_factor(int(year), start_year) for year in years]
+        )
         base_cf_series = np.minimum(1.0, base_cf_series * demand_factors)
 
     # Apply capacity derates (year-by-year)
@@ -181,7 +186,9 @@ def compute_cashflows_timeseries(
 
     # Revenue is based on ACTUAL generation (outages reduce revenue)
     if market_scenario:
-        prices = np.array([market_scenario.get_power_price(year, start_year) for year in years])
+        prices = np.array(
+            [market_scenario.get_power_price(int(year), start_year) for year in years]
+        )
     else:
         prices = np.full(n_years, price)
 
@@ -200,9 +207,9 @@ def compute_cashflows_timeseries(
 
     # Carbon costs (K-ETS)
     if yearly_transition_adj is not None:
-        carbon_cost_per_mwh = np.array([
-            yearly_transition_adj.get_carbon_cost_per_mwh_for_year(int(y)) for y in years
-        ])
+        carbon_cost_per_mwh = np.array(
+            [yearly_transition_adj.get_carbon_cost_per_mwh_for_year(int(y)) for y in years]
+        )
         carbon_costs = actual_mwh * carbon_cost_per_mwh
     else:
         carbon_costs = np.zeros(n_years)
@@ -258,7 +265,8 @@ def compute_cashflows_timeseries(
 
             # Update balance
             balance -= principal
-            if balance < 0: balance = 0
+            if balance < 0:
+                balance = 0
 
     # 5. Tax Calculation
     # Corporate Tax is applied to Earnings Before Tax (EBT)

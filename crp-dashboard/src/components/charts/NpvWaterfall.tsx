@@ -21,25 +21,40 @@ interface NpvWaterfallProps {
 export default function NpvWaterfall({ scenarios }: NpvWaterfallProps) {
   const baseline = scenarios.find((s) => s.scenario === "baseline");
   const modPhys = scenarios.find((s) => s.scenario === "moderate_physical");
-  const highPhys = scenarios.find((s) => s.scenario === "high_physical");
-  const modTrans = scenarios.find((s) => s.scenario === "moderate_transition");
-  const combinedAgg = scenarios.find((s) => s.scenario === "combined_aggressive");
+  const aggTrans = scenarios.find((s) => s.scenario === "aggressive_transition");
+  // Use the worst-case scenario as the final total
+  const worstCase = scenarios.reduce((worst, s) =>
+    s.npv_million < worst.npv_million ? s : worst
+  );
 
   if (!baseline) return null;
 
   const baseNpv = baseline.npv_million;
   const physImpact = modPhys ? modPhys.npv_million - baseNpv : 0;
-  const highPhysImpact = highPhys ? highPhys.npv_million - baseNpv : 0;
-  const transImpact = modTrans ? modTrans.npv_million - baseNpv : 0;
-  const combinedTotal = combinedAgg ? combinedAgg.npv_million : 0;
+  const transImpact = aggTrans ? aggTrans.npv_million - baseNpv : 0;
+  // Remaining impact from transition to worst-case
+  const remainingImpact = worstCase.npv_million - (aggTrans?.npv_million ?? baseNpv);
 
   const items = [
     { name: "Baseline NPV", value: baseNpv, isTotal: true },
-    { name: "Moderate Physical", value: physImpact, isTotal: false },
-    { name: "High Physical", value: highPhysImpact - physImpact, isTotal: false },
-    { name: "Transition Risk", value: transImpact, isTotal: false },
-    { name: "Combined Aggressive", value: combinedTotal, isTotal: true },
+    { name: "Physical Risk", value: physImpact, isTotal: false },
+    { name: "Transition Risk", value: transImpact - physImpact, isTotal: false },
   ];
+
+  // Add enhanced policy step if the worst case is different from aggressive transition
+  if (worstCase.scenario !== "aggressive_transition" && Math.abs(remainingImpact) > 1) {
+    items.push({
+      name: "Enhanced Policy",
+      value: remainingImpact,
+      isTotal: false,
+    });
+  }
+
+  items.push({
+    name: "Worst Case",
+    value: worstCase.npv_million,
+    isTotal: true,
+  });
 
   let running = 0;
   const chartData = items.map((item) => {
@@ -78,7 +93,7 @@ export default function NpvWaterfall({ scenarios }: NpvWaterfallProps) {
         />
         <YAxis
           tick={{ fontSize: 12 }}
-          tickFormatter={(v) => `$${(v / 1).toFixed(0)}M`}
+          tickFormatter={(v) => `$${v.toFixed(0)}M`}
         />
         <Tooltip
           formatter={(value: number, _name: string, item) => {

@@ -4,6 +4,7 @@ Translate expected losses into financing spreads and Climate Risk Premium (CRP).
 ENHANCED: Updated to work with extended credit rating scale (AAA to D)
 and counterfactual-based CRP calculation for proper climate risk pricing.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -58,17 +59,17 @@ def map_expected_loss_to_spreads(
     expected_loss_pct: float,
     npv_loss: float,
     params: Dict[str, Any],
-    rating_spread_bps: Optional[float] = None
+    rating_spread_bps: Optional[float] = None,
 ) -> FinancingImpact:
     """
     Map expected loss to financing cost impacts (debt spreads, equity premiums).
     Calculate Climate Risk Premium (CRP) and adjusted WACC.
-    
+
     Args:
         expected_loss_pct: Expected loss as % of CAPEX
         npv_loss: Absolute NPV loss
         params: Financing parameters
-        rating_spread_bps: Optional explicit spread from credit rating model. 
+        rating_spread_bps: Optional explicit spread from credit rating model.
                            If provided, overrides the linear spread slope model.
     """
     # Extract parameters
@@ -89,7 +90,7 @@ def map_expected_loss_to_spreads(
     else:
         # Fallback to linear model (Reduced Form Model)
         debt_spread = baseline_spread + expected_loss_pct * spread_slope
-        
+
     adjusted_debt_rate = risk_free_rate + (debt_spread / 10000)
 
     # Equity cost (baseline equity return ~12%, adjusted by risk premium)
@@ -121,14 +122,15 @@ def calculate_financing_from_rating(
     baseline_spread_bps: float,
     npv_loss: float,
     total_capex: float,
-    params: Dict[str, Any]
+    params: Dict[str, Any],
 ) -> FinancingImpact:
     """
     Calculate financing impact based on a specific credit rating spread.
-    
+
     Args:
-        rating_spread_bps: The spread associated with the scenario's credit rating (e.g., 250 for BBB)
-        baseline_spread_bps: The spread associated with the baseline scenario
+        rating_spread_bps: Spread for the scenario's credit rating
+            (e.g., 250 for BBB)
+        baseline_spread_bps: Spread for the baseline scenario
         npv_loss: Absolute NPV loss (Baseline NPV - Scenario NPV)
         total_capex: Total CAPEX for expected loss % calculation
         params: Financing parameters
@@ -148,13 +150,13 @@ def calculate_financing_from_rating(
     # Use the explicit rating spread
     debt_spread = rating_spread_bps
     adjusted_debt_rate = risk_free_rate + (debt_spread / 10000)
-    
+
     # Baseline debt cost (for comparison)
     baseline_debt_rate = risk_free_rate + (baseline_spread_bps / 10000)
 
     # 2. Equity Cost
-    # We still use the linear model for equity premium as we don't have a "Credit Rating for Equity"
-    # Alternatively, we could scale it by the spread increase ratio, but sticking to the slope is safer for now.
+    # Linear model for equity premium (no credit rating equivalent for equity)
+    # Could scale by spread increase ratio, but slope approach is safer.
     baseline_equity_rate = 0.12
     equity_premium_pct = expected_loss_pct * equity_slope
     adjusted_equity_rate = baseline_equity_rate + (equity_premium_pct / 100)
@@ -232,7 +234,9 @@ def calculate_financing_with_counterfactual(
     scenario_equity_rate = baseline_equity_rate + (equity_premium_pct / 100)
 
     # WACC calculations
-    wacc_counterfactual = debt_fraction * counterfactual_debt_rate + equity_fraction * baseline_equity_rate
+    wacc_counterfactual = (
+        debt_fraction * counterfactual_debt_rate + equity_fraction * baseline_equity_rate
+    )
     wacc_scenario = debt_fraction * scenario_debt_rate + equity_fraction * scenario_equity_rate
 
     # CRP = spread differential in basis points

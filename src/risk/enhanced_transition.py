@@ -276,13 +276,23 @@ def apply_enhanced_transition(
                 prices.append(cp.carbon_price_usd if cp else carbon_trajectory.get(year, 8))
             carbon_price = np.mean(prices)
         
-        adjusted_life = enhanced_korea_scenario.get_operating_years(
+        enhanced_life = enhanced_korea_scenario.get_operating_years(
             plant_params.get("cod_year", 2024),
             baseline_life
         )
-        
+
+        # Apply scenario severity: dispatch_priority_penalty scales the enhanced plan CF
+        # moderate (0.10) → CF reduced by 10%, aggressive (0.25) → CF reduced by 25%
+        if scenario.dispatch_priority_penalty > 0:
+            adjusted_cf = adjusted_cf * (1.0 - scenario.dispatch_priority_penalty)
+
+        # Cap operating years with scenario's retirement schedule
+        adjusted_life = min(enhanced_life, scenario.retirement_years)
+
         policy_mechanism = "11th Basic Plan - Accelerated Coal Phase-out"
-        notes = f"Enhanced Korea Power Plan: {enhanced_korea_scenario.name} | {enhanced_korea_scenario.policy_reference}"
+        notes = (f"Enhanced Korea Power Plan: {enhanced_korea_scenario.name} | "
+                 f"{enhanced_korea_scenario.policy_reference} | "
+                 f"severity_penalty={scenario.dispatch_priority_penalty:.1%}")
     
     # Fallback to legacy Korea Power Plan
     elif korea_plan_scenario is not None and KOREA_POWER_PLAN_AVAILABLE:

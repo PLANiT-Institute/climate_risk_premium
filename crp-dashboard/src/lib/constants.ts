@@ -48,6 +48,8 @@ export const SCENARIO_LABELS: Record<string, string> = {
   combined_aggressive: "Combined Aggressive",
   low_demand: "Low Demand",
   severe_drought: "Severe Drought",
+  enhanced_11th_plan: "Enhanced 11th Plan",
+  enhanced_combined: "Enhanced Combined",
 };
 
 export const SCENARIO_COLORS: Record<string, string> = {
@@ -61,6 +63,8 @@ export const SCENARIO_COLORS: Record<string, string> = {
   combined_aggressive: "#8e44ad",
   low_demand: "#f39c12",
   severe_drought: "#c0392b",
+  enhanced_11th_plan: "#d63031",
+  enhanced_combined: "#6c5ce7",
 };
 
 export const INVESTMENT_GRADE_RATINGS = ["AAA", "AA", "A", "BBB"];
