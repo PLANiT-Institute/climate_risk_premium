@@ -120,11 +120,7 @@ See `docs/METHODOLOGY_EQUATIONS.md` for complete equations.
 
 ---
 
-<<<<<<< HEAD
-## Simplified Structure
-=======
 ## Simplified in December 2024
->>>>>>> 7b1507166a09149c835e7a055a114db44cb2809e
 
 Previous version had 763 lines of complex code. Simplified to ~270 lines.
 
@@ -134,12 +130,8 @@ Previous version had 763 lines of complex code. Simplified to ~270 lines.
 - Single entry point: `calculate_physical_risk(year, rcp)`
 - Added visualization tools
 
-<<<<<<< HEAD
-**Archived files:** `archive/deprecated_correction/`
-=======
 **Archived files:** `archive/deprecated_2024_correction/`
 
 ---
 
 *Last updated: December 2024*
->>>>>>> 7b1507166a09149c835e7a055a114db44cb2809e

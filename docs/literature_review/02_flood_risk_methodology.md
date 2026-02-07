@@ -244,11 +244,7 @@ def climate_multiplier(year):
 
 ## 8. References
 
-<<<<<<< HEAD
-All citations have been verified.
-=======
 All citations have been verified as of December 2024.
->>>>>>> 7b1507166a09149c835e7a055a114db44cb2809e
 
 1. **FEMA (2025)**. *Hazus Flood Model Technical Manual, Version 7.0*. Federal Emergency Management Agency.
    - URL: https://www.fema.gov/flood-maps/products-tools/hazus
@@ -279,18 +275,6 @@ All citations have been verified as of December 2024.
 
 ## Citation Verification Log
 
-<<<<<<< HEAD
-| Source | Verification Method | Status |
-|--------|---------------------|--------|
-| FEMA HAZUS | Official FEMA website | ✅ |
-| Kim et al. (2024) | MDPI journal, DOI confirmed | ✅ |
-| Jang et al. (2023) | ScienceDirect, DOI confirmed | ✅ |
-| Seoul Flood Policy | Government website | ✅ |
-| IPCC AR6 | Official IPCC website | ✅ |
-
----
-
-=======
 | Source | Verification Method | Date Verified |
 |--------|---------------------|---------------|
 | FEMA HAZUS | Official FEMA website | Dec 2024 |
@@ -303,5 +287,4 @@ All citations have been verified as of December 2024.
 
 *Document created: December 2024*
 *Last updated: December 2024 - Citation Verification Complete*
->>>>>>> 7b1507166a09149c835e7a055a114db44cb2809e
 *Part of: Physical Risk Module Review - Step 4*

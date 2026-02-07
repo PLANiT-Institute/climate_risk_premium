@@ -342,11 +342,7 @@ def calculate_wildfire_outage_rate(
 
 ## 10. References
 
-<<<<<<< HEAD
-All citations have been verified.
-=======
 All citations have been verified as of December 2024.
->>>>>>> 7b1507166a09149c835e7a055a114db44cb2809e
 
 1. **Dale, L. et al. (2018)**. Assessing the Impact of Wildfires on the California Electricity Grid. California Energy Commission, CCCA4-CEC-2018-002.
    - URL: https://www.energy.ca.gov/sites/default/files/2019-12/Forests_CCCA4-CEC-2018-002_ada.pdf
@@ -378,18 +374,6 @@ All citations have been verified as of December 2024.
 
 ## Citation Verification Log
 
-<<<<<<< HEAD
-| Source | Verification Method | Corrections Made |
-|--------|---------------------|------------------|
-| Dale et al. (2018) | CA Energy Commission website | Added full citation |
-| Kim et al. (2025) | Springer Nature DOI | None |
-| Lee et al. (2025) | Nature Scientific Reports DOI | Author corrected from "Jang" |
-| World Weather Attribution | Official WWA website | None |
-| Forests FWI paper | MDPI journal | None |
-
----
-
-=======
 | Source | Verification Method | Date Verified | Corrections Made |
 |--------|---------------------|---------------|------------------|
 | Dale et al. (2018) | CA Energy Commission website | Dec 2024 | Added full citation |
@@ -402,5 +386,4 @@ All citations have been verified as of December 2024.
 
 *Document created: December 2024*
 *Last updated: December 2024 - Citation Verification Complete*
->>>>>>> 7b1507166a09149c835e7a055a114db44cb2809e
 *Part of: Physical Risk Module Review - Step 6*

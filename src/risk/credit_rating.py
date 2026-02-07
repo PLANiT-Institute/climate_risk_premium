@@ -407,9 +407,9 @@ def calculate_rating_metrics_from_financials(
     cash_and_equivalents: float,
     total_equity: float,
     total_assets: float,
-    dscr: float = None,
-    total_debt_service: float = None,
-    cfads: float = None,
+    dscr: Optional[float] = None,
+    total_debt_service: Optional[float] = None,
+    cfads: Optional[float] = None,
     consecutive_loss_years: int = 0,
 ) -> RatingMetrics:
     """
@@ -445,11 +445,11 @@ def calculate_rating_metrics_from_financials(
     net_debt = total_debt - cash_and_equivalents
     if is_ebitda_negative:
         # Negative EBITDA: ratio is meaningless, set high to trigger distress
-        net_debt_to_ebitda = 999 if net_debt > 0 else -999
+        net_debt_to_ebitda = 999.0 if net_debt > 0 else -999.0
     elif ebitda > 0:
         net_debt_to_ebitda = net_debt / ebitda
     else:
-        net_debt_to_ebitda = 999
+        net_debt_to_ebitda = 999.0
 
     # Leverage ratios - standard calculation
     debt_to_equity = (total_debt / total_equity * 100) if total_equity > 0 else 999
@@ -597,7 +597,7 @@ def get_counterfactual_baseline_rating() -> Rating:
 
 def assess_rating_with_counterfactual(
     scenario_metrics: RatingMetrics,
-    counterfactual_rating: Rating = None,
+    counterfactual_rating: Optional[Rating] = None,
 ) -> Dict[str, Any]:
     """
     Assess credit rating and calculate CRP against counterfactual baseline.

@@ -1,10 +1,7 @@
 # Physical Risk Module - Final Structure
 
-<<<<<<< HEAD
-=======
 **Date:** December 29, 2024
 
->>>>>>> 7b1507166a09149c835e7a055a114db44cb2809e
 ---
 
 ## HONEST ASSESSMENT: CLIMADA API Usage
@@ -218,8 +215,5 @@ risk_premium_2026/
 | Knutson et al. (2020) | 10.1175/BAMS-D-18-0194.1 | TC climate factor |
 
 ---
-<<<<<<< HEAD
-=======
 
 *Document created: December 29, 2024*
->>>>>>> 7b1507166a09149c835e7a055a114db44cb2809e

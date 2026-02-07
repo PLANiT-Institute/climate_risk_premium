@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-# Physical Risk Model
-=======
 # Physical Risk Model v2.0
->>>>>>> 7b1507166a09149c835e7a055a114db44cb2809e
 
 ## Overview
 
@@ -27,11 +23,7 @@ physical_risk_steps/
 ├── output/                      # MODEL OUTPUTS
 │   └── physical_risk_output.csv # Calculated results
 │
-<<<<<<< HEAD
-└── archive/                     # Previous versions
-=======
 └── archive_2024_12_29/          # Previous versions
->>>>>>> 7b1507166a09149c835e7a055a114db44cb2809e
 ```
 
 ---
@@ -98,11 +90,7 @@ physical_risk_steps/
 
 ### 1. climada_data.csv
 
-<<<<<<< HEAD
-CLIMADA API outputs.
-=======
 CLIMADA API outputs from December 29, 2024 query.
->>>>>>> 7b1507166a09149c835e7a055a114db44cb2809e
 
 | Column | Description |
 |--------|-------------|
@@ -163,8 +151,6 @@ python -m src.climada.climada_physical_risk_model
 ## Documentation
 
 Full methodology and sources: [PHYSICAL_RISK_MODEL.md](./PHYSICAL_RISK_MODEL.md)
-<<<<<<< HEAD
-=======
 
 ---
 
@@ -175,4 +161,3 @@ Full methodology and sources: [PHYSICAL_RISK_MODEL.md](./PHYSICAL_RISK_MODEL.md)
 | 1.0 | 2024-12-29 | Initial release |
 | 1.1 | 2024-12-29 | Peer review revisions |
 | 2.0 | 2024-12-29 | CSV-based pipeline |
->>>>>>> 7b1507166a09149c835e7a055a114db44cb2809e
