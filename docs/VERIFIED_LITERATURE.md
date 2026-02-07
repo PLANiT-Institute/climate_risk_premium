@@ -1028,8 +1028,5 @@ archive/deprecated_docs_2024/
 
 ---
 
-<<<<<<< HEAD
-=======
 *Last updated: December 28, 2024*
->>>>>>> 7b1507166a09149c835e7a055a114db44cb2809e
 *Verification performed via DOI.org and journal websites*

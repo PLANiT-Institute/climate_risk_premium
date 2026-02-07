@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import ScenarioSelector from "@/components/dashboard/ScenarioSelector";
 import DeathSpiralChart from "@/components/charts/DeathSpiralChart";
-import { CreditRatingRow, CashflowRow } from "@/lib/supabase/types";
+import { CreditRatingRow, CashflowRow, RawCashflowRow, normalizeCashflowRow } from "@/lib/supabase/types";
 import { SCENARIO_LABELS, RATING_COLORS } from "@/lib/constants";
 
 export default function DeathSpiralPage() {
@@ -19,9 +19,14 @@ export default function DeathSpiralPage() {
         ...Object.keys(SCENARIO_LABELS).map(async (s) => {
           try {
             const mod = await import(`@/data/cashflows/${s}.json`);
-            return { scenario: s, data: mod.default as CashflowRow[] };
+            return {
+              scenario: s,
+              data: (mod.default as RawCashflowRow[]).map((r) =>
+                normalizeCashflowRow(r, s)
+              ),
+            };
           } catch {
-            return { scenario: s, data: [] };
+            return { scenario: s, data: [] as CashflowRow[] };
           }
         }),
       ]);

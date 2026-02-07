@@ -1,16 +1,18 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import ScenarioSelector from "@/components/dashboard/ScenarioSelector";
 import CashflowWaterfall from "@/components/charts/CashflowWaterfall";
 import EbitdaTimeSeries from "@/components/charts/EbitdaTimeSeries";
-import { CashflowRow } from "@/lib/supabase/types";
+import FcfTimeSeries from "@/components/charts/FcfTimeSeries";
+import { CashflowRow, RawCashflowRow, normalizeCashflowRow } from "@/lib/supabase/types";
 import { SCENARIO_LABELS } from "@/lib/constants";
 
 export default function CashflowsPage() {
   const [selected, setSelected] = useState(["baseline"]);
   const [allData, setAllData] = useState<Record<string, CashflowRow[]>>({});
   const [loading, setLoading] = useState(true);
+  const [yearIndex, setYearIndex] = useState(0);
 
   useEffect(() => {
     async function load() {
@@ -20,10 +22,9 @@ export default function CashflowsPage() {
         scenarios.map(async (s) => {
           try {
             const mod = await import(`@/data/cashflows/${s}.json`);
-            result[s] = (mod.default as CashflowRow[]).map((r) => ({
-              ...r,
-              scenario: s,
-            }));
+            result[s] = (mod.default as RawCashflowRow[]).map((r) =>
+              normalizeCashflowRow(r, s)
+            );
           } catch {
             result[s] = [];
           }
@@ -36,7 +37,14 @@ export default function CashflowsPage() {
   }, []);
 
   const primaryScenario = selected[0] || "baseline";
-  const firstYear = allData[primaryScenario]?.[0];
+  const scenarioData = allData[primaryScenario] || [];
+  const years = useMemo(() => scenarioData.map((r) => r.year), [scenarioData]);
+  const selectedYear = scenarioData[yearIndex];
+
+  // Reset year index when scenario changes
+  useEffect(() => {
+    setYearIndex(0);
+  }, [primaryScenario]);
 
   return (
     <>
@@ -58,14 +66,39 @@ export default function CashflowsPage() {
         <div className="text-slate-400 text-center py-12">Loading cashflow data...</div>
       ) : (
         <>
-          {/* Waterfall for first year */}
-          {firstYear && (
+          {/* Waterfall with year slider */}
+          {selectedYear && (
             <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-              <h2 className="text-lg font-semibold text-slate-800 mb-4">
-                Year {firstYear.year} Cashflow Waterfall —{" "}
-                {SCENARIO_LABELS[primaryScenario]}
-              </h2>
-              <CashflowWaterfall data={firstYear} />
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-slate-800">
+                  Year {selectedYear.year} Cashflow Waterfall —{" "}
+                  {SCENARIO_LABELS[primaryScenario]}
+                </h2>
+                <span className="text-sm font-mono text-slate-500">
+                  EBITDA: ${(selectedYear.ebitda / 1e6).toFixed(0)}M
+                </span>
+              </div>
+
+              <CashflowWaterfall data={selectedYear} />
+
+              {/* Year slider */}
+              {years.length > 1 && (
+                <div className="mt-4 px-2">
+                  <input
+                    type="range"
+                    min={0}
+                    max={years.length - 1}
+                    value={yearIndex}
+                    onChange={(e) => setYearIndex(Number(e.target.value))}
+                    className="w-full accent-teal-600"
+                  />
+                  <div className="flex justify-between text-xs text-slate-400 mt-1">
+                    <span>{years[0]}</span>
+                    <span>{years[Math.floor(years.length / 2)]}</span>
+                    <span>{years[years.length - 1]}</span>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
@@ -75,6 +108,14 @@ export default function CashflowsPage() {
               EBITDA Trajectory
             </h2>
             <EbitdaTimeSeries data={allData} scenarios={selected} />
+          </div>
+
+          {/* Free Cash Flow Time Series */}
+          <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+            <h2 className="text-lg font-semibold text-slate-800 mb-4">
+              Free Cash Flow Trajectory
+            </h2>
+            <FcfTimeSeries data={allData} scenarios={selected} />
           </div>
 
           {/* Cashflow Table */}
@@ -97,10 +138,14 @@ export default function CashflowsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {(allData[primaryScenario] || []).map((row) => (
+                  {scenarioData.map((row) => (
                     <tr
                       key={row.year}
-                      className="border-b border-slate-100 hover:bg-slate-50"
+                      className={`border-b border-slate-100 hover:bg-slate-50 ${
+                        row.year === selectedYear?.year
+                          ? "bg-teal-50 font-medium"
+                          : ""
+                      }`}
                     >
                       <td className="p-2">{row.year}</td>
                       <td className="p-2 text-right">

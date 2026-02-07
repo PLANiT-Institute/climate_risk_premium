@@ -2,6 +2,7 @@ import { getScenarioResults } from "@/lib/queries/scenarios";
 import { getRatingTrajectories } from "@/lib/queries/ratings";
 import RatingMigration from "@/components/charts/RatingMigration";
 import DscrTimeSeries from "@/components/charts/DscrTimeSeries";
+import SpreadTimeSeries from "@/components/charts/SpreadTimeSeries";
 import { RATING_COLORS, SCENARIO_LABELS } from "@/lib/constants";
 
 export const revalidate = 3600;
@@ -37,6 +38,17 @@ export default async function CreditPage() {
           DSCR Trajectories
         </h2>
         <DscrTimeSeries data={ratings} scenarios={allScenarios} />
+      </div>
+
+      {/* Spread Time Series */}
+      <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+        <h2 className="text-lg font-semibold text-slate-800 mb-4">
+          Credit Spread Trajectories
+        </h2>
+        <p className="text-xs text-slate-500 mb-4">
+          Credit spread (bps) evolution by scenario, reflecting rating-driven cost of debt changes
+        </p>
+        <SpreadTimeSeries data={ratings} scenarios={allScenarios} />
       </div>
 
       {/* Rating Component Table */}

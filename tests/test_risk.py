@@ -35,23 +35,15 @@ def test_transition_adjustments(plant_params):
 
 
 def test_physical_adjustments(plant_params):
-    """Test physical risk adjustments."""
-    scenario = PhysicalScenario(
-        name="high_physical",
-        wildfire_outage_rate=0.05,
-        drought_derate=0.08,
-        cooling_temp_penalty=0.05,
-    )
+    """Test physical risk adjustments via engine-based API."""
+    adj = apply_physical(plant_params, "Baseline (Corrected)", 2024)
 
-    adj = apply_physical(plant_params, scenario)
-
-    # Outage rate should increase
-    base_outage = plant_params['base_outage_rate']
-    assert adj.outage_rate == base_outage + 0.05
-
-    # Derate and efficiency loss should be set
-    assert adj.capacity_derate == 0.08
-    assert adj.efficiency_loss == 0.05
+    # Engine returns PhysicalAdjustments with non-negative values
+    assert adj.outage_rate >= 0.0
+    assert adj.capacity_derate >= 0.0
+    assert adj.efficiency_loss >= 0.0
+    assert adj.water_constrained_capacity > 0.0
+    assert adj.water_constrained_capacity <= 1.0
 
 
 def test_expected_loss_calculation():

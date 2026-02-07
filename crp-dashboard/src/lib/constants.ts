@@ -38,7 +38,8 @@ export const RATING_SPREADS: Record<string, number> = {
 };
 
 export const SCENARIO_LABELS: Record<string, string> = {
-  baseline: "Baseline (No Risk)",
+  no_carbon_baseline: "No-Carbon Baseline",
+  baseline: "Baseline",
   moderate_transition: "Moderate Transition",
   aggressive_transition: "Aggressive Transition",
   moderate_physical: "Moderate Physical",
@@ -50,6 +51,7 @@ export const SCENARIO_LABELS: Record<string, string> = {
 };
 
 export const SCENARIO_COLORS: Record<string, string> = {
+  no_carbon_baseline: "#95a5a6",
   baseline: "#1a5f7a",
   moderate_transition: "#3498db",
   aggressive_transition: "#2c3e50",
