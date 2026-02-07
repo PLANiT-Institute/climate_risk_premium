@@ -20,6 +20,7 @@ def sample_plant_params():
         "debt_interest_rate": 0.05,
         "debt_tenor_years": 10,
         "power_price_per_mwh": 100,
+        "heat_rate_mmbtu_mwh": 9.5,
         "fixed_opex_per_kw_year": 0, # Simplify
         "variable_opex_per_mwh": 0, # Simplify
         "fuel_price_per_mmbtu": 0, # Simplify

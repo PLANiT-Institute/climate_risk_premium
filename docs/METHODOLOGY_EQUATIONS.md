@@ -31,8 +31,8 @@
     ┌─────────────────────────────────────────────┐
     │         COMPOUND RISK MULTIPLIER             │
     │                                              │
-    │   compound = 1 + (ρ × stress_indicator)     │
-    │   Max = 1.25x                               │
+    │   compound = 1.0 (independent hazards)      │
+    │   Legacy max = 1.25x (not used in prod)     │
     └─────────────────────────────────────────────┘
                           │
                           ▼
@@ -87,15 +87,16 @@ Calculation:
 ```
 R_wild(year, rcp) = R_wild,base × CC_multiplier(year, rcp)
 
-Climate Change Multiplier Table:
+Climate Change Multiplier Table (from src/climada/literature_parameters.py):
 ┌──────┬────────────┬────────────┐
 │ Year │   RCP4.5   │   RCP8.5   │
 ├──────┼────────────┼────────────┤
 │ 2024 │    1.00x   │    1.00x   │
 │ 2030 │    1.20x   │    1.30x   │
-│ 2040 │    1.50x   │    2.00x   │
+│ 2040 │    1.35x   │    1.65x   │
 │ 2050 │    1.50x   │    2.00x   │
-│ 2060 │    2.00x   │    4.00x   │
+│ 2060 │    1.70x   │    2.50x   │
+│ 2100 │    —       │    4.00x   │
 └──────┴────────────┴────────────┘
 ```
 
@@ -233,19 +234,22 @@ Total:
 
 ### 3.3 SLR Projections by Year
 
-**Source:** IPCC AR6 WGI Chapter 9
+**Source:** CMIP6 Models via MDPI Atmosphere (2021) | DOI: 10.3390/atmos12010090
 
 ```
-Global Mean Sea Level Rise (relative to 1995-2014):
+Sea Level Rise Projections (CMIP6, from src/climada/literature_parameters.py):
 ┌──────┬─────────┬─────────┐
-│ Year │  RCP4.5 │  RCP8.5 │
+│ Year │ SSP2-4.5│ SSP5-8.5│
 ├──────┼─────────┼─────────┤
-│ 2030 │  0.10m  │  0.10m  │
-│ 2040 │  0.19m  │  0.25m  │
-│ 2050 │  0.19m  │  0.25m  │
-│ 2060 │  0.19m  │  0.73m  │
-│ 2100 │  0.53m  │  0.84m  │
+│ 2030 │  0.05m  │  0.06m  │
+│ 2040 │  0.08m  │  0.12m  │
+│ 2050 │  0.12m  │  0.18m  │
+│ 2060 │  0.16m  │  0.30m  │
+│ 2100 │  0.25m  │  0.63m  │
 └──────┴─────────┴─────────┘
+
+Note: These are CMIP6 projections (lower than earlier IPCC AR6 WGI Ch9 estimates).
+SSP2-4.5 range at 2100: 0.15-0.35m; SSP5-8.5 range at 2100: 0.50-0.76m.
 ```
 
 ---
@@ -269,6 +273,15 @@ Our approach: Conservative correlation-based adjustment
 
 ### 4.2 Multiplier Calculation
 
+**Current Implementation:** The production code in `src/climada/literature_parameters.py`
+sets `compound_multiplier = 1.0` for all projection scenarios. This effectively disables
+compound amplification, treating hazards as independent and additive.
+
+**Rationale:** For a single asset (vs. a network/portfolio), compound effects are minimal.
+Individual hazard rates already capture extreme tail events. Korea's robust disaster
+response infrastructure further limits cascading failures at a single site.
+
+**Legacy formula (preserved for reference):**
 ```
 M_compound = 1 + (ρ × S)
 
@@ -277,16 +290,11 @@ Where:
   S = stress_indicator = (R_wild + R_flood + D_slr) / 0.01
 
 Maximum: M_compound ≤ 1.25
-
-Example (2060 RCP8.5):
-  R_wild = 0.00219 (0.22%)
-  R_flood = 0.00003 (0.003%)
-  D_slr = 0.0016 (0.16%)
-
-  S = (0.00219 + 0.00003 + 0.0016) / 0.01 = 0.38
-
-  M_compound = 1 + (0.3 × 0.38) = 1.114
 ```
+
+The legacy `calculate_compound_multiplier()` function supports severity-based values
+(baseline=1.0, moderate=1.05, high=1.10, extreme=1.15, catastrophic=1.25) but these
+are not used in the main projection pipeline.
 
 ### 4.3 Why Previous Multipliers Were Too High
 
@@ -333,16 +341,15 @@ R_total = (0.00055 + 0.000029 + 0) × 1.0
         = 0.000579 (0.058%)
 ```
 
-**RCP8.5 2060:**
+**RCP8.5 2060 (from code: wildfire_mult=2.5, flood_mult=1.80, slr=0.30m, compound=1.0):**
 ```
-R_wild  = 0.00219
-R_flood = 0.000031
-D_slr   = 0.00161
-M       = 1.15
+R_wild  = 0.00055 × 2.5  = 0.001375
+R_flood = 0.00003 × 1.80 = 0.000054
+D_slr   = 0.0022 × 0.30  = 0.000660
+M       = 1.0
 
-R_total = (0.00219 + 0.000031 + 0.00161) × 1.15
-        = 0.00383 × 1.15
-        = 0.00440 (0.44%)
+R_total = (0.001375 + 0.000054 + 0.000660) × 1.0
+        = 0.002089 (0.21%)
 ```
 
 ---
@@ -360,10 +367,10 @@ Where:
   D_capacity  = D_slr (capacity derating)
   D_efficiency = 0 (captured in D_slr for this model)
 
-Example (2060 RCP8.5):
-  CF_effective = 0.85 × (1 - 0.00222) × (1 - 0.00161) × 1.0
-               = 0.85 × 0.99778 × 0.99839
-               = 0.847 (reduction of ~0.3%)
+Example (2060 RCP8.5, from code):
+  CF_effective = 0.85 × (1 - 0.001429) × (1 - 0.000660) × 1.0
+               = 0.85 × 0.998571 × 0.999340
+               = 0.848 (reduction of ~0.21%)
 ```
 
 ### 6.2 DSCR Impact
@@ -371,12 +378,12 @@ Example (2060 RCP8.5):
 ```
 DSCR_impact = DSCR_base × R_total
 
-Example:
+Example (2060 RCP8.5):
   DSCR_base = 1.40x
-  R_total = 0.0044 (0.44%)
+  R_total = 0.0021 (0.21%)
 
-  DSCR_reduction = 1.40 × 0.0044 = 0.006x
-  DSCR_new = 1.40 - 0.006 = 1.394x
+  DSCR_reduction = 1.40 × 0.0021 = 0.003x
+  DSCR_new = 1.40 - 0.003 = 1.397x
 ```
 
 ### 6.3 Credit Spread Approximation
@@ -388,8 +395,8 @@ Where:
   risk_aversion_factor = 2-3 (typical for infrastructure)
 
 Example (2060 RCP8.5):
-  Spread_impact = 0.0044 × 1000 × 2.5
-                = 11 bps
+  Spread_impact = 0.0021 × 1000 × 2.5
+                = 5 bps
 
 Note: This is a rough approximation. Actual spreads depend on
       rating agency methodologies and market conditions.
@@ -404,8 +411,8 @@ Note: This is a rough approximation. Actual spreads depend on
 | Wildfire base rate | 0.055% | Kim et al. (2025) | 10.1007/s11069-025-07169-4 |
 | Flood base rate | 0.003% | Kim et al. (2024) | 10.3390/w16202987 |
 | SLR derate factor | 0.22%/m | Van Vliet (2016) | 10.1038/nclimate2903 |
-| Climate fire multiplier | 2x by 2050 | WWA (2025) | worldweatherattribution.org |
-| Compound max | 1.25x | Adapted framework | Zscheischler (2018) |
+| Climate fire multiplier | 2x by 2050 (RCP8.5) | WWA (2025) | worldweatherattribution.org |
+| Compound multiplier | 1.0 (production) | Conservative single-asset | Zscheischler (2018) framework |
 | Correlation estimate | 0.3 | Conservative estimate | - |
 
 ---
@@ -423,8 +430,6 @@ All equations are implemented in:
 
 ---
 
-<<<<<<< HEAD
-=======
 *Document created: December 2024*
->>>>>>> 7b1507166a09149c835e7a055a114db44cb2809e
+*Last updated: February 2026 (synced with src/climada/literature_parameters.py)*
 *Part of: Physical Risk Module Review - Step 9*

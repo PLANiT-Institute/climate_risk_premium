@@ -5,16 +5,20 @@ Updated to support new class-based risk models (src.models).
 """
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 
 import pandas as pd
 
+logger = logging.getLogger(__name__)
+
 from src.data import load_inputs, get_param_value
 from src.scenarios import TransitionScenario, PhysicalScenario, MarketScenario
 from src.risk import (
-    apply_transition, apply_physical, map_expected_loss_to_spreads, calculate_expected_loss, FinancingImpact,
+    TransitionAdjustments, apply_transition, apply_physical,
+    map_expected_loss_to_spreads, calculate_expected_loss, FinancingImpact,
     assess_credit_rating, calculate_rating_metrics_from_financials, RatingAssessment,
     calculate_financing_from_rating
 )
@@ -193,12 +197,18 @@ class CRPModelRunner:
             # Fallback to baseline if not found
             return get_physical_risk_scenario("Low")
 
+        # row may be a dataclass or a dict; use getattr for dataclasses, .get for dicts
+        def _val(key, default=0):
+            if isinstance(row, dict):
+                return row.get(key, default)
+            return getattr(row, key, default)
+
         return PhysicalScenario(
             name=scenario_name,
-            wildfire_outage_rate=float(row.get('wildfire_outage_rate', 0)),
-            drought_derate=float(row.get('drought_derate', 0)),
-            cooling_temp_penalty=float(row.get('cooling_temp_penalty', 0)),
-            water_availability_pct=float(row.get('water_availability_pct', 100.0)),
+            wildfire_outage_rate=float(_val('wildfire_outage_rate', 0)),
+            drought_derate=float(_val('drought_derate', 0)),
+            cooling_temp_penalty=float(_val('cooling_temp_penalty', 0)),
+            water_availability_pct=float(_val('water_availability_pct', 100.0)),
         )
 
     def _load_market_scenario(self, scenario_name: str) -> MarketScenario:
@@ -297,6 +307,10 @@ class CRPModelRunner:
                 (baseline, transition-only, physical-only, combined) and
                 produce a Shapley-value risk attribution.
         """
+        logger.info(
+            "Running scenario '%s' (transition=%s, physical=%s, market=%s)",
+            scenario_name, transition_scenario_name, physical_scenario_name, market_scenario_name,
+        )
         plant_params = self._get_plant_params()
 
         transition_scenario = self._load_transition_scenario(transition_scenario_name)
@@ -332,11 +346,9 @@ class CRPModelRunner:
                 end_year=start + transition_adj.operating_years - 1,
             )
 
-        # Handle physical scenario using new apply_physical(plant_params, scenario_name, year)
-        # The new API uses scenario_name string instead of PhysicalScenario objects
+        # Handle physical scenario: dispatch on data type
         if isinstance(physical_data, CLIMADAHazardData):
-            # CLIMADA data: use the scenario name from climada_hazards
-            # Create PhysicalAdjustments directly from CLIMADAHazardData
+            # CLIMADA hazard data loaded from CSV — build adjustments directly
             physical_adj = PhysicalAdjustments(
                 outage_rate=physical_data.wildfire_outage_rate + physical_data.flood_outage_rate,
                 capacity_derate=physical_data.slr_capacity_derate,
@@ -344,12 +356,13 @@ class CRPModelRunner:
                 water_constrained_capacity=1.0,
                 notes=f"CLIMADA: {physical_data.data_source}",
             )
-        elif hasattr(physical_data, 'name'):
-            # PhysicalScenario object from data_loader - use the name
-            physical_adj = apply_physical(plant_params, physical_data.name, current_year or 2024)
+        elif isinstance(physical_data, PhysicalScenario):
+            # PhysicalScenario object — pass directly to apply_physical
+            physical_adj = apply_physical(plant_params, physical_data)
         else:
-            # String scenario name
-            physical_adj = apply_physical(plant_params, str(physical_scenario_name), current_year or 2024)
+            # String or unknown — resolve to a PhysicalScenario via get_physical_risk_scenario
+            scenario_obj = get_physical_risk_scenario(str(physical_scenario_name))
+            physical_adj = apply_physical(plant_params, scenario_obj)
 
         # --- Combined run (always performed, same as before) ---
         combined = self._compute_component(
@@ -474,25 +487,38 @@ class CRPModelRunner:
                 {"name": "enhanced_combined", "transition": "moderate_transition", "physical": "moderate_physical", "use_enhanced": True},
             ]
 
+        logger.info("Running %d scenarios (decompose=%s)", len(scenarios), decompose)
         results = {}
         baseline_result = None
 
         # Run all scenarios
-        for scenario_spec in scenarios:
+        for i, scenario_spec in enumerate(scenarios, 1):
             market_name = scenario_spec.get("market", "baseline")
             power_plan_name = scenario_spec.get("power_plan", None)
             use_enhanced = scenario_spec.get("use_enhanced", False)
 
-            result = self.run_scenario(
-                scenario_spec["name"],
-                scenario_spec["transition"],
-                scenario_spec.get("physical", "baseline"),
-                market_name,
-                power_plan_name,
-                use_enhanced_korea_plan=use_enhanced,
-                decompose=decompose,
-            )
-            results[scenario_spec["name"]] = result
+            try:
+                result = self.run_scenario(
+                    scenario_spec["name"],
+                    scenario_spec["transition"],
+                    scenario_spec.get("physical", "baseline"),
+                    market_name,
+                    power_plan_name,
+                    use_enhanced_korea_plan=use_enhanced,
+                    decompose=decompose,
+                )
+                results[scenario_spec["name"]] = result
+                logger.info(
+                    "[%d/%d] Scenario '%s' completed (NPV=%,.0f, IRR=%.2f%%)",
+                    i, len(scenarios), scenario_spec["name"],
+                    result.metrics.npv, result.metrics.irr * 100,
+                )
+            except Exception as exc:
+                logger.error(
+                    "[%d/%d] Scenario '%s' failed: %s",
+                    i, len(scenarios), scenario_spec["name"], exc,
+                )
+                raise
 
             if scenario_spec["name"] == "baseline":
                 baseline_result = result

@@ -1,4 +1,4 @@
-import { CashflowRow } from "../supabase/types";
+import { CashflowRow, RawCashflowRow, normalizeCashflowRow } from "../supabase/types";
 
 const cashflowCache: Record<string, CashflowRow[]> = {};
 
@@ -6,10 +6,9 @@ async function fetchLocalCashflow(scenario: string): Promise<CashflowRow[]> {
   if (cashflowCache[scenario]) return cashflowCache[scenario];
   try {
     const { default: data } = await import(`@/data/cashflows/${scenario}.json`);
-    const rows = (data as Omit<CashflowRow, "scenario">[]).map((row) => ({
-      ...row,
-      scenario,
-    }));
+    const rows = (data as RawCashflowRow[]).map((row) =>
+      normalizeCashflowRow(row, scenario)
+    );
     cashflowCache[scenario] = rows;
     return rows;
   } catch {
@@ -37,9 +36,9 @@ export async function getCashflows(scenario: string): Promise<CashflowRow[]> {
 
 export async function getAllCashflows(): Promise<Record<string, CashflowRow[]>> {
   const scenarios = [
-    "baseline", "moderate_transition", "aggressive_transition",
-    "moderate_physical", "high_physical", "combined_moderate",
-    "combined_aggressive", "low_demand", "severe_drought",
+    "no_carbon_baseline", "baseline", "moderate_transition",
+    "aggressive_transition", "moderate_physical", "high_physical",
+    "combined_moderate", "combined_aggressive", "low_demand", "severe_drought",
   ];
   const result: Record<string, CashflowRow[]> = {};
   await Promise.all(

@@ -66,6 +66,24 @@ export interface CashflowRow {
   capex: number;
   free_cash_flow: number;
   capacity_factor: number;
+  carbon_costs?: number;
+}
+
+/** Raw JSON may use `lost_revenue_from_outages` instead of `outage_costs`. */
+export interface RawCashflowRow extends Omit<CashflowRow, "outage_costs" | "scenario"> {
+  outage_costs?: number;
+  lost_revenue_from_outages?: number;
+}
+
+export function normalizeCashflowRow(
+  raw: RawCashflowRow,
+  scenario: string
+): CashflowRow {
+  return {
+    ...raw,
+    scenario,
+    outage_costs: raw.outage_costs ?? raw.lost_revenue_from_outages ?? 0,
+  };
 }
 
 export interface CreditRatingRow {

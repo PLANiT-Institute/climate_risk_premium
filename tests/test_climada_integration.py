@@ -74,27 +74,23 @@ def test_effective_capacity_factor_multiplier():
 
 
 def test_calculate_compound_risk():
-    """Test compound risk calculation with dynamic amplification."""
+    """Test compound risk calculation with corrected multiplier logic."""
     hazard = calculate_compound_risk(
         wildfire_outage=0.025,
         flood_outage=0.003,
         slr_derate=0.020,
-        base_amplification=1.2
+        scenario_severity="moderate"
     )
 
     assert hazard.wildfire_outage_rate == 0.025
     assert hazard.flood_outage_rate == 0.003
     assert hazard.slr_capacity_derate == 0.020
 
-    # Compound multiplier is calculated dynamically based on total risk
-    # total_base_risk = 0.025 + 0.003 + 0.020 = 0.048
-    # risk_factor = min(1.0, 0.048 * 10) = 0.48
-    # final_multiplier = 1.2 + (0.8 * 0.48) = 1.584
-    expected_multiplier = 1.2 + (0.8 * min(1.0, 0.048 * 10))
-    assert abs(hazard.compound_multiplier - expected_multiplier) < 0.001
+    # Corrected: moderate severity = 1.05x multiplier
+    assert hazard.compound_multiplier == 1.05
 
     # Total outage should include compound multiplier
-    expected_outage = (0.025 + 0.003) * expected_multiplier
+    expected_outage = (0.025 + 0.003) * 1.05
     assert abs(hazard.total_outage_rate - expected_outage) < 0.0001
 
 
