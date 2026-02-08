@@ -54,26 +54,20 @@ def map_scenario(crp_scenario: str) -> str:
 class PLANiTAdapter:
     """Converts PLANiT hazard results to PhysicalAdjustments fields.
 
-    WILDFIRE-ONLY MODE (as of 2026-02-05)
-    -------------------------------------
-    Only wildfire is converted using CLIMADA's explicit damage function.
-    Other hazards (drought, flood, heatwave, water_risk) removed due to
-    PhysRisk API being a black-box without explicit vulnerability formulas.
-
-    Conversion formula
-    ------------------
-    * Wildfire ``aai_krw`` → ``outage_rate = aai / total_asset_value``
-
-    Other fields return default values:
-    * ``capacity_derate = 0.0`` (drought removed)
-    * ``efficiency_loss = 0.0`` (heatwave removed)
-    * ``water_constrained_capacity = 1.0`` (water_risk removed)
+    Conversion formulas
+    -------------------
+    * Wildfire (CLIMADA AAI):
+        ``outage_rate = aai_krw / total_asset_value_krw``
+    * Drought (PhysRisk impact_mean):
+        ``capacity_derate = impact_mean × drought_severity_scale``
+    * Water Risk (PhysRisk impact_mean):
+        ``water_constrained_capacity = max(0, 1 − impact_mean)``
 
     Year interpolation
     ------------------
     Linear between PLANiT anchor years (2030, 2040, 2050, 2060).
     Years before the first anchor blend linearly from a *baseline* value
-    (CSV or zero) to the first anchor value.
+    (or zero) to the first anchor value.
     """
 
     def __init__(self, config: Optional[PLANiTIntegrationConfig] = None):
@@ -96,10 +90,8 @@ class PLANiTAdapter:
             results: All PLANiTHazardResult entries (multiple hazards/years).
             target_year: The year for which adjustments are needed.
             crp_scenario: CRP-side scenario label (e.g. "RCP8.5").
-            csv_baseline: Optional dict of CSV baseline values keyed by
-                field name (outage_rate, capacity_derate, efficiency_loss,
-                water_constrained_capacity) used for pre-anchor blending
-                and per-hazard fallback.
+            csv_baseline: Optional dict of baseline values keyed by
+                field name used for pre-anchor blending and fallback.
 
         Returns:
             Dict with keys: outage_rate, capacity_derate, efficiency_loss,
@@ -121,8 +113,7 @@ class PLANiTAdapter:
         water_constrained_capacity = 1.0
         notes_parts: List[str] = []
 
-        # --- Wildfire → outage_rate (ONLY HAZARD WITH EXPLICIT FORMULA) ---
-        # CLIMADA ImpfWildfire uses sigmoid: damage_ratio = 1 / (1 + (i_half / FWI)²)
+        # --- Wildfire (CLIMADA) → outage_rate ---
         wf_val = self._interpolate_hazard(
             by_hazard.get("wildfire", []), target_year, baseline.get("outage_rate", 0.0)
         )
@@ -133,17 +124,28 @@ class PLANiTAdapter:
             outage_rate = baseline["outage_rate"]
             notes_parts.append("wildfire=csv_fallback")
 
-        # --- Removed hazards (PhysRisk black-box) ---
-        # Flood, Drought, Water Risk, Heatwave all removed as of 2026-02-05
-        # Returning default values: capacity_derate=0, efficiency_loss=0, water=1.0
-        notes_parts.append("other_hazards=removed(no_explicit_formula)")
+        # --- Drought (PhysRisk) → capacity_derate ---
+        dr_val = self._interpolate_hazard(
+            by_hazard.get("drought", []), target_year, baseline.get("capacity_derate", 0.0)
+        )
+        if dr_val is not None:
+            capacity_derate = dr_val * self._config.drought_severity_scale
+            notes_parts.append(f"drought_impact={dr_val:.6f}")
+
+        # --- Water Risk (PhysRisk) → water_constrained_capacity ---
+        wr_val = self._interpolate_hazard(
+            by_hazard.get("water_risk", []), target_year, baseline.get("water_constrained_capacity_loss", 0.0)
+        )
+        if wr_val is not None:
+            water_constrained_capacity = max(0.0, 1.0 - wr_val)
+            notes_parts.append(f"water_risk_impact={wr_val:.6f}")
 
         return {
             "outage_rate": outage_rate,
-            "capacity_derate": capacity_derate,  # 0.0 (drought removed)
-            "efficiency_loss": efficiency_loss,  # 0.0 (heatwave removed)
-            "water_constrained_capacity": water_constrained_capacity,  # 1.0 (water_risk removed)
-            "notes": f"CLIMADA wildfire only ({ssp} y{target_year}): " + ", ".join(notes_parts),
+            "capacity_derate": capacity_derate,
+            "efficiency_loss": efficiency_loss,
+            "water_constrained_capacity": water_constrained_capacity,
+            "notes": f"PLANiT ({ssp} y{target_year}): " + ", ".join(notes_parts),
         }
 
     def convert_yearly(

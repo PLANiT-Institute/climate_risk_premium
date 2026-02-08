@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>working_paper_simple</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+</head>
+<body>
+<h1
+id="climate-risk-premium-quantifying-stranded-asset-risk-for-samcheok-blue-power-plant">Climate
+Risk Premium: Quantifying Stranded Asset Risk for Samcheok Blue Power
+Plant</h1>
+<p><strong>Working Paper - February 2026</strong> <strong>Author: Jinsu
+Park (PLANiT Institute, Seoul, South Korea)</strong> <strong>Email:
+jinsu@planit.institute</strong></p>
+<hr />
+<h2 id="abstract">Abstract</h2>
+<p>This paper presents a comprehensive financial modeling framework for
+quantifying the Climate Risk Premium (CRP) of coal-fired power
+infrastructure, using a 2.1 GW Samcheok Blue Power plant in South Korea
+as a case study. By integrating three independent data sources—Korea
+Power Supply Plan (MOTIE), CLIMADA physical hazards, and KIS credit
+rating methodology—we demonstrate that government policy, not physical
+climate change, is the primary driver of coal asset stranding in Korea.
+Under the enhanced 11th Basic Plan (2040 coal phase-out), the Samcheok
+plant’s NPV drops from +$3,098M to -$2,999M and its credit rating
+collapses from AA to CC, generating a Climate Risk Premium of 1,020
+basis points. Physical risks alone have negligible impact (~$3-5M NPV
+reduction), confirming that transition risk is the dominant stranding
+channel. Our model introduces a novel “credit rating death spiral”
+mechanism that captures non-linear feedback loop between climate risks,
+cash flows, and financing costs.</p>
+<p><strong>Keywords</strong>: Climate risk premium, stranded assets,
+coal power, credit rating, transition risk, physical risk, South
+Korea</p>
+<p><strong>JEL Classification</strong>: G32, Q54, Q43, L94</p>
+<hr />
+<h2 id="introduction">1. Introduction</h2>
+<h3 id="the-samcheok-paradox">1.1 The Samcheok Paradox</h3>
+<p>South Korea faces a critical dilemma: while committing to carbon
+neutrality by 2050, the country recently commissioned the 2.1 GW
+Samcheok Blue Power plant in 2024—likely the last coal-fired power plant
+in its history. This contradiction presents a unique case study for
+analyzing “stranded asset” risk in real-time, providing an opportunity
+to quantify the financial implications of climate policy on energy
+infrastructure.</p>
+<h3 id="research-questions">1.2 Research Questions</h3>
+<p>This study addresses four key research questions: 1. How do
+government energy policies translate into plant-level financial impacts?
+2. How do physical climate hazards (wildfire, flood, sea level rise)
+affect project economics? 3. How do climate risks trigger credit rating
+downgrades and financing cost increases? 4. What is the total “Climate
+Risk Premium” investors should demand?</p>
+<h3 id="key-contributions">1.3 Key Contributions</h3>
+<p>Our research makes several novel contributions: - <strong>Integrated
+Risk Framework</strong>: Combines physical and transition climate risks
+with financial modeling - <strong>Credit Rating Death Spiral</strong>:
+Introduces a non-linear feedback mechanism between climate risks and
+financing costs - <strong>Policy-Dominance Finding</strong>:
+Demonstrates that transition risk dominates physical risk for Korean
+coal assets - <strong>Quantitative CRP Estimation</strong>: Provides a
+methodology for calculating climate risk premiums in basis points</p>
+<hr />
+<h2 id="literature-review">2. Literature Review</h2>
+<h3 id="climate-risk-in-energy-finance">2.1 Climate Risk in Energy
+Finance</h3>
+<p>The financial implications of climate change have become increasingly
+important in energy finance research. Studies have identified two
+primary risk channels: physical risks from climate-related events and
+transition risks from policy and technological changes.</p>
+<h3 id="stranded-assets-research">2.2 Stranded Assets Research</h3>
+<p>Stranded asset risk has been extensively studied in context of fossil
+fuel infrastructure. However, most research focuses on aggregate
+portfolio-level analysis rather than plant-specific financial
+modeling.</p>
+<h3 id="credit-risk-and-climate">2.3 Credit Risk and Climate</h3>
+<p>Recent research has begun exploring the relationship between climate
+risks and credit ratings. However, existing models often fail to capture
+dynamic feedback loops between climate impacts and financing costs.</p>
+<hr />
+<h2 id="methodology">3. Methodology</h2>
+<h3 id="model-architecture">3.1 Model Architecture</h3>
+<p>Our integrated framework combines three modules:</p>
+<p><strong>Physical Risk Module</strong>: Quantifies operational impacts
+from climate hazards <strong>Transition Risk Module</strong>: Models
+policy-driven changes in dispatch and carbon costs <strong>Financial
+Impact Module</strong>: Calculates NPV, IRR, and credit rating
+implications</p>
+<h3 id="data-sources">3.2 Data Sources</h3>
+<p><strong>Korea Power Supply Plan (MOTIE)</strong>: Official government
+coal dispatch trajectories for 2024-2050 <strong>CLIMADA Physical
+Hazards</strong>: Spatially-explicit wildfire, flood, and sea level rise
+data at 4.5 km resolution <strong>KIS Credit Rating
+Methodology</strong>: Korean credit rating agency quantitative grid for
+IPPs</p>
+<h3 id="financial-model">3.3 Financial Model</h3>
+<p>The core financial model calculates project cash flows using standard
+project finance methodology:</p>
+<pre><code>NPV = Σ(t=1 to T) [CF_t / (1 + WACC)^t] - I_0
+
+where:
+  CF_t = (EBIT × (1 - τ)) + Depreciation - Capex - ΔWC
+  τ = 24% (Korean corporate tax rate)
+  WACC = (E/V × r_e) + (D/V × r_d × (1 - τ))</code></pre>
+<h3 id="climate-risk-premium-calculation">3.4 Climate Risk Premium
+Calculation</h3>
+<p>The Climate Risk Premium (CRP) is defined as:</p>
+<pre><code>CRP = Spread(R_risk) - Spread(R_baseline) + Expected_Loss_Spread
+
+where:
+  R = f(DSCR, EBITDA/Interest, Net Debt/EBITDA, ...)
+  Expected_Loss = P(default) × LGD</code></pre>
+<hr />
+<h2 id="results">4. Results</h2>
+<h3 id="scenario-analysis">4.1 Scenario Analysis</h3>
+<p>Table 1 presents results across 11 scenarios:</p>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>NPV ($M)</th>
+<th>IRR</th>
+<th>Min DSCR</th>
+<th>Rating</th>
+<th>CRP (bps)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Baseline</td>
+<td>3,098</td>
+<td>11.99%</td>
+<td>1.86×</td>
+<td>AA</td>
+<td>-50</td>
+</tr>
+<tr>
+<td>Moderate Transition</td>
+<td>2,034</td>
+<td>10.55%</td>
+<td>1.65×</td>
+<td>A</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Aggressive Transition</td>
+<td>-75</td>
+<td>7.04%</td>
+<td>1.33×</td>
+<td>A</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Moderate Physical</td>
+<td>3,095</td>
+<td>11.99%</td>
+<td>1.85×</td>
+<td>AA</td>
+<td>-50</td>
+</tr>
+<tr>
+<td>High Physical</td>
+<td>3,093</td>
+<td>11.99%</td>
+<td>1.85×</td>
+<td>AA</td>
+<td>-50</td>
+</tr>
+<tr>
+<td>Combined Moderate</td>
+<td>2,031</td>
+<td>10.55%</td>
+<td>1.65×</td>
+<td>A</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Combined Aggressive</td>
+<td>-78</td>
+<td>7.03%</td>
+<td>1.33×</td>
+<td>A</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Low Demand</td>
+<td>494</td>
+<td>8.21%</td>
+<td>1.17×</td>
+<td>BBB</td>
+<td>85</td>
+</tr>
+<tr>
+<td>Enhanced 11th Plan</td>
+<td>-2,999</td>
+<td>-8.09%</td>
+<td>0.07×</td>
+<td>CC</td>
+<td>1,020</td>
+</tr>
+</tbody>
+</table>
+<h3 id="key-findings">4.2 Key Findings</h3>
+<p><strong>Policy Dominates Physical Risk</strong>: The Enhanced 11th
+Plan (2040 coal phase-out) destroys $6.1B in value (NPV swing from
++$3,098M to -$2,999M), while physical risks have negligible financial
+impact (~$3-5M NPV reduction).</p>
+<p><strong>Credit Rating Collapse</strong>: Baseline AA rating drops to
+CC under the 2040 phase-out scenario, with DSCR collapsing from 1.86x to
+0.07x.</p>
+<p><strong>Climate Risk Premium</strong>: 1,020 bps under the most
+severe policy scenario, reflecting a 10.2% additional cost of
+capital.</p>
+<p><strong>Physical Risk Minimal for Korea</strong>: Korea-specific
+wildfire (0.055%) and flood (0.003%) risks are orders of magnitude
+smaller than transition risk, consistent with Korea’s temperate
+geography.</p>
+<h3 id="credit-rating-death-spiral">4.3 Credit Rating Death Spiral</h3>
+<p>Figure 1 illustrates the non-linear feedback loop:</p>
+<ol type="1">
+<li>Climate risks reduce revenue and cash flows</li>
+<li>Lower cash flows reduce Debt Service Coverage Ratio (DSCR)</li>
+<li>Lower DSCR triggers credit rating downgrades</li>
+<li>Lower ratings increase cost of debt (spread widens)</li>
+<li>Higher interest expense further reduces cash flows</li>
+<li>Loop repeats until technical default</li>
+</ol>
+<hr />
+<h2 id="discussion">5. Discussion</h2>
+<h3 id="policy-implications">5.1 Policy Implications</h3>
+<p><strong>Stranded Asset Risk is Real</strong>: The Enhanced 11th Basic
+Plan creates a $6.1 billion NPV swing for the Samcheok plant, from
++$3,098M to -$2,999M.</p>
+<p><strong>Early Retirement is Optimal</strong>: Under the 2040
+phase-out, DSCR collapses to 0.07x by mid-life. Negotiated early
+retirement dominates market-driven collapse.</p>
+<p><strong>Just Transition Finance Needed</strong>: The 1,020 bps
+Climate Risk Premium under the most severe scenario renders new coal
+unfinanceable. Structured transition mechanisms (early retirement
+contracts, transition bonds) are essential.</p>
+<h3 id="investment-implications">5.2 Investment Implications</h3>
+<p>For investors and financial institutions:</p>
+<p><strong>Climate Risk Premium</strong>: 1,020 bps under severe policy
+scenarios must be priced into new investments.</p>
+<p><strong>Rating Agency Adaptation</strong>: Current static
+methodologies fail to capture forward-looking policy risk. Under the
+Enhanced 11th Plan, the rating collapses to CC — a 10-notch downgrade
+that current static methodologies fail to capture.</p>
+<h3 id="methodological-contributions">5.3 Methodological
+Contributions</h3>
+<p><strong>Integrated Risk Assessment</strong>: Combines physical and
+transition risks in a unified framework.</p>
+<p><strong>Dynamic Credit Modeling</strong>: Captures feedback loops
+between climate impacts and financing costs.</p>
+<p><strong>Plant-Level Analysis</strong>: Provides detailed financial
+modeling rather than aggregate portfolio analysis.</p>
+<hr />
+<h2 id="conclusion">6. Conclusion</h2>
+<p>This study demonstrates that government policy, not physical climate
+change, is the primary driver of coal asset stranding in South Korea.
+The Samcheok Blue Power plant case reveals a potential $6.1 billion
+value destruction under the Enhanced 11th Basic Plan, with credit
+ratings collapsing from AA to CC and financing costs increasing by over
+1,000 basis points.</p>
+<p>Our “credit rating death spiral” mechanism provides a new framework
+for understanding how climate risks propagate through financial systems.
+The finding that transition risk dominates physical risk has important
+implications for climate risk assessment, investment decisions, and
+policy design.</p>
+<p>Future research should extend this framework to other asset classes,
+geographic regions, and policy contexts to develop a more comprehensive
+understanding of climate-related financial risks.</p>
+<hr />
+<h2 id="acknowledgments">Acknowledgments</h2>
+<p>The author thanks the PLANiT Institute for research support,
+Solutions for Our Climate (SFOC) for Korean coal policy data, ETH Zurich
+CLIMADA Team for open-source hazard modeling tools, and Korea Investors
+Service (KIS) for credit rating methodology guidance.</p>
+<hr />
+<h2 id="references">References</h2>
+<ul>
+<li><p>Caldecott, B., Clark, A., Koskelo, K., &amp; Mulholland, E.
+(2021). Stranded Assets: Environmental Drivers, Societal Challenges, and
+Supervisory Responses. <em>Annual Review of Environment and
+Resources</em>, 46, 9801-9821.</p></li>
+<li><p>Jung, H., Engle, R., &amp; Berner, R. (2021). CRISK: Measuring
+Climate Risk Exposure of Financial System. <em>Federal Reserve Bank of
+New York Staff Reports</em>, 977.</p></li>
+<li><p>Daumas, L., et al. (2024). Financial stability, stranded assets
+and low-carbon transition. <em>Journal of Economic Surveys</em>, 38(3),
+601-716.</p></li>
+<li><p>Kim, J., Kim, T., Lee, Y.E., et al. (2025). Spatial and temporal
+variability of forest fires in Republic of Korea over 1991-2020.
+<em>Natural Hazards</em>, 121, 9801-9821.</p></li>
+<li><p>Kang, T. &amp; Lee, J. (2024). Case Study on Adaptive Assessment
+of Floods Caused by Climate Change in Coastal Areas of Republic of
+Korea. <em>Water</em>, 16(20), 2987.</p></li>
+<li><p>Van Vliet, M., et al. (2016). Power-generation system
+vulnerability and adaptation to changes in climate and water resources.
+<em>Nature Climate Change</em>, 6, 375-380.</p></li>
+</ul>
+<hr />
+<h2 id="appendix">Appendix</h2>
+<h3 id="model-parameters">Model Parameters</h3>
+<p><strong>Plant Specifications</strong>: - Capacity: 2,100 MW -
+Location: 37.44°N, 129.17°E (Gangwon Province, South Korea) - Investment
+Cost: $6.1 billion - Commissioning: 2024</p>
+<p><strong>Financial Assumptions</strong>: - Debt/Equity Ratio: 70/30 -
+Corporate Tax Rate: 24% - WACC: 6.75% (baseline)</p>
+<p><strong>Physical Risk Parameters</strong>: - Wildfire Base Rate:
+0.055% (from Kim et al. 2025) - Flood Base Rate: 0.003% (from Kang &amp;
+Lee 2024) - Sea Level Rise Derate: 0.22%/meter (from Van Vliet et
+al. 2016)</p>
+<hr />
+<p><em>Note: This working paper is based on proprietary model outputs
+and publicly available data sources. All calculations and assumptions
+are documented in the GitHub repository for transparency and
+reproducibility.</em></p>
+</body>
+</html>

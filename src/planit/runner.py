@@ -1,6 +1,7 @@
 """PLANiT runner — wraps PLANiT's programmatic API (CLIMADA + PhysRisk)."""
 from __future__ import annotations
 
+import csv
 import logging
 import sys
 from dataclasses import dataclass
@@ -157,6 +158,98 @@ class PLANiTRunner:
                 logger.error(f"Failed to run {hazard}: {e}")
                 all_results[hazard] = []
         return all_results
+
+    # ------------------------------------------------------------------
+    # Static CSV loader — reads pre-computed PLANiT result CSVs
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def load_results_from_csv(
+        results_dir: str,
+        target_asset: str = "삼척화력발전소",
+        anchor_years: Optional[List[int]] = None,
+    ) -> List[PLANiTHazardResult]:
+        """Load PLANiT results from pre-computed CSV files.
+
+        This allows using PLANiT outputs without CLIMADA/PhysRisk installed.
+        Reads wildfire (CLIMADA AAI), drought, and water_risk (PhysRisk
+        impact_mean) CSVs from ``results_dir``.
+
+        Args:
+            results_dir: Path to ``Physicalrisk_PLANiT/data/results/``.
+            target_asset: Korean asset name to filter PhysRisk rows.
+            anchor_years: Years to replicate wildfire AAI across
+                (default: [2030, 2040, 2050, 2060]).
+
+        Returns:
+            List of PLANiTHazardResult covering all available hazards.
+        """
+        if anchor_years is None:
+            anchor_years = [2030, 2040, 2050, 2060]
+
+        rdir = Path(results_dir)
+        results: List[PLANiTHazardResult] = []
+
+        # --- Wildfire (CLIMADA): hazard_type, scenario, aai_krw ---
+        for p in sorted(rdir.glob("wildfire_results_*.csv")):
+            with open(p, encoding="utf-8") as f:
+                for row in csv.DictReader(f):
+                    scenario_raw = row.get("scenario", "").strip()
+                    aai = float(row.get("aai_krw", 0))
+                    scenario = scenario_raw  # already "historical" / "ssp126"
+                    # Replicate across anchor years (CLIMADA has no year dim)
+                    for year in anchor_years:
+                        results.append(PLANiTHazardResult(
+                            hazard_type="wildfire",
+                            scenario=scenario,
+                            year=year,
+                            asset=target_asset,
+                            value=aai,
+                            std=0.0,
+                            unit="krw",
+                            source="climada",
+                        ))
+            break  # use newest file only
+
+        # --- PhysRisk CSVs (drought, water_risk): scenario, year, asset, impact_mean ---
+        for hazard_name in ("drought", "water_risk"):
+            for p in sorted(rdir.glob(f"{hazard_name}_results_*.csv")):
+                with open(p, encoding="utf-8") as f:
+                    for row in csv.DictReader(f):
+                        asset = row.get("asset", "").strip()
+                        if target_asset not in asset and asset not in target_asset:
+                            continue
+                        scenario_raw = row.get("scenario", "").strip()
+                        # Normalize: "ssp126_2030" → scenario="ssp126", year=2030
+                        # "historical_None" → scenario="historical", year=0
+                        parts = scenario_raw.split("_", 1)
+                        scenario = parts[0]
+                        raw_year = parts[1] if len(parts) > 1 else row.get("year", "")
+                        try:
+                            year = int(raw_year)
+                        except (ValueError, TypeError):
+                            year = 0
+
+                        impact_mean = float(row.get("impact_mean", 0))
+                        impact_std = float(row.get("impact_std", 0))
+
+                        results.append(PLANiTHazardResult(
+                            hazard_type=hazard_name,
+                            scenario=scenario,
+                            year=year,
+                            asset=asset,
+                            value=impact_mean,
+                            std=impact_std,
+                            unit="fraction",
+                            source="physrisk",
+                        ))
+                break  # use newest file only
+
+        logger.info(
+            "Loaded %d PLANiT results from CSV (%s)",
+            len(results), results_dir,
+        )
+        return results
 
     def _parse_results(
         self, raw: Dict[str, Any], hazard: str

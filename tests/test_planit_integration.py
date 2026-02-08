@@ -72,7 +72,7 @@ class TestScenarioMapping:
 # ===========================================================================
 
 class TestConversionFormulas:
-    """Test wildfire-only conversion (other hazards removed 2026-02-05)."""
+    """Test multi-hazard conversion (wildfire + drought + water_risk)."""
 
     def test_wildfire_aai_to_outage_rate(self, adapter, default_config):
         """Wildfire AAI (KRW) → outage_rate = AAI / total_asset_value."""
@@ -82,36 +82,32 @@ class TestConversionFormulas:
         expected = aai / default_config.total_asset_value_krw
         assert abs(adj["outage_rate"] - expected) < 1e-12
 
-    def test_drought_removed_returns_zero(self, adapter):
-        """Drought removed - capacity_derate always 0.0."""
+    def test_drought_converts_to_capacity_derate(self, adapter):
+        """Drought impact_mean → capacity_derate."""
         results = [_make_result("drought", "ssp585", 2050, 0.05)]
         adj = adapter.convert(results, 2050, "RCP8.5")
-        # Drought no longer processed, returns default 0.0
-        assert adj["capacity_derate"] == 0.0
+        assert abs(adj["capacity_derate"] - 0.05) < 1e-12
 
-    def test_water_risk_removed_returns_one(self, adapter):
-        """Water risk removed - water_constrained_capacity always 1.0."""
+    def test_water_risk_converts_to_water_constraint(self, adapter):
+        """Water risk impact_mean → water_constrained_capacity = 1 - impact."""
         results = [_make_result("water_risk", "ssp585", 2050, 0.1)]
         adj = adapter.convert(results, 2050, "RCP8.5")
-        # Water risk no longer processed, returns default 1.0
-        assert adj["water_constrained_capacity"] == 1.0
+        assert abs(adj["water_constrained_capacity"] - 0.9) < 1e-12
 
-    def test_heatwave_removed_returns_zero(self, adapter):
-        """Heatwave removed - efficiency_loss always 0.0."""
+    def test_heatwave_not_active(self, adapter):
+        """Heatwave not in active hazards - efficiency_loss stays 0.0."""
         results = [_make_result("heatwave", "ssp585", 2050, 0.02)]
         adj = adapter.convert(results, 2050, "RCP8.5")
-        # Heatwave no longer processed, returns default 0.0
         assert adj["efficiency_loss"] == 0.0
 
-    def test_flood_removed_not_added_to_outage(self, adapter):
-        """Flood removed - does not add to outage_rate."""
+    def test_flood_not_active(self, adapter):
+        """Flood not in active hazards - does not add to outage_rate."""
         results = [_make_result("flood", "ssp585", 2050, 0.01)]
         adj = adapter.convert(results, 2050, "RCP8.5")
-        # Flood no longer processed, outage_rate = 0 (no wildfire)
         assert adj["outage_rate"] == 0.0
 
-    def test_wildfire_only_mode(self, adapter, default_config):
-        """Only wildfire is processed, other hazards ignored."""
+    def test_multi_hazard_conversion(self, adapter, default_config):
+        """All active hazards are processed together."""
         aai = 2e9
         results = [
             _make_result("wildfire", "ssp585", 2050, aai, unit="krw", source="climada"),
@@ -122,21 +118,19 @@ class TestConversionFormulas:
         ]
         adj = adapter.convert(results, 2050, "RCP8.5")
 
-        # Only wildfire contributes to outage_rate
         expected_outage = aai / default_config.total_asset_value_krw
         assert abs(adj["outage_rate"] - expected_outage) < 1e-10
-        # Other fields return defaults (removed hazards)
-        assert adj["capacity_derate"] == 0.0
-        assert adj["efficiency_loss"] == 0.0
-        assert adj["water_constrained_capacity"] == 1.0
+        assert abs(adj["capacity_derate"] - 0.01) < 1e-12  # drought
+        assert adj["efficiency_loss"] == 0.0  # heatwave not active
+        assert abs(adj["water_constrained_capacity"] - 0.92) < 1e-12  # 1 - 0.08
 
-    def test_notes_indicate_wildfire_only_mode(self, adapter):
-        """Notes indicate CLIMADA wildfire only mode."""
+    def test_notes_indicate_planit_source(self, adapter):
+        """Notes indicate PLANiT source."""
         aai = 1e9
         results = [_make_result("wildfire", "ssp585", 2050, aai, unit="krw", source="climada")]
         adj = adapter.convert(results, 2050, "RCP8.5")
-        assert "CLIMADA wildfire only" in adj["notes"]
-        assert "other_hazards=removed" in adj["notes"]
+        assert "PLANiT" in adj["notes"]
+        assert "ssp585" in adj["notes"]
 
 
 # ===========================================================================
@@ -206,10 +200,6 @@ class TestYearInterpolation:
         # 2040 is index 16 (2040 - 2024), midpoint value = 1.5e9
         expected = 1.5e9 / default_config.total_asset_value_krw
         assert abs(arrays["outage_rates"][16] - expected) < 1e-12
-        # Removed hazards should be constants
-        assert all(arrays["capacity_derates"] == 0.0)
-        assert all(arrays["efficiency_losses"] == 0.0)
-        assert all(arrays["water_constraints"] == 1.0)
 
 
 # ===========================================================================
@@ -232,19 +222,11 @@ class TestFallback:
         assert adj["efficiency_loss"] == 0.0
         assert adj["water_constrained_capacity"] == 1.0
 
-    def test_removed_hazards_ignore_csv_fallback(self, adapter):
-        """Removed hazards (drought, etc.) ignore CSV baseline, return defaults."""
+    def test_no_data_returns_defaults(self, adapter):
+        """No PLANiT data and no CSV baseline returns default values."""
         results = []  # No PLANiT data
-        csv_baseline = {
-            "outage_rate": 0.001,
-            "capacity_derate": 0.005,
-            "efficiency_loss": 0.002,
-            "water_constrained_capacity": 0.98,
-        }
-        adj = adapter.convert(results, 2050, "RCP8.5", csv_baseline)
-        # Only outage_rate uses CSV
-        assert adj["outage_rate"] == 0.001
-        # Removed hazards ignore CSV baseline
+        adj = adapter.convert(results, 2050, "RCP8.5")
+        assert adj["outage_rate"] == 0.0
         assert adj["capacity_derate"] == 0.0
         assert adj["efficiency_loss"] == 0.0
         assert adj["water_constrained_capacity"] == 1.0
@@ -307,14 +289,12 @@ class TestCache:
 
 class TestConfig:
 
-    def test_defaults_wildfire_only(self):
-        """Config defaults to wildfire-only mode."""
+    def test_defaults_all_hazards(self):
+        """Config defaults to all available hazards."""
         cfg = PLANiTIntegrationConfig()
         assert cfg.total_asset_value_krw == 4.879e12
         assert cfg.target_asset == "삼척화력발전소"
-        # Only wildfire in planit_hazards
-        assert cfg.planit_hazards == ["wildfire"]
-        # No CSV fallback hazards
+        assert cfg.planit_hazards == ["wildfire", "drought", "water_risk"]
         assert cfg.csv_fallback_hazards == []
 
     def test_custom_config(self):
@@ -445,21 +425,50 @@ class TestWildfireVulnerability:
         assert all(0 <= d <= 1 for d in curve["damage_ratio"])
 
 
-class TestRemovedHazardsDocumentation:
-    """Verify removed hazards are documented."""
+class TestCSVLoader:
+    """Test PLANiTRunner.load_results_from_csv()."""
 
-    def test_removed_hazards_dict_exists(self):
-        from src.planit.vulnerability import REMOVED_HAZARDS
-        assert "drought" in REMOVED_HAZARDS
-        assert "flood" in REMOVED_HAZARDS
-        assert "heatwave" in REMOVED_HAZARDS
-        assert "water_risk" in REMOVED_HAZARDS
+    def test_loads_results_from_csv(self):
+        """Loads wildfire, drought, and water_risk from PLANiT result CSVs."""
+        from src.planit.runner import PLANiTRunner
+        from pathlib import Path
+        results_dir = str(Path(__file__).parent.parent / "Physicalrisk_PLANiT/data/results")
+        results = PLANiTRunner.load_results_from_csv(results_dir)
+        hazard_types = {r.hazard_type for r in results}
+        assert "wildfire" in hazard_types
+        assert "drought" in hazard_types
+        assert "water_risk" in hazard_types
+        assert len(results) > 0
 
-    def test_removed_hazards_have_reason(self):
-        from src.planit.vulnerability import REMOVED_HAZARDS
-        for hazard, info in REMOVED_HAZARDS.items():
-            assert "reason" in info, f"Missing reason for {hazard}"
-            assert "removal_date" in info, f"Missing removal_date for {hazard}"
+    def test_wildfire_has_krw_unit(self):
+        """Wildfire results use KRW units."""
+        from src.planit.runner import PLANiTRunner
+        from pathlib import Path
+        results_dir = str(Path(__file__).parent.parent / "Physicalrisk_PLANiT/data/results")
+        results = PLANiTRunner.load_results_from_csv(results_dir)
+        wildfire = [r for r in results if r.hazard_type == "wildfire"]
+        assert all(r.unit == "krw" for r in wildfire)
+        assert all(r.source == "climada" for r in wildfire)
+
+    def test_drought_has_fraction_unit(self):
+        """Drought results use fraction units."""
+        from src.planit.runner import PLANiTRunner
+        from pathlib import Path
+        results_dir = str(Path(__file__).parent.parent / "Physicalrisk_PLANiT/data/results")
+        results = PLANiTRunner.load_results_from_csv(results_dir)
+        drought = [r for r in results if r.hazard_type == "drought"]
+        assert all(r.unit == "fraction" for r in drought)
+        assert all(r.source == "physrisk" for r in drought)
+
+    def test_wildfire_replicated_across_anchors(self):
+        """Wildfire AAI replicated across all anchor years."""
+        from src.planit.runner import PLANiTRunner
+        from pathlib import Path
+        results_dir = str(Path(__file__).parent.parent / "Physicalrisk_PLANiT/data/results")
+        results = PLANiTRunner.load_results_from_csv(results_dir)
+        wf_ssp126 = [r for r in results if r.hazard_type == "wildfire" and r.scenario == "ssp126"]
+        years = {r.year for r in wf_ssp126}
+        assert years == {2030, 2040, 2050, 2060}
 
 
 # ===========================================================================
