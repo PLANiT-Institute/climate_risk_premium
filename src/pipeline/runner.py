@@ -32,7 +32,7 @@ from src.risk.attribution import decompose_risk_shapley
 from src.financials import compute_cashflows_timeseries, calculate_metrics, CashFlowTimeSeries, FinancialMetrics
 from src.scenarios.korea_power_plan import load_korea_power_plan_scenarios
 from src.risk.physical import get_physical_risk_scenario, PhysicalAdjustments
-from src.climada.hazards import load_climada_hazards, CLIMADAHazardData
+from src.planit import PLANiTRunner, PLANiTAdapter, PLANiTIntegrationConfig
 
 # Conditional import for enhanced 11th Basic Plan
 try:
@@ -50,6 +50,15 @@ except ImportError:
     NEW_MODELS_AVAILABLE = False
     ClimateRiskAPI = None
     CombinedRiskResult = None
+
+
+# CRP physical scenario → PLANiT SSP + target year
+PHYSICAL_SCENARIO_SSP_MAP: Dict[str, tuple] = {
+    "baseline": ("ssp126", 2024),
+    "moderate_physical": ("ssp126", 2040),
+    "high_physical": ("ssp585", 2040),
+    "severe_drought": ("ssp585", 2050),
+}
 
 
 @dataclass
@@ -108,15 +117,11 @@ class CRPModelRunner:
         self.base_dir = Path(base_dir)
         self.dataset = load_inputs(self.base_dir)
         self.power_plans = load_korea_power_plan_scenarios(self.base_dir / "data/raw/korea_power_plan.csv")
-        # Load CLIMADA hazard scenarios from literature_hazards.csv (Korea-specific values)
-        # Sources: Kim et al 2025, Kang & Lee 2024, WWA 2025, KSCCR 2024, CMIP6
-        hazards_path = self.base_dir / "data/raw/literature_hazards.csv"
-        if not hazards_path.exists():
-            hazards_path = self.base_dir / "data/raw/climada_hazards.csv"
-        if hazards_path.exists():
-            self.climada_hazards = load_climada_hazards(hazards_path)
-        else:
-            self.climada_hazards = {}
+        # Load PLANiT results from pre-computed CSVs (wildfire + drought + water_risk)
+        self._planit_config = PLANiTIntegrationConfig()
+        results_dir = str(self._planit_config.get_results_dir(str(self.base_dir)))
+        self._planit_results = PLANiTRunner.load_results_from_csv(results_dir)
+        self._planit_adapter = PLANiTAdapter(self._planit_config)
 
     def _get_plant_params(self) -> Dict[str, Any]:
         """Extract plant parameters as a flat dict."""
@@ -171,45 +176,29 @@ class CRPModelRunner:
             retirement_years=40,
         )
 
-    def _load_physical_scenario(self, scenario_name: str) -> PhysicalScenario | CLIMADAHazardData:
-        """Load physical scenario from CSV or CLIMADA data."""
-        # Check CLIMADA first
-        if scenario_name in self.climada_hazards:
-            return self.climada_hazards[scenario_name]
+    def _load_physical_scenario(self, scenario_name: str) -> PhysicalAdjustments:
+        """Load physical scenario via PLANiT adapter.
 
-        # Override for specific hardcoded scenarios if not in CSV
-        if scenario_name == "severe_drought":
-            # Force 50% water availability
-            return PhysicalScenario(
-                name="severe_drought",
-                wildfire_outage_rate=0.05,
-                drought_derate=0.05,
-                cooling_temp_penalty=0.02,
-                water_availability_pct=50.0
-            )
+        Maps CRP scenario names to SSP scenarios, then converts PLANiT
+        hazard results (wildfire, drought, water_risk) into PhysicalAdjustments.
+        """
+        ssp, target_year = PHYSICAL_SCENARIO_SSP_MAP.get(
+            scenario_name, ("ssp126", 2024)
+        )
 
-        # Check for dynamic levels first
-        if scenario_name.lower() in ["low", "medium", "high", "extreme"]:
-            return get_physical_risk_scenario(scenario_name)
+        # Map SSP back to CRP label for the adapter's scenario mapper
+        ssp_to_crp = {"ssp126": "SSP1-2.6", "ssp245": "RCP4.5", "ssp585": "RCP8.5"}
+        crp_label = ssp_to_crp.get(ssp, "SSP1-2.6")
 
-        physical_risks = self.dataset.get('physical') if isinstance(self.dataset, dict) else self.dataset.physical_risks
-        row = physical_risks.get(scenario_name) if physical_risks else None
-        if not row:
-            # Fallback to baseline if not found
-            return get_physical_risk_scenario("Low")
-
-        # row may be a dataclass or a dict; use getattr for dataclasses, .get for dicts
-        def _val(key, default=0):
-            if isinstance(row, dict):
-                return row.get(key, default)
-            return getattr(row, key, default)
-
-        return PhysicalScenario(
-            name=scenario_name,
-            wildfire_outage_rate=float(_val('wildfire_outage_rate', 0)),
-            drought_derate=float(_val('drought_derate', 0)),
-            cooling_temp_penalty=float(_val('cooling_temp_penalty', 0)),
-            water_availability_pct=float(_val('water_availability_pct', 100.0)),
+        adj = self._planit_adapter.convert(
+            self._planit_results, target_year, crp_label
+        )
+        return PhysicalAdjustments(
+            outage_rate=adj["outage_rate"],
+            capacity_derate=adj["capacity_derate"],
+            efficiency_loss=adj["efficiency_loss"],
+            water_constrained_capacity=adj["water_constrained_capacity"],
+            notes=adj["notes"],
         )
 
     def _load_market_scenario(self, scenario_name: str) -> MarketScenario:
@@ -315,7 +304,7 @@ class CRPModelRunner:
         plant_params = self._get_plant_params()
 
         transition_scenario = self._load_transition_scenario(transition_scenario_name)
-        physical_data = self._load_physical_scenario(physical_scenario_name)
+        physical_adj = self._load_physical_scenario(physical_scenario_name)
         market_scenario = self._load_market_scenario(market_scenario_name)
 
         # Load Korea Power Plan if specified
@@ -346,24 +335,6 @@ class CRPModelRunner:
                 start_year=start,
                 end_year=start + transition_adj.operating_years - 1,
             )
-
-        # Handle physical scenario: dispatch on data type
-        if isinstance(physical_data, CLIMADAHazardData):
-            # CLIMADA hazard data loaded from CSV — build adjustments directly
-            physical_adj = PhysicalAdjustments(
-                outage_rate=physical_data.wildfire_outage_rate + physical_data.flood_outage_rate,
-                capacity_derate=physical_data.slr_capacity_derate,
-                efficiency_loss=0.0,
-                water_constrained_capacity=1.0,
-                notes=f"CLIMADA: {physical_data.data_source}",
-            )
-        elif isinstance(physical_data, PhysicalScenario):
-            # PhysicalScenario object — pass directly to apply_physical
-            physical_adj = apply_physical(plant_params, physical_data)
-        else:
-            # String or unknown — resolve to a PhysicalScenario via get_physical_risk_scenario
-            scenario_obj = get_physical_risk_scenario(str(physical_scenario_name))
-            physical_adj = apply_physical(plant_params, scenario_obj)
 
         # --- Combined run (always performed, same as before) ---
         combined = self._compute_component(

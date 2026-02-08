@@ -12,12 +12,13 @@ class PLANiTIntegrationConfig:
 
     Attributes:
         planit_config_path: Path to PLANiT's unified_config.yaml
+        planit_results_dir: Path to pre-computed PLANiT result CSVs
         target_asset: Korean name of the target asset in PLANiT results
         total_asset_value_krw: Total asset value in KRW (for AAI → rate conversion)
         cache_dir: Directory for cached PLANiT results
         cache_ttl_hours: Cache time-to-live in hours
         enabled: Whether PLANiT integration is active
-        planit_hazards: Hazard types sourced from PLANiT
+        planit_hazards: Hazard types sourced from PLANiT (wildfire, drought, water_risk)
         csv_fallback_hazards: Hazard types that always fall back to CSV
         anchor_years: PLANiT projection years used as interpolation anchors
         drought_severity_scale: Scaling factor for drought impact_mean → capacity_derate
@@ -25,17 +26,15 @@ class PLANiTIntegrationConfig:
         flood_outage_scale: Scaling factor for flood impact_mean → outage_rate
     """
     planit_config_path: str = "Physicalrisk_PLANiT/config/unified_config.yaml"
+    planit_results_dir: str = "Physicalrisk_PLANiT/data/results"
     target_asset: str = "삼척화력발전소"
     total_asset_value_krw: float = 4.879e12
     cache_dir: str = "data/cache/planit"
     cache_ttl_hours: float = 24.0
     enabled: bool = True
-    # Only wildfire uses CLIMADA with explicit damage function (ImpfWildfire sigmoid)
-    # Other hazards (drought, flood, heatwave, water_risk) removed due to PhysRisk black-box API
     planit_hazards: List[str] = field(
-        default_factory=lambda: ["wildfire"]
+        default_factory=lambda: ["wildfire", "drought", "water_risk"]
     )
-    # Fallback hazards disabled - no CSV fallback for removed hazards
     csv_fallback_hazards: List[str] = field(
         default_factory=lambda: []
     )
@@ -50,6 +49,15 @@ class PLANiTIntegrationConfig:
     def get_planit_config_path(self, base_dir: Optional[str] = None) -> Path:
         """Resolve absolute path to PLANiT config."""
         p = Path(self.planit_config_path)
+        if p.is_absolute():
+            return p
+        if base_dir:
+            return Path(base_dir) / p
+        return p
+
+    def get_results_dir(self, base_dir: Optional[str] = None) -> Path:
+        """Resolve absolute path to PLANiT results directory."""
+        p = Path(self.planit_results_dir)
         if p.is_absolute():
             return p
         if base_dir:

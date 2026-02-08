@@ -5,7 +5,6 @@ from .physical import (
     PhysicalAdjustments,
     YearlyPhysicalAdjustments,
     apply_physical,
-    create_yearly_physical_adjustments,
 )
 
 # Optional imports for PLANiT integration
@@ -38,7 +37,6 @@ __all__ = [
     "PhysicalAdjustments",
     "YearlyPhysicalAdjustments",
     "apply_physical",
-    "create_yearly_physical_adjustments",
     "get_physical_risk_from_planit",
     "create_yearly_physical_adjustments_from_planit",
     "FinancingImpact",

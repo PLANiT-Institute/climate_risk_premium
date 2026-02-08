@@ -190,16 +190,18 @@ class DataLoader:
         return pd.read_csv(path)
     
     def load_physical_scenarios(self) -> Dict[str, PhysicalScenario]:
-        # Prefer literature_hazards.csv (has correct schema: scenario, wildfire_outage_rate, etc.)
-        # physical_scenarios.csv has different schema (scenario_name, hazard_type, parameter, value)
+        # Physical risk is now sourced from PLANiT (pre-computed CSVs).
+        # This loader is kept for backward compatibility but returns an empty
+        # dict when the archived literature_hazards.csv is not present.
         path = self.input_dir / "literature_hazards.csv"
         if not path.exists():
-            # Legacy fallback
             path = self.input_dir / "climada_hazards.csv"
-        
+        if not path.exists():
+            return {}
+
         df = pd.read_csv(path)
         scenarios = {}
-        
+
         for _, row in df.iterrows():
             name = row['scenario']
             scenarios[name] = PhysicalScenario(
@@ -214,7 +216,7 @@ class DataLoader:
                 slr_meters=float(row.get('slr_meters', 0)),
                 data_source=row.get('data_source', 'CLIMADA'),
             )
-        
+
         return scenarios
     
     def load_market_scenarios(self) -> Dict[str, List[MarketScenario]]:
