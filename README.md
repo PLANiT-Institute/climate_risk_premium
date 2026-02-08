@@ -11,7 +11,7 @@ This repository contains a comprehensive financial modeling framework for quanti
 2. **CLIMADA Physical Hazards** (ETH Zurich) - Spatially-explicit wildfire, flood, and sea level rise data
 3. **KIS Credit Rating Methodology** - Korean credit rating agency quantitative grid
 
-**Key Finding**: Government policy—not physical climate change—is the primary driver of coal asset stranding in Korea. Transition scenarios reduce NPV by 251-375%, while physical risks reduce NPV by 33-59%. Combined risks trigger a "credit rating death spiral" with Climate Risk Premiums reaching 5,854 basis points.
+**Key Finding**: Government policy — not physical climate change — is the primary driver of coal asset stranding in Korea. Under the enhanced 11th Basic Plan (2040 coal phase-out), the Samcheok plant's NPV drops from +$3,098M to -$2,999M and its credit rating collapses from AA to CC, generating a Climate Risk Premium of 1,020 basis points. Physical risks alone have negligible impact (~$3-5M NPV reduction), confirming that transition risk is the dominant stranding channel.
 
 ---
 
@@ -59,21 +59,26 @@ The model demonstrates a non-linear feedback loop:
 
 ### Scenario Analysis Summary
 
-| Scenario | NPV ($M) | Δ NPV | Min DSCR | Rating | CRP (bps) |
-|----------|----------|-------|----------|--------|-----------|
-| Baseline | 2,898 | — | 1.81× | BBB | — |
-| Moderate Transition | -4,381 | -251% | -1.39× | B | 3,880 |
-| Aggressive Transition | -7,964 | -375% | -4.37× | B | 5,635 |
-| Moderate Physical | 1,928 | -33% | 1.58× | BBB | 475 |
-| High Physical | 1,189 | -59% | 1.42× | BBB | 837 |
-| Combined Aggressive | -8,411 | -390% | -4.32× | B | 5,854 |
+| Scenario | NPV ($M) | IRR | Min DSCR | Rating | CRP (bps) |
+|----------|----------|------|----------|--------|-----------|
+| Baseline | 3,098 | 11.99% | 1.86× | AA | -50 |
+| Moderate Transition | 2,034 | 10.55% | 1.65× | A | 0 |
+| Aggressive Transition | -75 | 7.04% | 1.33× | A | 0 |
+| Moderate Physical | 3,095 | 11.99% | 1.85× | AA | -50 |
+| High Physical | 3,093 | 11.99% | 1.85× | AA | -50 |
+| Combined Moderate | 2,031 | 10.55% | 1.65× | A | 0 |
+| Combined Aggressive | -78 | 7.03% | 1.33× | A | 0 |
+| Low Demand | 494 | 8.21% | 1.17× | BBB | 85 |
+| Severe Drought | 3,099 | 11.99% | 1.86× | AA | -50 |
+| Enhanced 11th Plan | -2,999 | -8.09% | 0.07× | CC | 1,020 |
+| Enhanced Combined | -3,000 | -8.09% | 0.07× | CC | 1,020 |
 
 ### Key Insights
 
-1. **Policy Dominates**: Transition risk is 4-6× larger than physical risk
-2. **Investment Grade Lost**: All transition scenarios trigger BBB → B downgrade
-3. **Death Spiral Activated**: DSCR falls from 1.81× to negative values
-4. **Unfinanceable**: At 5,854 bps CRP, debt service exceeds total revenue
+1. **Policy Dominates**: The Enhanced 11th Plan (2040 coal phase-out) destroys $6.1B in value (NPV swing from +$3,098M to -$2,999M), while physical risks have negligible financial impact (~$3-5M NPV reduction)
+2. **Credit Rating Collapse**: Baseline AA rating drops to CC under the 2040 phase-out scenario, with DSCR collapsing from 1.86x to 0.07x
+3. **Climate Risk Premium**: 1,020 bps under the most severe policy scenario, reflecting a 10.2% additional cost of capital
+4. **Physical Risk Is Minimal for Korea**: Korea-specific wildfire (0.055%) and flood (0.003%) risks are orders of magnitude smaller than transition risk, consistent with Korea's temperate geography
 
 ---
 
@@ -172,7 +177,7 @@ python scripts/regenerate_dashboard_data.py
 This will:
 1. Load plant parameters from `data/raw/plant.csv`
 2. Load climate scenarios from `data/raw/physical.csv` and `data/raw/literature_hazards.csv`
-3. Run financial model for 9 scenario combinations (including enhanced 11th Plan)
+3. Run financial model for 11 scenario combinations (including enhanced 11th Plan)
 4. Calculate credit ratings using KIS methodology
 5. Output results to `data/processed/` (CSV) and `crp-dashboard/src/data/` (JSON)
 
@@ -330,7 +335,8 @@ climate_risk_premium/
 │   └── figures/
 ├── crp-dashboard/             # Next.js interactive dashboard
 ├── scripts/                   # Utility scripts
-│   └── regenerate_dashboard_data.py
+│   ├── regenerate_dashboard_data.py
+│   └── reproduce_results.py   # Canonical result reproduction
 ├── docs/                      # Documentation
 │   ├── METHODOLOGY_EQUATIONS.md  # Physical risk equations
 │   ├── VERIFIED_LITERATURE.md    # Verified citations & derivations
@@ -373,13 +379,13 @@ If you use this model in your research, please cite:
 
 ## Key Findings for Policymakers
 
-1. **Stranded Asset Risk is Real**: The 10th Power Supply Plan creates material financial risk for coal assets. Samcheok faces -251% to -390% NPV swing.
+1. **Stranded Asset Risk is Real**: The Enhanced 11th Basic Plan (2040 coal phase-out) creates a $6.1 billion NPV swing for the Samcheok plant, from +$3,098M to -$2,999M.
 
-2. **Early Retirement is Optimal**: Waiting for "natural" economic obsolescence subjects owners to accelerating losses. Negotiated early retirement dominates market-driven collapse.
+2. **Early Retirement is Optimal**: Under the 2040 phase-out, DSCR collapses to 0.07x by mid-life. Negotiated early retirement dominates market-driven collapse.
 
-3. **Just Transition Finance Needed**: Total societal cost of disorderly exit: $4-5 billion. Structured transition (early retirement contracts, transition bonds) could save $3.5 billion vs. chaotic default.
+3. **Just Transition Finance Needed**: The 1,020 bps Climate Risk Premium under the most severe scenario renders new coal unfinanceable. Structured transition mechanisms (early retirement contracts, transition bonds) are essential.
 
-4. **Rating Agencies Must Adapt**: Current ratings (BBB, 6-7% yields) don't reflect Power Supply Plan constraints. Forward-looking ratings should downgrade based on scheduled dispatch reductions.
+4. **Rating Agencies Must Adapt**: The model's baseline AA rating does not yet reflect forward-looking policy risk. Under the Enhanced 11th Plan, the rating collapses to CC — a 10-notch downgrade that current static methodologies fail to capture.
 
 ---
 
