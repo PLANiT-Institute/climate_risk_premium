@@ -38,15 +38,21 @@ The Climate Risk Premium (CRP) model demonstrates that the Samcheok Blue Power p
 
 ### Credit Rating Migration
 
-| Scenario | Baseline Rating | Risk Rating | Notches Down | Spread Increase |
-|----------|----------------|-------------|--------------|-----------------|
-| Moderate Transition | A (150 bps) | B (600 bps) | 3 | +450 bps |
-| Aggressive Transition | A (150 bps) | B (600 bps) | 3 | +450 bps |
-| Combined Aggressive | A (150 bps) | B (600 bps) | 3 | +450 bps |
-| Moderate Physical | A (150 bps) | A (150 bps) | 0 | +0 bps |
-| High Physical | A (150 bps) | A (150 bps) | 0 | +0 bps |
+| Scenario | Rating | CRP (bps) | Key Driver |
+|----------|--------|-----------|------------|
+| Baseline | AA | -50 | Strong financials, large capacity |
+| Moderate Transition | A | 0 | Dispatch reduction lowers EBITDA |
+| Aggressive Transition | A | 0 | Near-breakeven NPV |
+| Moderate Physical | AA | -50 | Negligible physical impact |
+| High Physical | AA | -50 | Negligible physical impact |
+| Combined Moderate | A | 0 | Transition dominates |
+| Combined Aggressive | A | 0 | Transition dominates |
+| Low Demand | BBB | 85 | Demand decline reduces revenue |
+| Severe Drought | AA | -50 | Drought has minimal impact |
+| Enhanced 11th Plan | CC | 1,020 | 2040 coal phase-out is catastrophic |
+| Enhanced Combined | CC | 1,020 | Phase-out + physical (physical negligible) |
 
-**Key Observation**: All transition scenarios trigger **loss of investment grade status** (A → B), while physical-only scenarios maintain investment grade.
+**Key Observation**: Only the Enhanced 11th Plan (2040 coal phase-out) triggers a catastrophic rating collapse (AA to CC). Moderate and aggressive transition scenarios remain investment grade (A). Physical risk alone has no impact on credit rating.
 
 ---
 
@@ -82,26 +88,20 @@ The Climate Risk Premium (CRP) model demonstrates that the Samcheok Blue Power p
 
 ## Climate Risk Premium Decomposition
 
-### CRP Components by Scenario
+### CRP by Scenario (Counterfactual Approach)
 
-| Scenario | Expected Loss (%) | NPV Loss ($M) | Debt Spread (bps) | Equity Premium (%) | Total CRP (bps) |
-|----------|------------------|---------------|-------------------|-------------------|-----------------|
-| Moderate Transition | 149% | 7,279 | 600 | 119% | 3,880 |
-| Aggressive Transition | 222% | 10,863 | 600 | 177% | 5,635 |
-| Combined Aggressive | 231% | 11,309 | 600 | 185% | 5,854 |
-| Moderate Physical | 24% | 1,180 | 150 | 19% | 578 |
-| High Physical | 44% | 2,160 | 150 | 35% | 1,058 |
+The CRP is calculated as the spread difference between the scenario credit rating and a counterfactual "no climate risk" baseline rating (A = 150 bps).
 
-### WACC Impact
+| Scenario | Rating | Spread (bps) | CRP (bps) | NPV ($M) | NPV Loss vs Baseline ($M) |
+|----------|--------|-------------|-----------|----------|--------------------------|
+| Baseline | AA | 100 | -50 | 3,098 | -- |
+| Moderate Transition | A | 150 | 0 | 2,034 | 1,064 |
+| Aggressive Transition | A | 150 | 0 | -75 | 3,173 |
+| Low Demand | BBB | 250 | 85 | 494 | 2,604 |
+| Enhanced 11th Plan | CC | 1,170 | 1,020 | -2,999 | 6,097 |
+| Enhanced Combined | CC | 1,170 | 1,020 | -3,000 | 6,098 |
 
-| Scenario | Baseline WACC | Adjusted WACC | WACC Increase |
-|----------|---------------|---------------|---------------|
-| Baseline | 6.75% | 6.75% | — |
-| Moderate Transition | 6.75% | 45.6% | +38.8 pp |
-| Aggressive Transition | 6.75% | 63.1% | +56.4 pp |
-| Combined Aggressive | 6.75% | 65.3% | +58.5 pp |
-
-**Key Observation**: Under aggressive scenarios, WACC exceeds 60%, making the project mathematically unfinanceable.
+**Key Observation**: The CRP reaches 1,020 bps only under the Enhanced 11th Plan (2040 coal phase-out). Moderate and aggressive transition scenarios do not generate a positive CRP above the counterfactual baseline because their ratings remain at A (the counterfactual level).
 
 ---
 
@@ -154,16 +154,15 @@ The Climate Risk Premium (CRP) model demonstrates that the Samcheok Blue Power p
 
 ## The Credit Rating Death Spiral
 
-### Timeline Under Aggressive Transition
+### Timeline Under Enhanced 11th Plan (2040 Coal Phase-Out)
 
 | Year | Event | DSCR | Rating | Spread |
 |------|-------|------|--------|--------|
-| T=0 | COD, Initial Rating | 1.81× | A | 150 bps |
-| T=3 | Dispatch reduction begins | 1.40× | A | 150 bps |
-| T=5 | EBITDA/Interest < 2.0× | 0.95× | BBB | 250 bps |
-| T=6 | DSCR < 1.0×, refinancing stress | 0.50× | BB | 400 bps |
-| T=7 | EBITDA negative | -0.30× | B | 600 bps |
-| T=8 | Technical default | -1.50× | D | — |
+| T=0 | COD, Initial Rating | 1.86× | AA | 100 bps |
+| T=3 | Dispatch reduction accelerates | ~1.4× | A | 150 bps |
+| T=8 | Carbon costs + dispatch cuts erode EBITDA | ~0.5× | BB | 400 bps |
+| T=12 | Phase-out approaches, EBITDA collapses | ~0.1× | CC | 1,170 bps |
+| T=15 | Full phase-out by 2040 | 0.07× | CC | 1,170 bps |
 
 ### Feedback Loop Dynamics
 
@@ -182,8 +181,8 @@ Policy Dispatch Reduction → ↓Revenue → ↓EBITDA → ↓DSCR
 ### 1. Stranded Asset Risk Quantification
 
 - **Total Asset at Risk**: $4.9 billion initial investment
-- **Expected Loss Range**: $7.3-11.3 billion NPV destruction
-- **Loss Multiple**: 1.5-2.3× initial investment
+- **Maximum NPV Destruction**: $6.1 billion (baseline +$3,098M to enhanced plan -$3,000M)
+- **Loss Multiple**: 1.2x initial investment under worst-case policy scenario
 
 ### 2. Just Transition Finance Requirements
 
@@ -197,7 +196,7 @@ Policy Dispatch Reduction → ↓Revenue → ↓EBITDA → ↓DSCR
 
 ### 3. Recommended Actions
 
-1. **For Investors**: Demand 3,000-6,000 bps higher yields to compensate for climate risk
+1. **For Investors**: Demand up to 1,020 bps higher yields to compensate for policy-driven climate risk
 2. **For Rating Agencies**: Incorporate Power Supply Plan trajectories into forward-looking ratings
 3. **For Government**: Establish early retirement contracts to avoid chaotic default
 4. **For Lenders**: Stress-test coal portfolios against transition scenarios
