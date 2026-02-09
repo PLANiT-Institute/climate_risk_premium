@@ -76,7 +76,7 @@ export default function PhysicalRiskMap({
       {showControls && onScenarioChange && (
         <div className="absolute top-4 right-4 z-[1000] bg-white rounded-lg shadow-lg p-2">
           <div className="flex gap-1">
-            {(["baseline", "rcp45_2050", "rcp85_2060"] as RiskScenario[]).map((s) => (
+            {(["baseline", "ssp126_2040", "ssp585_2050"] as RiskScenario[]).map((s) => (
               <button
                 key={s}
                 onClick={() => onScenarioChange(s)}

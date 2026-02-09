@@ -33,6 +33,6 @@ export const ASSET_COLORS = {
 // Scenario display labels
 export const SCENARIO_LABELS: Record<RiskScenario, string> = {
   baseline: "Baseline (2024)",
-  rcp45_2050: "RCP4.5 (2050)",
-  rcp85_2060: "RCP8.5 (2060)",
+  ssp126_2040: "SSP1-2.6 (2040)",
+  ssp585_2050: "SSP5-8.5 (2050)",
 };

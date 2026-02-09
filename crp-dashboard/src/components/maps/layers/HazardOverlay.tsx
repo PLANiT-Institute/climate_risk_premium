@@ -13,7 +13,7 @@ export default function HazardOverlay({ scenario, center }: HazardOverlayProps) 
 
   // Base radius increases with risk level (in meters)
   const baseRadius = 3000;
-  const radiusMultiplier = scenario === "baseline" ? 1 : scenario === "rcp45_2050" ? 1.5 : 2.5;
+  const radiusMultiplier = scenario === "baseline" ? 1 : scenario === "ssp126_2040" ? 1.5 : 2.5;
   const radius = baseRadius * radiusMultiplier;
 
   const riskColor = getRiskColor(risks.total);

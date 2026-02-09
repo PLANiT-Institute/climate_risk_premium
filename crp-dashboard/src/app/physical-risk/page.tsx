@@ -14,32 +14,32 @@ const PhysicalRiskMap = dynamic(
 const HAZARD_DATA = [
   {
     hazard: "Wildfire",
-    baseline_rate: "0.055%",
-    rcp45_2050: "0.082%",
-    rcp85_2060: "0.220%",
-    source: "Kim et al. (2025)",
-    doi: "10.1007/s11069-025-07169-4",
+    baseline: "0.001%",
+    ssp126_2040: "0.005%",
+    ssp585_2050: "0.001%",
+    source: "CLIMADA / PLANiT",
+    doi: "https://github.com/CLIMADA-project/climada_python",
     methodology:
-      "15 fires/yr × 0.10 impact × 32h / 8,760h, climate multiplied 1.0–4.0x",
+      "AAI probabilistic: 20 events, KRW / 4.879T total asset value",
   },
   {
-    hazard: "Flood",
-    baseline_rate: "0.003%",
-    rcp45_2050: "0.003%",
-    rcp85_2060: "0.003%",
-    source: "Kang & Lee (2024)",
-    doi: "10.3390/w16202987",
+    hazard: "Drought",
+    baseline: "0.094%",
+    ssp126_2040: "0.257%",
+    ssp585_2050: "0.101%",
+    source: "PhysRisk / PLANiT",
+    doi: "https://github.com/os-climate/physrisk",
     methodology:
-      "0.3% surge prob × 0.70 impact × 120h / 8,760h, multiplied up to 2.64x",
+      "Water stress impact_mean × 1.0 severity scale",
   },
   {
-    hazard: "Sea Level Rise",
-    baseline_rate: "0.000%",
-    rcp45_2050: "0.042%",
-    rcp85_2060: "0.161%",
-    source: "IPCC AR6 WGI Ch.9",
-    doi: "ipcc.ch",
-    methodology: "SLR (m) × 0.0022 derate + temp effect + storm surge amplification",
+    hazard: "Water Risk",
+    baseline: "0.000%",
+    ssp126_2040: "0.559%",
+    ssp585_2050: "0.546%",
+    source: "PhysRisk / PLANiT",
+    doi: "https://github.com/os-climate/physrisk",
+    methodology: "Water availability: max(0, 1 - impact_mean) constraint",
   },
 ];
 
@@ -50,7 +50,7 @@ const COMPOUND_RISK = {
 };
 
 export default function PhysicalRiskPage() {
-  const [scenario, setScenario] = useState<RiskScenario>("rcp85_2060");
+  const [scenario, setScenario] = useState<RiskScenario>("ssp585_2050");
 
   return (
     <>
@@ -67,8 +67,8 @@ export default function PhysicalRiskPage() {
         style={{ borderLeftColor: COLORS.physical, backgroundColor: "#fef2f2" }}
       >
         <p className="text-sm font-medium text-red-800">
-          Physical risk is minimal (~0.06–0.44% CF loss). Transition/policy risk
-          is the dominant concern for Samcheok.
+          Physical risk is modest (~0.10–0.82% CF loss). Transition/policy risk
+          remains the dominant concern for Samcheok.
         </p>
       </div>
 
@@ -98,9 +98,9 @@ export default function PhysicalRiskPage() {
             <thead>
               <tr className="border-b-2 border-slate-200">
                 <th className="p-3 text-left">Hazard</th>
-                <th className="p-3 text-right">Baseline Rate</th>
-                <th className="p-3 text-right">RCP4.5 (2050)</th>
-                <th className="p-3 text-right">RCP8.5 (2060)</th>
+                <th className="p-3 text-right">Baseline</th>
+                <th className="p-3 text-right">SSP1-2.6 (2040)</th>
+                <th className="p-3 text-right">SSP5-8.5 (2050)</th>
                 <th className="p-3 text-left">Source</th>
                 <th className="p-3 text-left">Methodology</th>
               </tr>
@@ -109,10 +109,10 @@ export default function PhysicalRiskPage() {
               {HAZARD_DATA.map((h) => (
                 <tr key={h.hazard} className="border-b border-slate-100">
                   <td className="p-3 font-medium">{h.hazard}</td>
-                  <td className="p-3 text-right font-mono">{h.baseline_rate}</td>
-                  <td className="p-3 text-right font-mono">{h.rcp45_2050}</td>
+                  <td className="p-3 text-right font-mono">{h.baseline}</td>
+                  <td className="p-3 text-right font-mono">{h.ssp126_2040}</td>
                   <td className="p-3 text-right font-mono text-red-600">
-                    {h.rcp85_2060}
+                    {h.ssp585_2050}
                   </td>
                   <td className="p-3">
                     <a
@@ -166,26 +166,24 @@ export default function PhysicalRiskPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b-2 border-slate-200">
-                <th className="p-3 text-left">Year</th>
                 <th className="p-3 text-left">Scenario</th>
                 <th className="p-3 text-right">Wildfire</th>
-                <th className="p-3 text-right">Flood</th>
-                <th className="p-3 text-right">SLR</th>
+                <th className="p-3 text-right">Drought</th>
+                <th className="p-3 text-right">Water Risk</th>
                 <th className="p-3 text-right font-semibold">Total CF Loss</th>
               </tr>
             </thead>
             <tbody>
               {[
-                { year: 2024, scenario: "Baseline", wf: "0.055%", fl: "0.003%", slr: "0.000%", total: "0.058%" },
-                { year: 2050, scenario: "RCP4.5", wf: "0.082%", fl: "0.003%", slr: "0.042%", total: "0.127%" },
-                { year: 2060, scenario: "RCP8.5", wf: "0.220%", fl: "0.003%", slr: "0.161%", total: "0.384%" },
+                { scenario: "Baseline (2024)", wf: "0.001%", dr: "0.094%", wr: "0.000%", total: "0.095%" },
+                { scenario: "SSP1-2.6 (2040)", wf: "0.005%", dr: "0.257%", wr: "0.559%", total: "0.820%" },
+                { scenario: "SSP5-8.5 (2050)", wf: "0.001%", dr: "0.101%", wr: "0.546%", total: "0.648%" },
               ].map((r) => (
-                <tr key={`${r.year}-${r.scenario}`} className="border-b border-slate-100">
-                  <td className="p-3">{r.year}</td>
+                <tr key={r.scenario} className="border-b border-slate-100">
                   <td className="p-3">{r.scenario}</td>
                   <td className="p-3 text-right font-mono">{r.wf}</td>
-                  <td className="p-3 text-right font-mono">{r.fl}</td>
-                  <td className="p-3 text-right font-mono">{r.slr}</td>
+                  <td className="p-3 text-right font-mono">{r.dr}</td>
+                  <td className="p-3 text-right font-mono">{r.wr}</td>
                   <td className="p-3 text-right font-mono font-bold">{r.total}</td>
                 </tr>
               ))}
@@ -194,24 +192,27 @@ export default function PhysicalRiskPage() {
         </div>
       </div>
 
-      {/* CLIMADA Validation */}
+      {/* PLANiT vs Literature Validation */}
       <div className="bg-white rounded-lg shadow-sm p-6">
         <h2 className="text-lg font-semibold text-slate-800 mb-4">
-          CLIMADA vs Literature Validation
+          PLANiT vs Literature Validation
         </h2>
         <div className="grid grid-cols-2 gap-4">
           <div className="bg-blue-50 rounded-lg p-4">
-            <p className="text-sm font-semibold text-blue-800">CLIMADA Total</p>
-            <p className="text-2xl font-bold text-blue-600">0.029%</p>
+            <p className="text-sm font-semibold text-blue-800">PLANiT Wildfire AAI</p>
+            <p className="text-2xl font-bold text-blue-600">67.9M KRW</p>
+            <p className="text-xs text-blue-500 mt-1">→ 0.001% outage rate</p>
           </div>
           <div className="bg-green-50 rounded-lg p-4">
-            <p className="text-sm font-semibold text-green-800">Literature Total</p>
-            <p className="text-2xl font-bold text-green-600">0.058%</p>
+            <p className="text-sm font-semibold text-green-800">Literature Wildfire</p>
+            <p className="text-2xl font-bold text-green-600">0.055%</p>
+            <p className="text-xs text-green-500 mt-1">Kim et al. (2025)</p>
           </div>
         </div>
         <p className="text-xs text-slate-500 mt-3">
-          CLIMADA estimates are ~0.50x of literature-based estimates. Literature approach
-          adopted as conservative upper bound.
+          PLANiT uses CLIMADA probabilistic modeling (AAI over 20 simulated events);
+          literature uses incident-based estimation. PLANiT is lower but models actual
+          probabilistic impact on asset value (67.9M KRW / 4.879T total asset).
         </p>
       </div>
     </>
