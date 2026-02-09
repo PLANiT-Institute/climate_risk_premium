@@ -40,17 +40,17 @@ export type PowerGridFeature =
 
 export type PowerGridGeoJSON = FeatureCollection<Geometry, GeoJsonProperties>;
 
-export type RiskScenario = "baseline" | "rcp45_2050" | "rcp85_2060";
+export type RiskScenario = "baseline" | "ssp126_2040" | "ssp585_2050";
 
 export interface HazardRisk {
-  wildfire: number;
-  flood: number;
-  slr: number;
-  total: number;
+  wildfire: number;   // CLIMADA AAI → outage_rate
+  drought: number;    // PhysRisk impact_mean
+  waterRisk: number;  // PhysRisk impact_mean
+  total: number;      // Combined CF impact
 }
 
 export const SCENARIO_RISKS: Record<RiskScenario, HazardRisk> = {
-  baseline: { wildfire: 0.00055, flood: 0.00003, slr: 0.0, total: 0.00058 },
-  rcp45_2050: { wildfire: 0.00082, flood: 0.00003, slr: 0.00042, total: 0.00127 },
-  rcp85_2060: { wildfire: 0.0022, flood: 0.00003, slr: 0.00161, total: 0.00384 },
+  baseline: { wildfire: 0.0000139, drought: 0.000938, waterRisk: 0.0, total: 0.00095 },
+  ssp126_2040: { wildfire: 0.0000469, drought: 0.002569, waterRisk: 0.005592, total: 0.0082 },
+  ssp585_2050: { wildfire: 0.0000139, drought: 0.001007, waterRisk: 0.005457, total: 0.0065 },
 };

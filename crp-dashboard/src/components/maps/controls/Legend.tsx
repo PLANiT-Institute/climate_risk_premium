@@ -79,10 +79,10 @@ export default function Legend({ scenario }: LegendProps) {
         <div className="grid grid-cols-2 gap-1 text-xs">
           <span className="text-slate-600">Wildfire:</span>
           <span className="font-mono text-right">{(risks.wildfire * 100).toFixed(3)}%</span>
-          <span className="text-slate-600">Flood:</span>
-          <span className="font-mono text-right">{(risks.flood * 100).toFixed(3)}%</span>
-          <span className="text-slate-600">Sea Level Rise:</span>
-          <span className="font-mono text-right">{(risks.slr * 100).toFixed(3)}%</span>
+          <span className="text-slate-600">Drought:</span>
+          <span className="font-mono text-right">{(risks.drought * 100).toFixed(3)}%</span>
+          <span className="text-slate-600">Water Risk:</span>
+          <span className="font-mono text-right">{(risks.waterRisk * 100).toFixed(3)}%</span>
           <span className="text-slate-600 font-semibold">Total:</span>
           <span className="font-mono text-right font-semibold">{(risks.total * 100).toFixed(3)}%</span>
         </div>
