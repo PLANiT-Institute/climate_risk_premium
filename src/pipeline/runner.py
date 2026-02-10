@@ -334,6 +334,7 @@ class CRPModelRunner:
                 plant_params, enhanced_korea_scenario,
                 start_year=start,
                 end_year=start + transition_adj.operating_years - 1,
+                dispatch_priority_penalty=transition_scenario.dispatch_priority_penalty,
             )
 
         # --- Combined run (always performed, same as before) ---

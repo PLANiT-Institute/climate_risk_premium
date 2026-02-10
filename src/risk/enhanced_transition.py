@@ -246,7 +246,7 @@ def apply_enhanced_transition(
     baseline_cf = float(plant_params.get("capacity_factor", 0.5))
     baseline_life = int(plant_params.get("operating_years", 40))
     capacity_mw = float(plant_params.get("capacity_mw", 1000))
-    heat_rate = float(plant_params.get("heat_rate", 8.8))  # Typical for supercritical coal
+    heat_rate = float(plant_params.get("heat_rate_mmbtu_mwh", plant_params.get("heat_rate", 8.8)))
     carbon_content = float(plant_params.get("carbon_content", 0.093))  # Tons CO2/MMBtu for coal
     
     # Initialize carbon price trajectory
@@ -400,7 +400,7 @@ def calculate_enhanced_revenue_impact(
         
         # Carbon cost for this year
         carbon_price = adjustments.carbon_price_trajectory.get(year, 35)
-        heat_rate = float(plant_params.get("heat_rate", 8.8))
+        heat_rate = float(plant_params.get("heat_rate_mmbtu_mwh", plant_params.get("heat_rate", 8.8)))
         carbon_content = float(plant_params.get("carbon_content", 0.093))
         carbon_cost = KETSCarbonPricing.calculate_carbon_cost_burden(
             capacity_mw, adjustments.capacity_factor, heat_rate, carbon_content, carbon_price
