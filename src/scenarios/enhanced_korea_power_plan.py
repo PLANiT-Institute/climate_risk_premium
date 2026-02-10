@@ -59,13 +59,13 @@ class NuclearExpansionPlan:
         """Get nuclear capacity for given year."""
         if year <= 2024:
             return self.current_capacity_gw
-        
-        # Find the relevant phase
+
+        # Find the latest phase where year >= phase_year
+        result = self.current_capacity_gw
         for phase_year, phase_data in sorted(self.phase.items()):
             if year >= phase_year:
-                return phase_data.get('total_capacity', self.current_capacity_gw)
-        
-        return self.current_capacity_gw
+                result = phase_data.get('total_capacity', self.current_capacity_gw)
+        return result
 
 
 @dataclass
@@ -501,6 +501,11 @@ def create_enhanced_11th_plan() -> EnhancedKoreaPowerPlan:
             year=2038,  # 11th Plan target year
             coal_share=12.5, nuclear_share=36.5, renewable_share=21.7,
             gas_share=14.3, hydrogen_share=15.0, total_demand_twh=780.0
+        ),
+        PowerMixTarget(
+            year=2040,  # Presidential pledge: complete coal exit by 2040
+            coal_share=0.0, nuclear_share=40.0, renewable_share=30.0,
+            gas_share=12.0, hydrogen_share=18.0, total_demand_twh=800.0
         ),
     ]
     

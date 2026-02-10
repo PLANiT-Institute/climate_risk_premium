@@ -228,6 +228,7 @@ def create_yearly_transition_adjustments(
     start_year: int,
     end_year: int,
     emission_factor: float = 0.82,  # tCO2/MWh (supercritical coal)
+    dispatch_priority_penalty: float = 0.0,
 ) -> YearlyTransitionAdjustments:
     """
     Build year-by-year transition adjustments from an enhanced Korea Power Plan.
@@ -238,6 +239,8 @@ def create_yearly_transition_adjustments(
         start_year: First operating year
         end_year: Last operating year (inclusive)
         emission_factor: tCO2/MWh for the plant (default 0.82 supercritical coal)
+        dispatch_priority_penalty: Severity scaling factor from TransitionScenario
+            (e.g. 0.10 for moderate → CFs multiplied by 0.90)
 
     Returns:
         YearlyTransitionAdjustments with per-year CF and carbon costs
@@ -248,6 +251,10 @@ def create_yearly_transition_adjustments(
     capacity_factors = np.array([
         enhanced_korea_scenario.get_capacity_factor(int(y), baseline_cf) for y in years
     ])
+
+    # Apply severity scaling consistent with apply_enhanced_transition()
+    if dispatch_priority_penalty > 0:
+        capacity_factors = capacity_factors * (1.0 - dispatch_priority_penalty)
 
     carbon_costs_per_mwh = np.array([
         _carbon_cost_per_mwh(enhanced_korea_scenario, int(y), emission_factor)
