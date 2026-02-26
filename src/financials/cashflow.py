@@ -336,7 +336,7 @@ def compute_cashflows(
     """
     capacity_mw = float(plant_params.get("capacity_mw", 2000))
     price = float(plant_params.get("power_price_per_mwh", 80))
-    heat_rate = float(plant_params.get("heat_rate_mmbtu_mwh", 9.5))
+    heat_rate = float(plant_params.get("heat_rate_mmbtu_mwh", 8.8))
     fuel_price = float(plant_params.get("fuel_price_per_mmbtu", 3.2))
     fixed_opex = float(plant_params.get("fixed_opex_per_kw_year", 42))
     variable_opex = float(plant_params.get("variable_opex_per_mwh", 4.5))

@@ -4,8 +4,16 @@ Shared pytest fixtures for the Climate Risk Premium test suite.
 Provides reusable plant parameters, scenario objects, and helper factories
 so individual test files can focus on testing specific behavior.
 """
+from pathlib import Path
+import sys
+
 import pytest
 import numpy as np
+
+# Ensure `src` imports resolve when running plain `pytest` from repo root.
+REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
 from src.risk import TransitionAdjustments, PhysicalAdjustments
 from src.risk.transition import YearlyTransitionAdjustments
@@ -24,19 +32,19 @@ def samcheok_plant_params():
         "capacity_mw": 2100,
         "capacity_factor": 0.85,
         "power_price_per_mwh": 80,
-        "heat_rate_mmbtu_mwh": 9.5,
+        "heat_rate_mmbtu_mwh": 8.8,
         "fuel_price_per_mmbtu": 3.2,
         "fixed_opex_per_kw_year": 35,
         "variable_opex_per_mwh": 4.5,
-        "total_capex_million": 4900,
+        "total_capex_million": 3550,
         "useful_life": 40,
-        "tax_rate": 0.24,
+        "tax_rate": 0.25,
         "debt_fraction": 0.70,
         "debt_interest_rate": 0.061,
         "debt_tenor_years": 20,
         "operating_years": 40,
         "discount_rate": 0.08,
-        "emissions_tCO2_per_mwh": 0.95,
+        "emissions_tCO2_per_mwh": 0.82,
     }
 
 
@@ -47,7 +55,7 @@ def simple_plant_params():
         "capacity_mw": 1000,
         "capacity_factor": 0.5,
         "power_price_per_mwh": 100,
-        "heat_rate_mmbtu_mwh": 9.5,
+        "heat_rate_mmbtu_mwh": 8.8,
         "fuel_price_per_mmbtu": 0,
         "fixed_opex_per_kw_year": 0,
         "variable_opex_per_mwh": 0,

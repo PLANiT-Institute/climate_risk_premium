@@ -1,0 +1,69 @@
+{
+  "run_id": "freeze-793a1728-70dc-42f5-b145-db42800de535",
+  "run_timestamp": "2026-02-19T03:33:52.095204+00:00",
+  "git_commit": "b0ecf0a9fc30c9da1097bc26d75bb02c6d86605e",
+  "python_version": "3.14.2",
+  "scenario_set_id": "default_11_scenarios_v1",
+  "input_files": [
+    "/Users/jinsu/Documents/GitHub/climate_risk_premium/results/scenario_comparison.csv",
+    "/Users/jinsu/Documents/GitHub/climate_risk_premium/results/credit_ratings.csv",
+    "/Users/jinsu/Documents/GitHub/climate_risk_premium/results/cashflow_aggressive_transition.csv",
+    "/Users/jinsu/Documents/GitHub/climate_risk_premium/results/cashflow_baseline.csv",
+    "/Users/jinsu/Documents/GitHub/climate_risk_premium/results/cashflow_combined_aggressive.csv",
+    "/Users/jinsu/Documents/GitHub/climate_risk_premium/results/cashflow_combined_moderate.csv",
+    "/Users/jinsu/Documents/GitHub/climate_risk_premium/results/cashflow_enhanced_11th_plan.csv",
+    "/Users/jinsu/Documents/GitHub/climate_risk_premium/results/cashflow_enhanced_combined.csv",
+    "/Users/jinsu/Documents/GitHub/climate_risk_premium/results/cashflow_high_physical.csv",
+    "/Users/jinsu/Documents/GitHub/climate_risk_premium/results/cashflow_low_demand.csv",
+    "/Users/jinsu/Documents/GitHub/climate_risk_premium/results/cashflow_moderate_physical.csv",
+    "/Users/jinsu/Documents/GitHub/climate_risk_premium/results/cashflow_moderate_transition.csv",
+    "/Users/jinsu/Documents/GitHub/climate_risk_premium/results/cashflow_severe_drought.csv"
+  ],
+  "output_files": [
+    "/Users/jinsu/Documents/GitHub/climate_risk_premium/paper_dev/02_results_freeze/results_snapshot/scenario_comparison.csv",
+    "/Users/jinsu/Documents/GitHub/climate_risk_premium/paper_dev/02_results_freeze/results_snapshot/credit_ratings.csv",
+    "/Users/jinsu/Documents/GitHub/climate_risk_premium/paper_dev/02_results_freeze/results_snapshot/cashflow_aggressive_transition.csv",
+    "/Users/jinsu/Documents/GitHub/climate_risk_premium/paper_dev/02_results_freeze/results_snapshot/cashflow_baseline.csv",
+    "/Users/jinsu/Documents/GitHub/climate_risk_premium/paper_dev/02_results_freeze/results_snapshot/cashflow_combined_aggressive.csv",
+    "/Users/jinsu/Documents/GitHub/climate_risk_premium/paper_dev/02_results_freeze/results_snapshot/cashflow_combined_moderate.csv",
+    "/Users/jinsu/Documents/GitHub/climate_risk_premium/paper_dev/02_results_freeze/results_snapshot/cashflow_enhanced_11th_plan.csv",
+    "/Users/jinsu/Documents/GitHub/climate_risk_premium/paper_dev/02_results_freeze/results_snapshot/cashflow_enhanced_combined.csv",
+    "/Users/jinsu/Documents/GitHub/climate_risk_premium/paper_dev/02_results_freeze/results_snapshot/cashflow_high_physical.csv",
+    "/Users/jinsu/Documents/GitHub/climate_risk_premium/paper_dev/02_results_freeze/results_snapshot/cashflow_low_demand.csv",
+    "/Users/jinsu/Documents/GitHub/climate_risk_premium/paper_dev/02_results_freeze/results_snapshot/cashflow_moderate_physical.csv",
+    "/Users/jinsu/Documents/GitHub/climate_risk_premium/paper_dev/02_results_freeze/results_snapshot/cashflow_moderate_transition.csv",
+    "/Users/jinsu/Documents/GitHub/climate_risk_premium/paper_dev/02_results_freeze/results_snapshot/cashflow_severe_drought.csv"
+  ],
+  "sha256": {
+    "input": {
+      "scenario_comparison.csv": "f8e532f782b945556cc46d71345bf2b035b49ace12b0642516d1057295893e22",
+      "credit_ratings.csv": "55d2d1f0855eb2cba1492330a30a9e83ff215ba1427dabda7814c63f3f28779f",
+      "cashflow_aggressive_transition.csv": "f3843a6fd4c83a0795eb1181f48804708be70f6b3f762c7223df19e145e1664a",
+      "cashflow_baseline.csv": "6bbc848dbcfbb561075072197dc1f461d1acd76ff0cac2cf51d27fdb2e6564fe",
+      "cashflow_combined_aggressive.csv": "f3718db195f5ddc396e09596732739d3ababb6ed49eec978c853a5d770b4de5a",
+      "cashflow_combined_moderate.csv": "082953c49bfc689036c02ddbbba4bd641bd25a7edf892ffd6b9f54327546b62a",
+      "cashflow_enhanced_11th_plan.csv": "61d4153335f0cf5e0366db354280799f267b571195d293d41b44d502d0c44f03",
+      "cashflow_enhanced_combined.csv": "e7ddb75a6dde76c2cc5b4cfe4b9056e8b684663d1395a80634a8a0fadce7c0e3",
+      "cashflow_high_physical.csv": "fdabd7f8c465e029bac4e629dcf111e9ff869a43bb909beccf38f72f4e0d5eca",
+      "cashflow_low_demand.csv": "0ed848edf14eae6f7e49c266b17de47506d9dc2773f03c24940b4ffbf20d2613",
+      "cashflow_moderate_physical.csv": "2a4e0cbe86e3ae5585dd7209d683408cc522cd99c78ac71a7dc68c2536acb729",
+      "cashflow_moderate_transition.csv": "cd30f58844bdc667d2874e128fa603b78406ffa43eebe3eadbf3f4ad80681354",
+      "cashflow_severe_drought.csv": "ae100850f449840d90acc22206a1dd2f35d1e38df6186e197b185646bb810455"
+    },
+    "output": {
+      "scenario_comparison.csv": "f8e532f782b945556cc46d71345bf2b035b49ace12b0642516d1057295893e22",
+      "credit_ratings.csv": "55d2d1f0855eb2cba1492330a30a9e83ff215ba1427dabda7814c63f3f28779f",
+      "cashflow_aggressive_transition.csv": "f3843a6fd4c83a0795eb1181f48804708be70f6b3f762c7223df19e145e1664a",
+      "cashflow_baseline.csv": "6bbc848dbcfbb561075072197dc1f461d1acd76ff0cac2cf51d27fdb2e6564fe",
+      "cashflow_combined_aggressive.csv": "f3718db195f5ddc396e09596732739d3ababb6ed49eec978c853a5d770b4de5a",
+      "cashflow_combined_moderate.csv": "082953c49bfc689036c02ddbbba4bd641bd25a7edf892ffd6b9f54327546b62a",
+      "cashflow_enhanced_11th_plan.csv": "61d4153335f0cf5e0366db354280799f267b571195d293d41b44d502d0c44f03",
+      "cashflow_enhanced_combined.csv": "e7ddb75a6dde76c2cc5b4cfe4b9056e8b684663d1395a80634a8a0fadce7c0e3",
+      "cashflow_high_physical.csv": "fdabd7f8c465e029bac4e629dcf111e9ff869a43bb909beccf38f72f4e0d5eca",
+      "cashflow_low_demand.csv": "0ed848edf14eae6f7e49c266b17de47506d9dc2773f03c24940b4ffbf20d2613",
+      "cashflow_moderate_physical.csv": "2a4e0cbe86e3ae5585dd7209d683408cc522cd99c78ac71a7dc68c2536acb729",
+      "cashflow_moderate_transition.csv": "cd30f58844bdc667d2874e128fa603b78406ffa43eebe3eadbf3f4ad80681354",
+      "cashflow_severe_drought.csv": "ae100850f449840d90acc22206a1dd2f35d1e38df6186e197b185646bb810455"
+    }
+  }
+}

@@ -385,8 +385,8 @@ CONCLUSION: Physical risk = 5-34 hours/year = VERY SMALL!
 |-------|--------------|-------------|
 | **Kim et al. (2025)** | "451 fires per year in Korea" | → We derived 0.055% wildfire risk |
 | **Kang & Lee (2024)** | "Coastal flood modeling for Korea" | → We derived 0.003% flood risk |
-| **Van Vliet (2016)** | "Power plants lose capacity from warming" | → We derived 0.22% per meter SLR |
-| **IPCC AR6 (2021)** | "Sea level will rise 0.25m by 2050" | → We use 0.25m directly |
+| **Van Vliet (2016)** | "Power plants lose capacity from warming water (river cooling impacts)" | → We derived 0.22% per meter SLR (independent engineering estimate, not directly from paper) |
+| **IPCC AR6 (2021)** | "Sea level will rise 0.25m by 2100 (SSP1-2.6)" | → We use 0.25m for RCP4.5 pathway (conservative; SSP2-4.5 actual ≈ 0.44m) |
 
 **Important:** The percentages (0.055%, 0.003%, 0.22%) are **our estimates**, NOT from the papers!
 
@@ -892,8 +892,9 @@ OUTPUTS:
 
 - **Scope:** Global analysis of 24,515 hydropower + 1,427 thermoelectric plants
 - **Key finding:** 61-74% of hydropower plants face reduced capacity by 2040+
-- **Mechanism:** Water availability + water temperature affects cooling
+- **Mechanism:** Water availability + water temperature affects **river cooling** (not SLR directly)
 - **Samcheok relevance:** Coastal thermal plant - cooling efficiency degradation applies
+- **Note:** Van Vliet addresses river cooling impacts. SLR derate (0.22%/m) is an independent engineering estimate.
 
 ### 4. Compound Risk (Zscheischler et al. 2018)
 

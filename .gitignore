@@ -13,6 +13,25 @@ __pycache__/
 .venv/
 venv/
 
+# Reproducibility note:
+# `results/` and `data/processed/` are intentionally versioned in this repo.
+
 # OS
 .DS_Store
 Thumbs.db
+
+# LaTeX build artifacts
+*.aux
+*.log
+*.out
+*.toc
+*.bbl
+*.blg
+*.spl
+*.synctex.gz
+
+# Python/tool caches
+.mypy_cache/
+
+# R artifacts
+.Rhistory
