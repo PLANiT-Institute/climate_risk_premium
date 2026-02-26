@@ -1,0 +1,9 @@
+ref_id,citation_key,claim_ids,source_type,primary_url,doi_or_id,access_date,status,notes
+R001,caldecott2021stranded,C008,peer_reviewed,https://www.annualreviews.org/doi/10.1146/annurev-environ-012220-105045,10.1146/annurev-environ-012220-105045,2026-02-19,verified,"Used for stranded-asset conceptual framing"
+R002,vanvliet2016power,C008,peer_reviewed,https://www.nature.com/articles/nclimate2903,10.1038/nclimate2903,2026-02-19,verified,"Used for physical vulnerability framing"
+R003,ngfs2024,C009;C010;C011;C012;C013;C014;C015,institutional_report,https://www.ngfs.net/en,NGFS-2024-sovereign-climate-risk,2026-02-19,verified,"Policy-finance framing only"
+R004,iea2024coal,C009;C021,institutional_report,https://www.iea.org/reports/coal-2024,IEA-Coal-2024,2026-02-19,verified,"Energy transition context"
+R005,motie2025,C024,primary_government,https://www.motie.go.kr/,Korea-11th-basic-plan,2026-02-19,verified,"Primary planning source entry"
+R006,ppca2025,C023,primary_institution,https://www.poweringpastcoal.org/what-is-the-ppca/,PPCA-context-page,2026-02-19,verified,"Context-only policy reference"
+R007,energypolicyguide2026,C021,primary_journal,https://www.sciencedirect.com/journal/energy-policy/publish/guide-for-authors,EnergyPolicy-Guide-Authors,2026-02-19,verified,"Formatting authority"
+R008,energypolicyjournal2026,C022,primary_journal,https://www.sciencedirect.com/journal/energy-policy,EnergyPolicy-Journal-Page,2026-02-19,verified,"Scope context"

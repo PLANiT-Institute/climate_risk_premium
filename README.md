@@ -11,7 +11,7 @@ This repository contains a comprehensive financial modeling framework for quanti
 2. **CLIMADA Physical Hazards** (ETH Zurich) - Spatially-explicit wildfire, flood, and sea level rise data
 3. **KIS Credit Rating Methodology** - Korean credit rating agency quantitative grid
 
-**Key Finding**: Government policy — not physical climate change — is the primary driver of coal asset stranding in Korea. Under the enhanced 11th Basic Plan (2040 coal phase-out), the Samcheok plant's NPV drops from +$3,098M to -$2,999M and its credit rating collapses from AA to CC, generating a Climate Risk Premium of 1,020 basis points. Physical risks alone have negligible impact (~$3-5M NPV reduction), confirming that transition risk is the dominant stranding channel.
+**Key Finding**: Government policy — not physical climate change — is the primary driver of coal asset stranding in Korea in the canonical frozen run. Under the enhanced 11th Basic Plan (2040 coal phase-out), the Samcheok plant's NPV drops from +$3,103M to -$3,293M and its credit rating shifts from AA to C, generating a counterfactual Climate Risk Premium of 1,735 basis points. Physical risks alone are materially smaller than severe transition scenarios in this setup.
 
 ---
 
@@ -61,24 +61,24 @@ The model demonstrates a non-linear feedback loop:
 
 | Scenario | NPV ($M) | IRR | Min DSCR | Rating | CRP (bps) |
 |----------|----------|------|----------|--------|-----------|
-| Baseline | 3,098 | 11.99% | 1.86× | AA | -50 |
-| Moderate Transition | 2,034 | 10.55% | 1.65× | A | 0 |
-| Aggressive Transition | -75 | 7.04% | 1.33× | A | 0 |
-| Moderate Physical | 3,095 | 11.99% | 1.85× | AA | -50 |
-| High Physical | 3,093 | 11.99% | 1.85× | AA | -50 |
-| Combined Moderate | 2,031 | 10.55% | 1.65× | A | 0 |
-| Combined Aggressive | -78 | 7.03% | 1.33× | A | 0 |
-| Low Demand | 494 | 8.21% | 1.17× | BBB | 85 |
-| Severe Drought | 3,099 | 11.99% | 1.86× | AA | -50 |
-| Enhanced 11th Plan | -2,999 | -8.09% | 0.07× | CC | 1,020 |
-| Enhanced Combined | -3,000 | -8.09% | 0.07× | CC | 1,020 |
+| Baseline | 3,103 | 12.00% | 1.86× | AA | -50 |
+| Moderate Transition | 2,038 | 10.56% | 1.65× | A | 0 |
+| Aggressive Transition | -72 | 7.05% | 1.33× | A | 0 |
+| Moderate Physical | 3,074 | 11.96% | 1.85× | AA | -50 |
+| High Physical | 3,042 | 11.91% | 1.84× | AA | -50 |
+| Combined Moderate | 2,018 | 10.53% | 1.64× | A | 0 |
+| Combined Aggressive | -109 | 6.97% | 1.32× | A | 0 |
+| Low Demand | 497 | 8.22% | 1.17× | BBB | 85 |
+| Severe Drought | 3,084 | 11.98% | 1.85× | AA | -50 |
+| Enhanced 11th Plan | -3,293 | -13.02% | -0.24× | C | 1,735 |
+| Enhanced Combined | -3,297 | -13.07% | -0.24× | C | 1,735 |
 
 ### Key Insights
 
-1. **Policy Dominates**: The Enhanced 11th Plan (2040 coal phase-out) destroys $6.1B in value (NPV swing from +$3,098M to -$2,999M), while physical risks have negligible financial impact (~$3-5M NPV reduction)
-2. **Credit Rating Collapse**: Baseline AA rating drops to CC under the 2040 phase-out scenario, with DSCR collapsing from 1.86x to 0.07x
-3. **Climate Risk Premium**: 1,020 bps under the most severe policy scenario, reflecting a 10.2% additional cost of capital
-4. **Physical Risk Is Minimal for Korea**: Korea-specific wildfire (0.055%) and flood (0.003%) risks are orders of magnitude smaller than transition risk, consistent with Korea's temperate geography
+1. **Policy Dominates**: The Enhanced 11th Plan (2040 coal phase-out) destroys about $6.4B in value (NPV swing from +$3,103M to -$3,293M), while physical-only scenarios are substantially smaller in impact.
+2. **Credit Deterioration**: Baseline AA shifts to C under the enhanced phase-out scenario, with minimum DSCR moving from 1.86x to -0.24x.
+3. **Climate Risk Premium**: 1,735 bps under the most severe policy scenario in the frozen baseline.
+4. **Physical vs Transition**: Physical scenarios remain materially lower impact than enhanced transition scenarios in this run.
 
 ---
 
@@ -379,13 +379,13 @@ If you use this model in your research, please cite:
 
 ## Key Findings for Policymakers
 
-1. **Stranded Asset Risk is Real**: The Enhanced 11th Basic Plan (2040 coal phase-out) creates a $6.1 billion NPV swing for the Samcheok plant, from +$3,098M to -$2,999M.
+1. **Stranded Asset Risk is Real**: The Enhanced 11th Basic Plan (2040 coal phase-out) creates about a $6.4 billion NPV swing for the Samcheok plant, from +$3,103M to -$3,293M in the frozen run.
 
-2. **Early Retirement is Optimal**: Under the 2040 phase-out, DSCR collapses to 0.07x by mid-life. Negotiated early retirement dominates market-driven collapse.
+2. **Early Retirement is a Core Policy Question**: Under the 2040 phase-out run, minimum DSCR falls to -0.24x, highlighting deep debt-service stress.
 
-3. **Just Transition Finance Needed**: The 1,020 bps Climate Risk Premium under the most severe scenario renders new coal unfinanceable. Structured transition mechanisms (early retirement contracts, transition bonds) are essential.
+3. **Just Transition Finance Needed**: The 1,735 bps Climate Risk Premium under the most severe scenario indicates extreme financing stress. Structured transition mechanisms (early retirement contracts, transition bonds) remain central.
 
-4. **Rating Agencies Must Adapt**: The model's baseline AA rating does not yet reflect forward-looking policy risk. Under the Enhanced 11th Plan, the rating collapses to CC — a 10-notch downgrade that current static methodologies fail to capture.
+4. **Rating Agencies Must Adapt**: In the frozen run, baseline AA shifts to C under the Enhanced 11th Plan, indicating that static methods can materially understate forward-looking policy stress.
 
 ---
 

@@ -11,7 +11,7 @@ BASELINE PARAMETERS (derived from literature):
 
 CLIMATE PROJECTION SOURCES (verified):
 - Wildfire: World Weather Attribution (2025) - Korean wildfires 2x more likely
-- Flood: Korean Society of Climate Change Research (2024) - SSP scenarios
+- Flood: Korean Society of Climate Change Research (2023) - SSP scenarios
           npj Climate and Atmospheric Science (2025) | DOI: 10.1038/s41612-025-01067-z
 - SLR: CMIP6 Models via MDPI Atmosphere (2021) | DOI: 10.3390/atmos12010090
 - TC: Knutson et al. (2020) via CLIMADA | DOI: 10.1175/BAMS-D-18-0194.1
@@ -38,8 +38,9 @@ WILDFIRE_BASE_RATE = 0.00055
 FLOOD_BASE_RATE = 0.00003
 
 # SLR: 0.22% capacity derate per meter of sea level rise (DERIVED)
-# Informed by: Van Vliet et al. (2016), DOI: 10.1038/nclimate2903
-# Derivation: Engineering estimate for coastal thermal plant cooling degradation
+# Engineering estimate for coastal thermal plant. Van Vliet (2016) addresses
+# river cooling impacts, not SLR directly. SLR derate is an independent assumption.
+# DOI: 10.1038/nclimate2903
 SLR_DERATE_PER_METER = 0.0022
 
 
@@ -63,15 +64,17 @@ class ClimateProjection:
 # =============================================================================
 # Sources:
 # - Wildfire: WWA (2025) - 2x current, 4x by 2100
-# - Flood: KSCCR (2024) - +29% (2030), +46% (2050), +53% (2100) for SSP5-8.5
-# - SLR: CMIP6 via MDPI Atmosphere (2021) - 0.25m (SSP2-4.5), 0.63m (SSP5-8.5) by 2100
+# - Flood: KSCCR (2023) - +29% (2030), +46% (2050), +53% (2100) for SSP5-8.5
+# - SLR: CMIP6 via MDPI Atmosphere (2021) - 0.25m (SSP1-2.6), 0.63m (SSP5-8.5) by 2100
+#   Note: 0.25m is SSP1-2.6 per MDPI paper, not SSP2-4.5. SSP2-4.5 actual ≈ 0.44m (IPCC AR6).
 
 PROJECTIONS: Dict[str, ClimateProjection] = {
     # Baseline
     "baseline_2024": ClimateProjection(2024, "current", 1.0, 1.0, 0.0, 1.0),
 
     # SSP2-4.5 / RCP 4.5 (moderate climate change)
-    # Wildfire: WWA interpolated, Flood: Yeongsan Basin, SLR: CMIP6 linear
+    # Wildfire: WWA interpolated, Flood: Yeongsan Basin
+    # SLR: Labeled "rcp45" for model pathway but sourced from SSP1-2.6 (CMIP6 linear)
     "rcp45_2030": ClimateProjection(2030, "RCP4.5", 1.2, 1.10, 0.05, 1.0),
     "rcp45_2040": ClimateProjection(2040, "RCP4.5", 1.35, 1.18, 0.08, 1.0),
     "rcp45_2050": ClimateProjection(2050, "RCP4.5", 1.5, 1.25, 0.12, 1.0),
@@ -83,6 +86,10 @@ PROJECTIONS: Dict[str, ClimateProjection] = {
     "rcp85_2040": ClimateProjection(2040, "RCP8.5", 1.65, 1.38, 0.12, 1.0),
     "rcp85_2050": ClimateProjection(2050, "RCP8.5", 2.0, 1.46, 0.18, 1.0),
     "rcp85_2060": ClimateProjection(2060, "RCP8.5", 2.5, 1.80, 0.30, 1.0),
+    # Flood 2.64: Seo et al. (2025) reports 3.7x hourly extreme rainfall increase (July, SSP5-8.5)
+    # Reduced to 2.64 to account for: (1) seasonal vs annual averaging,
+    # (2) hourly rainfall frequency ≠ flood event frequency
+    # Derivation: 3.7 × 0.714 seasonal-to-annual adjustment ≈ 2.64
     "rcp85_2100": ClimateProjection(2100, "RCP8.5", 4.0, 2.64, 0.63, 1.0),
 }
 
@@ -262,7 +269,9 @@ FLOOD_OUTAGE_PARAMS = {"baseline_flood_outage_rate": type('obj', (object,), {'va
 SLR_PARAMS = {
     "rcp45_slr_2030_m": type('obj', (object,), {'value': 0.05})(),  # CMIP6 linear interpolation
     "rcp45_slr_2050_m": type('obj', (object,), {'value': 0.12})(),  # CMIP6 linear interpolation
-    "rcp45_slr_2100_m": type('obj', (object,), {'value': 0.25})(),  # CMIP6: 0.15-0.35m range
+    # Note: Labeled as "rcp45" for model pathway but sourced from SSP1-2.6
+    # SSP2-4.5 actual SLR ≈ 0.44m (IPCC AR6). Conservative estimate used.
+    "rcp45_slr_2100_m": type('obj', (object,), {'value': 0.25})(),  # CMIP6 SSP1-2.6 Korean Peninsula regional
     "rcp85_slr_2030_m": type('obj', (object,), {'value': 0.06})(),  # CMIP6 linear interpolation
     "rcp85_slr_2050_m": type('obj', (object,), {'value': 0.18})(),  # CMIP6 linear interpolation
     "rcp85_slr_2100_m": type('obj', (object,), {'value': 0.63})(),  # CMIP6: 0.50-0.76m range
@@ -271,7 +280,7 @@ COMPOUND_RISK_PARAMS = {}
 
 # VERIFIED CLIMATE MULTIPLIERS
 # Wildfire: WWA (2025) - Korean wildfires
-# Flood: KSCCR (2024) - Korean watersheds under SSP scenarios
+# Flood: KSCCR (2023) - Korean watersheds under SSP scenarios
 CLIMATE_MULTIPLIERS = {
     # Wildfire - WWA (2025): current 2x, future 4x by 2100
     "wildfire_rcp45_2030": 1.2,   # WWA interpolated
@@ -280,11 +289,12 @@ CLIMATE_MULTIPLIERS = {
     "wildfire_rcp85_2030": 1.3,   # WWA interpolated
     "wildfire_rcp85_2050": 2.0,   # WWA: current climate = 2x
     "wildfire_rcp85_2100": 4.0,   # WWA: 2x current × 2x future
-    # Flood - KSCCR (2024): +29% (2030), +46% (2050), +164% (2100) for SSP5-8.5
+    # Flood - KSCCR (2023): +29% (2030), +46% (2050), +164% (2100) for SSP5-8.5
     "flood_rcp45_2050": 1.25,     # Yeongsan Basin +31.7%
     "flood_rcp85_2030": 1.29,     # KSCCR early century
     "flood_rcp85_2050": 1.46,     # KSCCR mid century
-    "flood_rcp85_2100": 2.64,     # npj Clim 3.7x freq
+    # Seo et al. (2025): 3.7x hourly extreme × 0.714 seasonal-to-annual adj ≈ 2.64
+    "flood_rcp85_2100": 2.64,     # npj Clim 3.7x freq adjusted
 }
 
 

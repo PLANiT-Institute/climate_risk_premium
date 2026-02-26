@@ -73,7 +73,13 @@ def csv_to_json(csv_path: Path, json_path: Path) -> None:
 
 
 def generate_yearly_ratings(results: dict, output_path: Path) -> None:
-    """Generate yearly ratings data from scenario results."""
+    """Generate yearly ratings data from scenario results.
+
+    Note:
+        This output is dashboard-only and uses an approximate DSCR-to-rating
+        mapping. Paper-grade ratings should be taken from frozen scenario
+        outputs (`scenario_comparison.csv` / `credit_ratings.csv`).
+    """
     yearly_data = []
 
     for scenario_name, result in results.items():
@@ -81,7 +87,11 @@ def generate_yearly_ratings(results: dict, output_path: Path) -> None:
             continue
 
         years = result.cashflow.years
-        dscr_values = result.cashflow.dscr if hasattr(result.cashflow, 'dscr') else [result.metrics.avg_dscr] * len(years)
+        dscr_values = (
+            result.cashflow.dscr
+            if hasattr(result.cashflow, "dscr")
+            else [result.metrics.avg_dscr] * len(years)
+        )
 
         for i, year in enumerate(years):
             # Approximate rating from DSCR
@@ -103,13 +113,15 @@ def generate_yearly_ratings(results: dict, output_path: Path) -> None:
                 "scenario": scenario_name,
                 "year": int(year),
                 "dscr": round(float(dscr), 3),
-                "rating": rating
+                "rating": rating,
+                "rating_method": "approx_dscr_mapping",
+                "paper_grade_metric": False,
             })
 
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(yearly_data, f, indent=2, ensure_ascii=False)
 
-    print(f"  Generated: {output_path.name}")
+    print(f"  Generated: {output_path.name} (dashboard approximation only)")
 
 
 def main():
