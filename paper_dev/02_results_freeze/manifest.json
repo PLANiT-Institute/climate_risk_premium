@@ -1,7 +1,7 @@
 {
-  "run_id": "freeze-8cff8d1e-844a-458e-ab7d-fa81632b97af",
-  "run_timestamp": "2026-02-26T05:06:04.379020+00:00",
-  "git_commit": "b0ecf0a9fc30c9da1097bc26d75bb02c6d86605e",
+  "run_id": "freeze-249d2070-a1db-4c85-b5aa-e344bf29c044",
+  "run_timestamp": "2026-02-26T12:53:09.935876+00:00",
+  "git_commit": "c48ef2f3eaaa13dfbfdc5065be07a64cc16a2d14",
   "python_version": "3.14.2",
   "scenario_set_id": "default_11_scenarios_v1",
   "input_files": [

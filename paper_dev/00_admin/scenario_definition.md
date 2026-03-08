@@ -1,4 +1,4 @@
-# Scenario Definition Contract (Energy Policy Paper)
+# Scenario Definition Contract (Climate Risk Management Paper)
 
 This document defines the only scenario set admissible for manuscript tables, figures, and claims.
 

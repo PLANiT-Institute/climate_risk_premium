@@ -250,21 +250,21 @@ export default function ModelPipelinePage() {
                   <span className="font-mono text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded flex-shrink-0">Wildfire</span>
                   <span className="text-slate-600">
                     CLIMADA-computed Annual Average Impact (AAI) per SSP × year anchor.
-                    CSV: <code className="text-xs bg-slate-200 px-1 rounded">wildfire_aai_results.csv</code>
+                    CSV: <code className="text-xs bg-slate-200 px-1 rounded">wildfire_results_*.csv</code>
                   </span>
                 </div>
                 <div className="flex items-start gap-2">
                   <span className="font-mono text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded flex-shrink-0">Drought</span>
                   <span className="text-slate-600">
                     PhysRisk drought impact_mean per SSP × year.
-                    CSV: <code className="text-xs bg-slate-200 px-1 rounded">drought_results.csv</code>
+                    CSV: <code className="text-xs bg-slate-200 px-1 rounded">drought_results_*.csv</code>
                   </span>
                 </div>
                 <div className="flex items-start gap-2">
                   <span className="font-mono text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded flex-shrink-0">Water Risk</span>
                   <span className="text-slate-600">
                     PhysRisk water_risk impact_mean per SSP × year.
-                    CSV: <code className="text-xs bg-slate-200 px-1 rounded">water_risk_results.csv</code>
+                    CSV: <code className="text-xs bg-slate-200 px-1 rounded">water_risk_results_*.csv</code>
                   </span>
                 </div>
               </div>
@@ -350,7 +350,7 @@ export default function ModelPipelinePage() {
               <h3 className="text-sm font-semibold text-slate-700 mb-3">Conversion Formulas</h3>
               <EquationBlock
                 label="Wildfire: AAI → Outage Rate"
-                latex="\text{outage\_rate} = \frac{\text{AAI}}{4.879 \times 10^{12}} \quad \text{(GDP normalization)}"
+                latex="\text{outage\_rate} = \frac{\text{AAI}}{4.879 \times 10^{12}} \quad \text{(asset-value normalization)}"
               />
               <EquationBlock
                 label="Drought: Impact Mean → Capacity Derate"
@@ -725,12 +725,12 @@ export default function ModelPipelinePage() {
             <div>
               <h3 className="text-sm font-semibold text-slate-700 mb-3">Counterfactual CRP Approach</h3>
               <p className="text-sm text-slate-600 mb-3">
-                The Climate Risk Premium is computed as the difference between the scenario credit spread
-                and the counterfactual (&quot;A&quot;-rated, no climate risk) spread.
+                The production model computes CRP from the WACC gap between scenario and counterfactual
+                (A-rated no-climate-risk reference).
               </p>
               <EquationBlock
                 label="Climate Risk Premium"
-                latex="CRP = \text{Spread}_{scenario} - \text{Spread}_{counterfactual} = \text{Spread}_{scenario} - 150\text{ bps}"
+                latex="CRP_{bps} = \left(WACC_{scenario} - WACC_{counterfactual}\right)\times 10^4"
               />
               <div className="bg-slate-50 rounded-lg p-4 mt-3">
                 <div className="flex items-center gap-4 justify-center flex-wrap">

@@ -1,28 +1,118 @@
-# Energy Policy Submission Strategy (Updated 2026)
+# Submission Strategy (Updated 2026-02-27)
 
 ## Target and Positioning
 
-- Primary target: **Energy Policy**
-- Fallback target after first decision: **Energy Economics**
 - Paper type: single-case Samcheok study with reproducibility-first package
+- Author profile: early-career, small institution (PLANiT Institute)
+- Paper characteristics: deterministic scenario analysis, project finance model, credit rating/CRP, reproducibility governance
+
+## Tiered Submission Strategy (APC-free priority)
+
+```
+1st  Climate Risk Management (Elsevier, IF 5.0)  elsarticle compatible, Case Report accepted
+2nd  Clean Energy (Oxford UP, IF 3.7)             APC free, OUP reformat required
+3rd  Carbon Management (T&F, IF 3.2)              subscription-only = APC free, T&F reformat required
+```
+
+---
+
+## Journal Details
+
+### 1. Climate Risk Management (Elsevier) — CURRENT TARGET
+
+| Field | Detail |
+|-------|--------|
+| IF | 5.0 (CiteScore 5.7) |
+| Competition | Moderate — ~89 articles/year |
+| Scope | Climate risk assessment, risk management for decision-making |
+| Case study | "Case Report" type explicitly accepted |
+| Review | ~30 weeks (submission to publication) |
+| APC | $3,480 (Gold OA mandatory) |
+| Format | elsarticle — **current manuscript format, no reformat needed** |
+
+**Why this journal:**
+- Journal name directly matches paper topic (climate risk + management)
+- Case Report type explicitly welcomed — no single-case reviewer resistance
+- elsarticle compatible — zero reformatting
+- IF 5.0 — meaningful for early-career first publication
+- Small community — lower competition than Energy Policy (~1,000+ articles/year)
+
+**Caveat:** APC $3,480 (Gold OA mandatory). If budget is a constraint, fall back to Clean Energy.
+
+### 2. Clean Energy (Oxford University Press) — FALLBACK (APC-FREE)
+
+| Field | Detail |
+|-------|--------|
+| IF | 3.7 |
+| Competition | Low-moderate — founded 2017, growing |
+| Scope | Clean energy technologies, decarbonization |
+| Case study | Applied/industrial case studies accepted |
+| Review | Relatively fast (newer journal) |
+| APC | **Free ($0)** |
+| Format | OUP template — **reformat required** |
+
+**Why this journal:**
+- APC $0 — decisive advantage for small institution
+- IF 3.7 — meaningful level
+- Coal decarbonization papers published before
+- Growing journal — welcoming submissions
+
+**Reformat needed:** OUP LaTeX template, energy transition/decarbonization framing emphasis.
+
+### 3. Carbon Management (Taylor & Francis) — FALLBACK (NICHE)
+
+| Field | Detail |
+|-------|--------|
+| IF | 3.2 |
+| Competition | Low — niche journal, small community |
+| Scope | GHG, carbon policy, carbon economics |
+| Case study | Applied case studies accepted |
+| Review | ~13 weeks (fast) |
+| APC | $2,195 (OA optional) / **subscription-only = free** |
+| Format | T&F template — **reformat required** |
+
+**Why this journal:**
+- Niche and accessible
+- Carbon pricing/emission scenario emphasis fits scope
+- Subscription-only option avoids APC
+
+**Reformat needed:** T&F template, emphasize carbon pricing aspects.
+
+---
+
+## Journals NOT Recommended
+
+| Journal | IF | Reason |
+|---------|-----|--------|
+| Energy Policy | 9.2 | Too competitive for single-case early-career paper |
+| Energy Economics | 13.0 | More competitive + econometric methodology preferred |
+| Energy Strategy Reviews | 9.9 | Same competition level as Energy Policy |
+| Energy Research & Social Science | 8.5 | Social science methodology required — scope mismatch |
+| Sustainability (MDPI) | 3.3 | Norwegian Level 0 — reputation risk |
+| Energy for Sustainable Development | 4.9 | Developing country focus — Korea not applicable |
+| Int'l J. Sustainable Energy | 2.0 | Renewable energy engineering focus |
+
+---
 
 ## Current Baseline (Canonical Frozen Run)
 
-- Baseline NPV: **$3,103M**
-- Enhanced 11th Plan NPV: **-$3,293M**
-- NPV swing: **$6,396M**
+- Baseline NPV: **$4,629M**
+- Enhanced 11th Plan NPV: **-$1,891M**
+- NPV swing: **$6,520M**
 - Baseline rating: **AA**
-- Enhanced rating: **C**
-- Counterfactual CRP (enhanced): **1,735 bps**
+- Enhanced rating: **CC**
+- Counterfactual CRP (enhanced): **1,020 bps**
 
 ## Working Timeline (2026)
 
-| Stage | Energy Policy | Notes |
-|------|---------------|-------|
+| Stage | Status | Notes |
+|-------|--------|-------|
 | Freeze canonical package | Complete | Frozen outputs + manifest in `paper_dev/02_results_freeze` |
-| Manuscript consistency pass | Week of Feb 17, 2026 | Remove conflicting legacy claims |
-| Internal review + final edits | Week of Feb 24, 2026 | Claim registry and reproducibility checks |
-| Submission window | Early March 2026 | Submit once checklist is fully complete |
+| Manuscript consistency pass | Complete | Week of Feb 17, 2026 |
+| Internal review + final edits | Complete | Week of Feb 24, 2026 |
+| Fact-check parameter fix | Complete | Feb 26, 2026 — corrected 6 plant parameters, re-ran full pipeline |
+| Journal strategy research | Complete | Feb 27, 2026 — tiered strategy finalized |
+| Submission window | Mid-March 2026 | Submit to Climate Risk Management first |
 
 ## Required Submission Materials
 
@@ -42,8 +132,10 @@
 4. `pytest` passes without `PYTHONPATH` workaround.
 5. README summary and results summary match frozen numbers.
 
-## Fallback Rule
+## Fallback Procedure
 
-If Energy Policy declines, activate fallback checklist:
+If Climate Risk Management desk-rejects or rejects after review:
 
-- `paper_dev/00_admin/fallback_energy_economics.md`
+1. **Clean Energy (OUP):** Reformat to OUP template, strengthen energy transition framing, update cover letter. No APC cost.
+2. **Carbon Management (T&F):** Reformat to T&F template, emphasize carbon pricing and emission scenario dimensions. Choose subscription-only to avoid APC.
+3. Detailed fallback checklists in `paper_dev/00_admin/fallback_clean_energy.md` and `paper_dev/00_admin/fallback_carbon_management.md`.

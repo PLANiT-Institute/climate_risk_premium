@@ -6,6 +6,7 @@ Updated to support new class-based risk models (src.models).
 from __future__ import annotations
 
 import logging
+import os
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, Any, List, Optional
@@ -117,11 +118,119 @@ class CRPModelRunner:
         self.base_dir = Path(base_dir)
         self.dataset = load_inputs(self.base_dir)
         self.power_plans = load_korea_power_plan_scenarios(self.base_dir / "data/raw/korea_power_plan.csv")
-        # Load PLANiT results from pre-computed CSVs (wildfire + drought + water_risk)
+        # Default behavior remains CSV-backed. Set CRP_PLANIT_MODE=live to run PLANiT at runtime.
         self._planit_config = PLANiTIntegrationConfig()
-        results_dir = str(self._planit_config.get_results_dir(str(self.base_dir)))
-        self._planit_results = PLANiTRunner.load_results_from_csv(results_dir)
+        self._planit_results = self._load_planit_results()
         self._planit_adapter = PLANiTAdapter(self._planit_config)
+
+    def _load_planit_results(self) -> List[Any]:
+        """Load PLANiT hazard results.
+
+        Modes:
+        - csv  (default): read pre-computed CSV snapshots from Physicalrisk_PLANiT/data/results
+        - live          : call PLANiT runtime (CLIMADA/PhysRisk) and backfill gaps from csv snapshots
+        """
+        mode = os.getenv("CRP_PLANIT_MODE", "csv").strip().lower()
+        if mode == "live":
+            live_results = self._load_planit_results_live()
+            if live_results:
+                if self._is_dynamic_planit_location():
+                    logger.info(
+                        "Using live PLANiT runtime results for dynamic location (rows=%d, no CSV backfill)",
+                        len(live_results),
+                    )
+                    return live_results
+                csv_results = self._load_planit_results_csv()
+                merged = self._merge_planit_results(live_results, csv_results)
+                logger.info(
+                    "Using live PLANiT runtime results with CSV backfill (live=%d, csv=%d, merged=%d)",
+                    len(live_results), len(csv_results), len(merged),
+                )
+                return merged
+            if self._is_dynamic_planit_location():
+                logger.warning("Live PLANiT returned no results for dynamic location; returning empty set.")
+                return []
+            logger.warning("Live PLANiT returned no results; falling back to CSV snapshots.")
+        return self._load_planit_results_csv()
+
+    def _load_planit_results_csv(self) -> List[Any]:
+        """Load pre-computed PLANiT CSV snapshots."""
+        results_dir = str(self._planit_config.get_results_dir(str(self.base_dir)))
+        results = PLANiTRunner.load_results_from_csv(results_dir)
+        logger.info("Loaded PLANiT CSV results (%d rows) from %s", len(results), results_dir)
+        return results
+
+    def _load_planit_results_live(self) -> List[Any]:
+        """Run PLANiT and return flattened hazard results.
+
+        Optional environment variables:
+        - CRP_PLANIT_SCENARIOS: comma-separated SSP ids, e.g. "ssp126,ssp245,ssp585"
+        - CRP_PLANIT_YEARS: comma-separated years, e.g. "2030,2040,2050,2060"
+        """
+        scenarios = self._parse_planit_scenarios_env() or self._default_planit_scenarios()
+        years = self._parse_planit_years_env()
+
+        try:
+            runner = PLANiTRunner(self._planit_config, base_dir=str(self.base_dir))
+            by_hazard = runner.run_all_hazards(scenarios=scenarios, years=years)
+            flattened = [r for rows in by_hazard.values() for r in rows]
+            return flattened
+        except Exception as exc:
+            logger.warning("Live PLANiT run failed: %s", exc)
+            return []
+
+    @staticmethod
+    def _default_planit_scenarios() -> List[str]:
+        """Default live scenarios used by CRP physical pathways.
+
+        Derived from CRP physical scenario mapping to avoid running
+        unnecessary SSPs in live mode.
+        """
+        used = {ssp for ssp, _year in PHYSICAL_SCENARIO_SSP_MAP.values() if ssp != "historical"}
+        return sorted(used)
+
+    @staticmethod
+    def _is_dynamic_planit_location() -> bool:
+        return bool(os.getenv("CRP_PLANIT_LAT", "").strip() and os.getenv("CRP_PLANIT_LON", "").strip())
+
+    @staticmethod
+    def _merge_planit_results(live_results: List[Any], csv_results: List[Any]) -> List[Any]:
+        """Merge live and csv PLANiT rows with live rows taking priority.
+
+        Key fields are chosen so each hazard/scenario/year/asset has one row.
+        """
+        merged: Dict[tuple, Any] = {}
+        for row in csv_results:
+            key = (row.hazard_type, row.scenario, row.year, row.asset)
+            merged[key] = row
+        for row in live_results:
+            key = (row.hazard_type, row.scenario, row.year, row.asset)
+            merged[key] = row
+        return list(merged.values())
+
+    @staticmethod
+    def _parse_planit_scenarios_env() -> Optional[List[str]]:
+        raw = os.getenv("CRP_PLANIT_SCENARIOS", "").strip()
+        if not raw:
+            return None
+        items = [s.strip().lower() for s in raw.split(",") if s.strip()]
+        return items or None
+
+    @staticmethod
+    def _parse_planit_years_env() -> Optional[List[int]]:
+        raw = os.getenv("CRP_PLANIT_YEARS", "").strip()
+        if not raw:
+            return None
+        years: List[int] = []
+        for token in raw.split(","):
+            token = token.strip()
+            if not token:
+                continue
+            try:
+                years.append(int(token))
+            except ValueError:
+                logger.warning("Ignoring invalid CRP_PLANIT_YEARS token: %s", token)
+        return years or None
 
     def _get_plant_params(self) -> Dict[str, Any]:
         """Extract plant parameters as a flat dict."""

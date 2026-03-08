@@ -1,0 +1,13 @@
+{
+  "timestamp": 1772870598.397387,
+  "data": {
+    "hazard_type": "wildfire",
+    "scenario": "ssp126",
+    "year": 2060,
+    "asset": "\uc0bc\ucc99\ud654\ub825\ubc1c\uc804\uc18c",
+    "value": 123495989.77184124,
+    "std": 0.0,
+    "unit": "krw",
+    "source": "climada"
+  }
+}

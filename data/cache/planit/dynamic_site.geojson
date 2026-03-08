@@ -1,0 +1,1 @@
+{"type": "FeatureCollection", "features": [{"type": "Feature", "properties": {"name": "dynamic_samcheok", "capacity_mw": 2100.0, "type": "Coal/Steam/Recirculating", "source": "user_input"}, "geometry": {"type": "Polygon", "coordinates": [[[129.16400000000002, 37.399], [129.184, 37.399], [129.184, 37.419], [129.16400000000002, 37.419], [129.16400000000002, 37.399]]]}}]}

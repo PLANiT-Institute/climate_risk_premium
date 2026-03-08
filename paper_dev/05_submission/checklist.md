@@ -1,4 +1,4 @@
-# Energy Policy Submission Checklist
+# Climate Risk Management Submission Checklist
 
 ## Manuscript Integrity
 
