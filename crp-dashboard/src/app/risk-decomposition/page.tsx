@@ -58,7 +58,7 @@ export default async function RiskDecompositionPage() {
               : "N/A"}
           </p>
           <p className="text-xs text-slate-400 mt-1">
-            Wildfire + flood + sea level rise
+            Wildfire + drought + water risk
           </p>
         </div>
         <div

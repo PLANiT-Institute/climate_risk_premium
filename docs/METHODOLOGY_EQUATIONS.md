@@ -87,7 +87,8 @@ Calculation:
 ```
 R_wild(year, rcp) = R_wild,base × CC_multiplier(year, rcp)
 
-Climate Change Multiplier Table (from src/climada/literature_parameters.py):
+Climate Change Multiplier Table (production values from PLANiT computed results;
+legacy literature fallback archived to src/climada/archive/literature_parameters.py):
 ┌──────┬────────────┬────────────┐
 │ Year │   RCP4.5   │   RCP8.5   │
 ├──────┼────────────┼────────────┤
@@ -237,7 +238,8 @@ Total:
 **Source:** CMIP6 Models via MDPI Atmosphere (2021) | DOI: 10.3390/atmos12010090
 
 ```
-Sea Level Rise Projections (CMIP6, from src/climada/literature_parameters.py):
+Sea Level Rise Projections (CMIP6; legacy literature fallback archived to
+src/climada/archive/literature_parameters.py):
 ┌──────┬─────────┬─────────┐
 │ Year │ SSP2-4.5│ SSP5-8.5│
 ├──────┼─────────┼─────────┤
@@ -273,9 +275,11 @@ Our approach: Conservative correlation-based adjustment
 
 ### 4.2 Multiplier Calculation
 
-**Current Implementation:** The production code in `src/climada/literature_parameters.py`
-sets `compound_multiplier = 1.0` for all projection scenarios. This effectively disables
-compound amplification, treating hazards as independent and additive.
+**Current Implementation:** The production pipeline uses PLANiT (CLIMADA + PhysRisk)
+computed results with `compound_multiplier = 1.0` for all projection scenarios.
+This effectively disables compound amplification, treating hazards as independent
+and additive. Legacy literature fallback is archived in
+`src/climada/archive/literature_parameters.py`.
 
 **Rationale:** For a single asset (vs. a network/portfolio), compound effects are minimal.
 Individual hazard rates already capture extreme tail events. Korea's robust disaster
@@ -423,13 +427,13 @@ All equations are implemented in:
 
 | File | Function | Purpose |
 |------|----------|---------|
-| `src/climada/literature_parameters.py` | `calculate_wildfire_outage_rate()` | Eq. 1.1-1.3 |
-| `src/climada/literature_parameters.py` | `calculate_flood_outage_rate()` | Eq. 2.1-2.2 |
+| `Physicalrisk_PLANiT/src/main.py` | `run_single_hazard()` | CLIMADA/PhysRisk computation |
+| `src/planit/adapter.py` | PLANiT → PhysicalAdjustments | Pipeline integration |
 | `src/climada/hazards.py` | `create_corrected_baseline()` | All hazard calcs |
 | `src/risk/physical.py` | `get_physical_risk_from_climada()` | Total risk |
 
 ---
 
 *Document created: December 2024*
-*Last updated: February 2026 (synced with src/climada/literature_parameters.py)*
+*Last updated: February 2026 (production uses PLANiT computed results; literature fallback archived)*
 *Part of: Physical Risk Module Review - Step 9*

@@ -102,9 +102,13 @@ class PLANiTAdapter:
 
         # Group results by hazard → list of (year, value)
         by_hazard: Dict[str, List[Tuple[int, float]]] = {}
+        target_asset = self._config.target_asset
         for r in results:
             if r.scenario != ssp:
                 continue
+            if target_asset and r.asset:
+                if target_asset not in r.asset and r.asset not in target_asset:
+                    continue
             by_hazard.setdefault(r.hazard_type, []).append((r.year, r.value))
 
         outage_rate = 0.0

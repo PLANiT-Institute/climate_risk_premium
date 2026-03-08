@@ -1,4 +1,8 @@
 """
+ARCHIVED: Literature-derived fallback values (Dec 2024).
+Production pipeline uses PLANiT (CLIMADA + PhysRisk) computed results.
+See Physicalrisk_PLANiT/ for the actual physical risk computation.
+
 Physical Risk Parameters for Samcheok Blue Power Plant.
 
 Simplified module with corrected values based on Korea-specific literature.

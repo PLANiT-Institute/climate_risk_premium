@@ -72,8 +72,34 @@ def csv_to_json(csv_path: Path, json_path: Path) -> None:
     print(f"  Converted: {csv_path.name} -> {json_path.name}")
 
 
+RATING_SPREAD_MAP = {
+    "AAA": 50, "AA": 100, "A": 150, "BBB": 250,
+    "BB": 400, "B": 600, "CCC": 900, "CC": 1500, "C": 2500, "D": 5000,
+}
+
+SCENARIO_DISPLAY = {
+    "baseline": "Baseline",
+    "moderate_transition": "Moderate Transition",
+    "aggressive_transition": "Aggressive Transition",
+    "moderate_physical": "Moderate Physical",
+    "high_physical": "High Physical",
+    "combined_moderate": "Combined Moderate",
+    "combined_aggressive": "Combined Aggressive",
+    "low_demand": "Low Demand",
+    "severe_drought": "Severe Drought",
+    "enhanced_11th_plan": "Enhanced 11th Plan",
+    "enhanced_combined": "Enhanced Combined",
+}
+
+BASE_RATE = 0.0675  # 6.75% base interest rate
+
+
 def generate_yearly_ratings(results: dict, output_path: Path) -> None:
     """Generate yearly ratings data from scenario results.
+
+    Produces fields matching the CreditRatingRow TypeScript interface:
+      scenario, display_name, year, dscr, rating, spread_bps,
+      cost_of_debt, ebitda, debt_service
 
     Note:
         This output is dashboard-only and uses an approximate DSCR-to-rating
@@ -86,12 +112,15 @@ def generate_yearly_ratings(results: dict, output_path: Path) -> None:
         if result.cashflow is None:
             continue
 
-        years = result.cashflow.years
+        cf = result.cashflow
+        years = cf.years
         dscr_values = (
-            result.cashflow.dscr
-            if hasattr(result.cashflow, "dscr")
+            cf.dscr
+            if hasattr(cf, "dscr")
             else [result.metrics.avg_dscr] * len(years)
         )
+
+        display_name = SCENARIO_DISPLAY.get(scenario_name, scenario_name)
 
         for i, year in enumerate(years):
             # Approximate rating from DSCR
@@ -109,13 +138,22 @@ def generate_yearly_ratings(results: dict, output_path: Path) -> None:
             else:
                 rating = "CCC"
 
+            spread_bps = RATING_SPREAD_MAP.get(rating, 900)
+            cost_of_debt = round(BASE_RATE + spread_bps / 10000, 6)
+
+            ebitda = float(cf.ebitda[i]) if i < len(cf.ebitda) else 0.0
+            debt_service = float(cf.interest_expense[i]) if i < len(cf.interest_expense) else 0.0
+
             yearly_data.append({
                 "scenario": scenario_name,
+                "display_name": display_name,
                 "year": int(year),
                 "dscr": round(float(dscr), 3),
                 "rating": rating,
-                "rating_method": "approx_dscr_mapping",
-                "paper_grade_metric": False,
+                "spread_bps": spread_bps,
+                "cost_of_debt": cost_of_debt,
+                "ebitda": round(ebitda, 2),
+                "debt_service": round(debt_service, 2),
             })
 
     with open(output_path, "w", encoding="utf-8") as f:

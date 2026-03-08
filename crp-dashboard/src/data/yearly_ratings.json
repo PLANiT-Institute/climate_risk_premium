@@ -1,2818 +1,3874 @@
 [
   {
     "scenario": "baseline",
+    "display_name": "Baseline",
     "year": 2025,
     "dscr": 2.994,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 666736644.0,
+    "debt_service": 151585000.0
   },
   {
     "scenario": "baseline",
+    "display_name": "Baseline",
     "year": 2026,
     "dscr": 2.994,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 680456196.84,
+    "debt_service": 147508325.07
   },
   {
     "scenario": "baseline",
+    "display_name": "Baseline",
     "year": 2027,
     "dscr": 2.994,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 694439920.66,
+    "debt_service": 143182972.97
   },
   {
     "scenario": "baseline",
+    "display_name": "Baseline",
     "year": 2028,
     "dscr": 2.994,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 708693009.36,
+    "debt_service": 138593774.4
   },
   {
     "scenario": "baseline",
+    "display_name": "Baseline",
     "year": 2029,
     "dscr": 2.994,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 723220760.11,
+    "debt_service": 133724634.71
   },
   {
     "scenario": "baseline",
+    "display_name": "Baseline",
     "year": 2030,
     "dscr": 2.994,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 738028575.37,
+    "debt_service": 128558477.5
   },
   {
     "scenario": "baseline",
+    "display_name": "Baseline",
     "year": 2031,
     "dscr": 2.994,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 753121964.99,
+    "debt_service": 123077184.7
   },
   {
     "scenario": "baseline",
+    "display_name": "Baseline",
     "year": 2032,
     "dscr": 2.994,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 768506548.4,
+    "debt_service": 117261533.03
   },
   {
     "scenario": "baseline",
+    "display_name": "Baseline",
     "year": 2033,
     "dscr": 2.994,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 784188056.75,
+    "debt_service": 111091126.62
   },
   {
     "scenario": "baseline",
+    "display_name": "Baseline",
     "year": 2034,
     "dscr": 2.994,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 800172335.18,
+    "debt_service": 104544325.42
   },
   {
     "scenario": "baseline",
+    "display_name": "Baseline",
     "year": 2035,
     "dscr": 2.994,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 816465345.1,
+    "debt_service": 97598169.34
   },
   {
     "scenario": "baseline",
+    "display_name": "Baseline",
     "year": 2036,
     "dscr": 2.994,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 833073166.48,
+    "debt_service": 90228297.74
   },
   {
     "scenario": "baseline",
+    "display_name": "Baseline",
     "year": 2037,
     "dscr": 2.994,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 850002000.24,
+    "debt_service": 82408863.98
   },
   {
     "scenario": "baseline",
+    "display_name": "Baseline",
     "year": 2038,
     "dscr": 2.994,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 867258170.7,
+    "debt_service": 74112444.75
   },
   {
     "scenario": "baseline",
+    "display_name": "Baseline",
     "year": 2039,
     "dscr": 2.994,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 884848127.98,
+    "debt_service": 65309943.95
   },
   {
     "scenario": "baseline",
+    "display_name": "Baseline",
     "year": 2040,
     "dscr": 2.994,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 902778450.59,
+    "debt_service": 55970490.61
   },
   {
     "scenario": "baseline",
+    "display_name": "Baseline",
     "year": 2041,
     "dscr": 2.994,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 921055847.93,
+    "debt_service": 46061330.6
   },
   {
     "scenario": "baseline",
+    "display_name": "Baseline",
     "year": 2042,
     "dscr": 2.994,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 932985212.78,
+    "debt_service": 35547711.84
   },
   {
     "scenario": "baseline",
+    "display_name": "Baseline",
     "year": 2043,
     "dscr": 2.994,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 941699798.51,
+    "debt_service": 24392762.34
   },
   {
     "scenario": "baseline",
+    "display_name": "Baseline",
     "year": 2044,
     "dscr": 2.994,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 950501530.09,
+    "debt_service": 12557360.91
   },
   {
     "scenario": "baseline",
+    "display_name": "Baseline",
     "year": 2045,
     "dscr": 2.994,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 959391279.0,
+    "debt_service": 0.0
   },
   {
     "scenario": "baseline",
+    "display_name": "Baseline",
     "year": 2046,
     "dscr": 2.994,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 968369925.39,
+    "debt_service": 0.0
   },
   {
     "scenario": "baseline",
+    "display_name": "Baseline",
     "year": 2047,
     "dscr": 2.994,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 977438358.24,
+    "debt_service": 0.0
   },
   {
     "scenario": "baseline",
+    "display_name": "Baseline",
     "year": 2048,
     "dscr": 2.994,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 986597475.42,
+    "debt_service": 0.0
   },
   {
     "scenario": "baseline",
+    "display_name": "Baseline",
     "year": 2049,
     "dscr": 2.994,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 995848183.78,
+    "debt_service": 0.0
   },
   {
     "scenario": "baseline",
+    "display_name": "Baseline",
     "year": 2050,
     "dscr": 2.994,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1005191399.21,
+    "debt_service": 0.0
   },
   {
     "scenario": "baseline",
+    "display_name": "Baseline",
     "year": 2051,
     "dscr": 2.994,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1014628046.81,
+    "debt_service": 0.0
   },
   {
     "scenario": "baseline",
+    "display_name": "Baseline",
     "year": 2052,
     "dscr": 2.994,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1024159060.87,
+    "debt_service": 0.0
   },
   {
     "scenario": "baseline",
+    "display_name": "Baseline",
     "year": 2053,
     "dscr": 2.994,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1033785385.08,
+    "debt_service": 0.0
   },
   {
     "scenario": "baseline",
+    "display_name": "Baseline",
     "year": 2054,
     "dscr": 2.994,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1043507972.53,
+    "debt_service": 0.0
   },
   {
     "scenario": "baseline",
+    "display_name": "Baseline",
     "year": 2055,
     "dscr": 2.994,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1053327785.86,
+    "debt_service": 0.0
   },
   {
     "scenario": "baseline",
+    "display_name": "Baseline",
     "year": 2056,
     "dscr": 2.994,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1063245797.32,
+    "debt_service": 0.0
   },
   {
     "scenario": "baseline",
+    "display_name": "Baseline",
     "year": 2057,
     "dscr": 2.994,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1073262988.89,
+    "debt_service": 0.0
   },
   {
     "scenario": "baseline",
+    "display_name": "Baseline",
     "year": 2058,
     "dscr": 2.994,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1083380352.38,
+    "debt_service": 0.0
   },
   {
     "scenario": "baseline",
+    "display_name": "Baseline",
     "year": 2059,
     "dscr": 2.994,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1093598889.5,
+    "debt_service": 0.0
   },
   {
     "scenario": "baseline",
+    "display_name": "Baseline",
     "year": 2060,
     "dscr": 2.994,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1103919612.0,
+    "debt_service": 0.0
   },
   {
     "scenario": "baseline",
+    "display_name": "Baseline",
     "year": 2061,
     "dscr": 2.994,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1114343541.72,
+    "debt_service": 0.0
   },
   {
     "scenario": "baseline",
+    "display_name": "Baseline",
     "year": 2062,
     "dscr": 2.994,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1124871710.74,
+    "debt_service": 0.0
   },
   {
     "scenario": "baseline",
+    "display_name": "Baseline",
     "year": 2063,
     "dscr": 2.994,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1135505161.44,
+    "debt_service": 0.0
   },
   {
     "scenario": "baseline",
+    "display_name": "Baseline",
     "year": 2064,
     "dscr": 2.994,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1146244946.66,
+    "debt_service": 0.0
   },
   {
     "scenario": "moderate_transition",
+    "display_name": "Moderate Transition",
     "year": 2025,
     "dscr": 2.644,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 579649980.0,
+    "debt_service": 151585000.0
   },
   {
     "scenario": "moderate_transition",
+    "display_name": "Moderate Transition",
     "year": 2026,
     "dscr": 2.644,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 591755467.8,
+    "debt_service": 147508325.07
   },
   {
     "scenario": "moderate_transition",
+    "display_name": "Moderate Transition",
     "year": 2027,
     "dscr": 2.644,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 604094047.64,
+    "debt_service": 143182972.97
   },
   {
     "scenario": "moderate_transition",
+    "display_name": "Moderate Transition",
     "year": 2028,
     "dscr": 2.644,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 616670302.38,
+    "debt_service": 138593774.4
   },
   {
     "scenario": "moderate_transition",
+    "display_name": "Moderate Transition",
     "year": 2029,
     "dscr": 2.644,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 629488905.98,
+    "debt_service": 133724634.71
   },
   {
     "scenario": "moderate_transition",
+    "display_name": "Moderate Transition",
     "year": 2030,
     "dscr": 2.644,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 642554625.33,
+    "debt_service": 128558477.5
   },
   {
     "scenario": "moderate_transition",
+    "display_name": "Moderate Transition",
     "year": 2031,
     "dscr": 2.644,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 655872322.05,
+    "debt_service": 123077184.7
   },
   {
     "scenario": "moderate_transition",
+    "display_name": "Moderate Transition",
     "year": 2032,
     "dscr": 2.644,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 669446954.47,
+    "debt_service": 117261533.03
   },
   {
     "scenario": "moderate_transition",
+    "display_name": "Moderate Transition",
     "year": 2033,
     "dscr": 2.644,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 683283579.48,
+    "debt_service": 111091126.62
   },
   {
     "scenario": "moderate_transition",
+    "display_name": "Moderate Transition",
     "year": 2034,
     "dscr": 2.644,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 697387354.57,
+    "debt_service": 104544325.42
   },
   {
     "scenario": "moderate_transition",
+    "display_name": "Moderate Transition",
     "year": 2035,
     "dscr": 2.644,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 711763539.79,
+    "debt_service": 97598169.34
   },
   {
     "scenario": "moderate_transition",
+    "display_name": "Moderate Transition",
     "year": 2036,
     "dscr": 2.644,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 726417499.83,
+    "debt_service": 90228297.74
   },
   {
     "scenario": "moderate_transition",
+    "display_name": "Moderate Transition",
     "year": 2037,
     "dscr": 2.644,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 741354706.1,
+    "debt_service": 82408863.98
   },
   {
     "scenario": "moderate_transition",
+    "display_name": "Moderate Transition",
     "year": 2038,
     "dscr": 2.644,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 756580738.85,
+    "debt_service": 74112444.75
   },
   {
     "scenario": "moderate_transition",
+    "display_name": "Moderate Transition",
     "year": 2039,
     "dscr": 2.644,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 772101289.4,
+    "debt_service": 65309943.95
   },
   {
     "scenario": "moderate_transition",
+    "display_name": "Moderate Transition",
     "year": 2040,
     "dscr": 2.644,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 787922162.28,
+    "debt_service": 55970490.61
   },
   {
     "scenario": "moderate_transition",
+    "display_name": "Moderate Transition",
     "year": 2041,
     "dscr": 2.644,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 804049277.59,
+    "debt_service": 46061330.6
   },
   {
     "scenario": "moderate_transition",
+    "display_name": "Moderate Transition",
     "year": 2042,
     "dscr": 2.644,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 820488673.21,
+    "debt_service": 35547711.84
   },
   {
     "scenario": "moderate_transition",
+    "display_name": "Moderate Transition",
     "year": 2043,
     "dscr": 2.644,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 837246507.23,
+    "debt_service": 24392762.34
   },
   {
     "scenario": "moderate_transition",
+    "display_name": "Moderate Transition",
     "year": 2044,
     "dscr": 2.644,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 854329060.33,
+    "debt_service": 12557360.91
   },
   {
     "scenario": "moderate_transition",
+    "display_name": "Moderate Transition",
     "year": 2045,
     "dscr": 2.644,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 871742738.23,
+    "debt_service": 0.0
   },
   {
     "scenario": "moderate_transition",
+    "display_name": "Moderate Transition",
     "year": 2046,
     "dscr": 2.644,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 889494074.2,
+    "debt_service": 0.0
   },
   {
     "scenario": "moderate_transition",
+    "display_name": "Moderate Transition",
     "year": 2047,
     "dscr": 2.644,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 907589731.59,
+    "debt_service": 0.0
   },
   {
     "scenario": "moderate_transition",
+    "display_name": "Moderate Transition",
     "year": 2048,
     "dscr": 2.644,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 926036506.46,
+    "debt_service": 0.0
   },
   {
     "scenario": "moderate_transition",
+    "display_name": "Moderate Transition",
     "year": 2049,
     "dscr": 2.644,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 944841330.21,
+    "debt_service": 0.0
   },
   {
     "scenario": "moderate_transition",
+    "display_name": "Moderate Transition",
     "year": 2050,
     "dscr": 2.644,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 964011272.33,
+    "debt_service": 0.0
   },
   {
     "scenario": "moderate_transition",
+    "display_name": "Moderate Transition",
     "year": 2051,
     "dscr": 2.644,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 983553543.09,
+    "debt_service": 0.0
   },
   {
     "scenario": "moderate_transition",
+    "display_name": "Moderate Transition",
     "year": 2052,
     "dscr": 2.644,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1003475496.44,
+    "debt_service": 0.0
   },
   {
     "scenario": "moderate_transition",
+    "display_name": "Moderate Transition",
     "year": 2053,
     "dscr": 2.644,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1023784632.82,
+    "debt_service": 0.0
   },
   {
     "scenario": "moderate_transition",
+    "display_name": "Moderate Transition",
     "year": 2054,
     "dscr": 2.644,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1043507972.53,
+    "debt_service": 0.0
   },
   {
     "scenario": "moderate_transition",
+    "display_name": "Moderate Transition",
     "year": 2055,
     "dscr": 2.644,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1053327785.86,
+    "debt_service": 0.0
   },
   {
     "scenario": "moderate_transition",
+    "display_name": "Moderate Transition",
     "year": 2056,
     "dscr": 2.644,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1063245797.32,
+    "debt_service": 0.0
   },
   {
     "scenario": "moderate_transition",
+    "display_name": "Moderate Transition",
     "year": 2057,
     "dscr": 2.644,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1073262988.89,
+    "debt_service": 0.0
   },
   {
     "scenario": "moderate_transition",
+    "display_name": "Moderate Transition",
     "year": 2058,
     "dscr": 2.644,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1083380352.38,
+    "debt_service": 0.0
   },
   {
     "scenario": "moderate_transition",
+    "display_name": "Moderate Transition",
     "year": 2059,
     "dscr": 2.644,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1093598889.5,
+    "debt_service": 0.0
   },
   {
     "scenario": "aggressive_transition",
+    "display_name": "Aggressive Transition",
     "year": 2025,
     "dscr": 2.107,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 449019984.0,
+    "debt_service": 151585000.0
   },
   {
     "scenario": "aggressive_transition",
+    "display_name": "Aggressive Transition",
     "year": 2026,
     "dscr": 2.107,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 458704374.24,
+    "debt_service": 147508325.07
   },
   {
     "scenario": "aggressive_transition",
+    "display_name": "Aggressive Transition",
     "year": 2027,
     "dscr": 2.107,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 468575238.11,
+    "debt_service": 143182972.97
   },
   {
     "scenario": "aggressive_transition",
+    "display_name": "Aggressive Transition",
     "year": 2028,
     "dscr": 2.107,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 478636241.9,
+    "debt_service": 138593774.4
   },
   {
     "scenario": "aggressive_transition",
+    "display_name": "Aggressive Transition",
     "year": 2029,
     "dscr": 2.107,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 488891124.79,
+    "debt_service": 133724634.71
   },
   {
     "scenario": "aggressive_transition",
+    "display_name": "Aggressive Transition",
     "year": 2030,
     "dscr": 2.107,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 499343700.26,
+    "debt_service": 128558477.5
   },
   {
     "scenario": "aggressive_transition",
+    "display_name": "Aggressive Transition",
     "year": 2031,
     "dscr": 2.107,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 509997857.64,
+    "debt_service": 123077184.7
   },
   {
     "scenario": "aggressive_transition",
+    "display_name": "Aggressive Transition",
     "year": 2032,
     "dscr": 2.107,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 520857563.57,
+    "debt_service": 117261533.03
   },
   {
     "scenario": "aggressive_transition",
+    "display_name": "Aggressive Transition",
     "year": 2033,
     "dscr": 2.107,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 531926863.59,
+    "debt_service": 111091126.62
   },
   {
     "scenario": "aggressive_transition",
+    "display_name": "Aggressive Transition",
     "year": 2034,
     "dscr": 2.107,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 543209883.66,
+    "debt_service": 104544325.42
   },
   {
     "scenario": "aggressive_transition",
+    "display_name": "Aggressive Transition",
     "year": 2035,
     "dscr": 2.107,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 554710831.84,
+    "debt_service": 97598169.34
   },
   {
     "scenario": "aggressive_transition",
+    "display_name": "Aggressive Transition",
     "year": 2036,
     "dscr": 2.107,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 566433999.87,
+    "debt_service": 90228297.74
   },
   {
     "scenario": "aggressive_transition",
+    "display_name": "Aggressive Transition",
     "year": 2037,
     "dscr": 2.107,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 578383764.88,
+    "debt_service": 82408863.98
   },
   {
     "scenario": "aggressive_transition",
+    "display_name": "Aggressive Transition",
     "year": 2038,
     "dscr": 2.107,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 590564591.08,
+    "debt_service": 74112444.75
   },
   {
     "scenario": "aggressive_transition",
+    "display_name": "Aggressive Transition",
     "year": 2039,
     "dscr": 2.107,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 602981031.52,
+    "debt_service": 65309943.95
   },
   {
     "scenario": "aggressive_transition",
+    "display_name": "Aggressive Transition",
     "year": 2040,
     "dscr": 2.107,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 615637729.83,
+    "debt_service": 55970490.61
   },
   {
     "scenario": "aggressive_transition",
+    "display_name": "Aggressive Transition",
     "year": 2041,
     "dscr": 2.107,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 628539422.07,
+    "debt_service": 46061330.6
   },
   {
     "scenario": "aggressive_transition",
+    "display_name": "Aggressive Transition",
     "year": 2042,
     "dscr": 2.107,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 641690938.57,
+    "debt_service": 35547711.84
   },
   {
     "scenario": "aggressive_transition",
+    "display_name": "Aggressive Transition",
     "year": 2043,
     "dscr": 2.107,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 655097205.78,
+    "debt_service": 24392762.34
   },
   {
     "scenario": "aggressive_transition",
+    "display_name": "Aggressive Transition",
     "year": 2044,
     "dscr": 2.107,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 668763248.26,
+    "debt_service": 12557360.91
   },
   {
     "scenario": "aggressive_transition",
+    "display_name": "Aggressive Transition",
     "year": 2045,
     "dscr": 2.107,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 682694190.59,
+    "debt_service": 0.0
   },
   {
     "scenario": "aggressive_transition",
+    "display_name": "Aggressive Transition",
     "year": 2046,
     "dscr": 2.107,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 696895259.36,
+    "debt_service": 0.0
   },
   {
     "scenario": "aggressive_transition",
+    "display_name": "Aggressive Transition",
     "year": 2047,
     "dscr": 2.107,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 711371785.27,
+    "debt_service": 0.0
   },
   {
     "scenario": "aggressive_transition",
+    "display_name": "Aggressive Transition",
     "year": 2048,
     "dscr": 2.107,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 726129205.17,
+    "debt_service": 0.0
   },
   {
     "scenario": "aggressive_transition",
+    "display_name": "Aggressive Transition",
     "year": 2049,
     "dscr": 2.107,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 741173064.17,
+    "debt_service": 0.0
   },
   {
     "scenario": "moderate_physical",
+    "display_name": "Moderate Physical",
     "year": 2025,
     "dscr": 2.984,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 664800043.46,
+    "debt_service": 151585000.0
   },
   {
     "scenario": "moderate_physical",
+    "display_name": "Moderate Physical",
     "year": 2026,
     "dscr": 2.984,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 678483703.33,
+    "debt_service": 147508325.07
   },
   {
     "scenario": "moderate_physical",
+    "display_name": "Moderate Physical",
     "year": 2027,
     "dscr": 2.984,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 692430843.05,
+    "debt_service": 143182972.97
   },
   {
     "scenario": "moderate_physical",
+    "display_name": "Moderate Physical",
     "year": 2028,
     "dscr": 2.984,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 706646642.95,
+    "debt_service": 138593774.4
   },
   {
     "scenario": "moderate_physical",
+    "display_name": "Moderate Physical",
     "year": 2029,
     "dscr": 2.984,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 721136386.33,
+    "debt_service": 133724634.71
   },
   {
     "scenario": "moderate_physical",
+    "display_name": "Moderate Physical",
     "year": 2030,
     "dscr": 2.984,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 735905461.51,
+    "debt_service": 128558477.5
   },
   {
     "scenario": "moderate_physical",
+    "display_name": "Moderate Physical",
     "year": 2031,
     "dscr": 2.984,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 750959363.94,
+    "debt_service": 123077184.7
   },
   {
     "scenario": "moderate_physical",
+    "display_name": "Moderate Physical",
     "year": 2032,
     "dscr": 2.984,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 766303698.34,
+    "debt_service": 117261533.03
   },
   {
     "scenario": "moderate_physical",
+    "display_name": "Moderate Physical",
     "year": 2033,
     "dscr": 2.984,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 781944180.87,
+    "debt_service": 111091126.62
   },
   {
     "scenario": "moderate_physical",
+    "display_name": "Moderate Physical",
     "year": 2034,
     "dscr": 2.984,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 797886641.38,
+    "debt_service": 104544325.42
   },
   {
     "scenario": "moderate_physical",
+    "display_name": "Moderate Physical",
     "year": 2035,
     "dscr": 2.984,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 814137025.67,
+    "debt_service": 97598169.34
   },
   {
     "scenario": "moderate_physical",
+    "display_name": "Moderate Physical",
     "year": 2036,
     "dscr": 2.984,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 830701397.81,
+    "debt_service": 90228297.74
   },
   {
     "scenario": "moderate_physical",
+    "display_name": "Moderate Physical",
     "year": 2037,
     "dscr": 2.984,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 847585942.51,
+    "debt_service": 82408863.98
   },
   {
     "scenario": "moderate_physical",
+    "display_name": "Moderate Physical",
     "year": 2038,
     "dscr": 2.984,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 864796967.52,
+    "debt_service": 74112444.75
   },
   {
     "scenario": "moderate_physical",
+    "display_name": "Moderate Physical",
     "year": 2039,
     "dscr": 2.984,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 882340906.12,
+    "debt_service": 65309943.95
   },
   {
     "scenario": "moderate_physical",
+    "display_name": "Moderate Physical",
     "year": 2040,
     "dscr": 2.984,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 900224319.57,
+    "debt_service": 55970490.61
   },
   {
     "scenario": "moderate_physical",
+    "display_name": "Moderate Physical",
     "year": 2041,
     "dscr": 2.984,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 918453899.75,
+    "debt_service": 46061330.6
   },
   {
     "scenario": "moderate_physical",
+    "display_name": "Moderate Physical",
     "year": 2042,
     "dscr": 2.984,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 927309858.78,
+    "debt_service": 35547711.84
   },
   {
     "scenario": "moderate_physical",
+    "display_name": "Moderate Physical",
     "year": 2043,
     "dscr": 2.984,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 935975304.83,
+    "debt_service": 24392762.34
   },
   {
     "scenario": "moderate_physical",
+    "display_name": "Moderate Physical",
     "year": 2044,
     "dscr": 2.984,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 944727405.34,
+    "debt_service": 12557360.91
   },
   {
     "scenario": "moderate_physical",
+    "display_name": "Moderate Physical",
     "year": 2045,
     "dscr": 2.984,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 953567026.85,
+    "debt_service": 0.0
   },
   {
     "scenario": "moderate_physical",
+    "display_name": "Moderate Physical",
     "year": 2046,
     "dscr": 2.984,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 962495044.59,
+    "debt_service": 0.0
   },
   {
     "scenario": "moderate_physical",
+    "display_name": "Moderate Physical",
     "year": 2047,
     "dscr": 2.984,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 971512342.49,
+    "debt_service": 0.0
   },
   {
     "scenario": "moderate_physical",
+    "display_name": "Moderate Physical",
     "year": 2048,
     "dscr": 2.984,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 980619813.38,
+    "debt_service": 0.0
   },
   {
     "scenario": "moderate_physical",
+    "display_name": "Moderate Physical",
     "year": 2049,
     "dscr": 2.984,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 989818358.98,
+    "debt_service": 0.0
   },
   {
     "scenario": "moderate_physical",
+    "display_name": "Moderate Physical",
     "year": 2050,
     "dscr": 2.984,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 999108890.03,
+    "debt_service": 0.0
   },
   {
     "scenario": "moderate_physical",
+    "display_name": "Moderate Physical",
     "year": 2051,
     "dscr": 2.984,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1008492326.39,
+    "debt_service": 0.0
   },
   {
     "scenario": "moderate_physical",
+    "display_name": "Moderate Physical",
     "year": 2052,
     "dscr": 2.984,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1017969597.12,
+    "debt_service": 0.0
   },
   {
     "scenario": "moderate_physical",
+    "display_name": "Moderate Physical",
     "year": 2053,
     "dscr": 2.984,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1027541640.55,
+    "debt_service": 0.0
   },
   {
     "scenario": "moderate_physical",
+    "display_name": "Moderate Physical",
     "year": 2054,
     "dscr": 2.984,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1037209404.42,
+    "debt_service": 0.0
   },
   {
     "scenario": "moderate_physical",
+    "display_name": "Moderate Physical",
     "year": 2055,
     "dscr": 2.984,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1046973845.93,
+    "debt_service": 0.0
   },
   {
     "scenario": "moderate_physical",
+    "display_name": "Moderate Physical",
     "year": 2056,
     "dscr": 2.984,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1056835931.85,
+    "debt_service": 0.0
   },
   {
     "scenario": "moderate_physical",
+    "display_name": "Moderate Physical",
     "year": 2057,
     "dscr": 2.984,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1066796638.63,
+    "debt_service": 0.0
   },
   {
     "scenario": "moderate_physical",
+    "display_name": "Moderate Physical",
     "year": 2058,
     "dscr": 2.984,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1076856952.48,
+    "debt_service": 0.0
   },
   {
     "scenario": "moderate_physical",
+    "display_name": "Moderate Physical",
     "year": 2059,
     "dscr": 2.984,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1087017869.46,
+    "debt_service": 0.0
   },
   {
     "scenario": "moderate_physical",
+    "display_name": "Moderate Physical",
     "year": 2060,
     "dscr": 2.984,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1097280395.62,
+    "debt_service": 0.0
   },
   {
     "scenario": "moderate_physical",
+    "display_name": "Moderate Physical",
     "year": 2061,
     "dscr": 2.984,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1107645547.04,
+    "debt_service": 0.0
   },
   {
     "scenario": "moderate_physical",
+    "display_name": "Moderate Physical",
     "year": 2062,
     "dscr": 2.984,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1118114349.97,
+    "debt_service": 0.0
   },
   {
     "scenario": "moderate_physical",
+    "display_name": "Moderate Physical",
     "year": 2063,
     "dscr": 2.984,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1128687840.93,
+    "debt_service": 0.0
   },
   {
     "scenario": "moderate_physical",
+    "display_name": "Moderate Physical",
     "year": 2064,
     "dscr": 2.984,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1139367066.81,
+    "debt_service": 0.0
   },
   {
     "scenario": "high_physical",
+    "display_name": "High Physical",
     "year": 2025,
     "dscr": 2.972,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 661287679.81,
+    "debt_service": 151585000.0
   },
   {
     "scenario": "high_physical",
+    "display_name": "High Physical",
     "year": 2026,
     "dscr": 2.972,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 674906241.5,
+    "debt_service": 147508325.07
   },
   {
     "scenario": "high_physical",
+    "display_name": "High Physical",
     "year": 2027,
     "dscr": 2.972,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 688787029.57,
+    "debt_service": 143182972.97
   },
   {
     "scenario": "high_physical",
+    "display_name": "High Physical",
     "year": 2028,
     "dscr": 2.972,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 702935199.71,
+    "debt_service": 138593774.4
   },
   {
     "scenario": "high_physical",
+    "display_name": "High Physical",
     "year": 2029,
     "dscr": 2.972,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 717356010.07,
+    "debt_service": 133724634.71
   },
   {
     "scenario": "high_physical",
+    "display_name": "High Physical",
     "year": 2030,
     "dscr": 2.972,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 732054823.36,
+    "debt_service": 128558477.5
   },
   {
     "scenario": "high_physical",
+    "display_name": "High Physical",
     "year": 2031,
     "dscr": 2.972,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 747037108.86,
+    "debt_service": 123077184.7
   },
   {
     "scenario": "high_physical",
+    "display_name": "High Physical",
     "year": 2032,
     "dscr": 2.972,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 762308444.64,
+    "debt_service": 117261533.03
   },
   {
     "scenario": "high_physical",
+    "display_name": "High Physical",
     "year": 2033,
     "dscr": 2.972,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 777874519.66,
+    "debt_service": 111091126.62
   },
   {
     "scenario": "high_physical",
+    "display_name": "High Physical",
     "year": 2034,
     "dscr": 2.972,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 793741136.05,
+    "debt_service": 104544325.42
   },
   {
     "scenario": "high_physical",
+    "display_name": "High Physical",
     "year": 2035,
     "dscr": 2.972,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 809914211.31,
+    "debt_service": 97598169.34
   },
   {
     "scenario": "high_physical",
+    "display_name": "High Physical",
     "year": 2036,
     "dscr": 2.972,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 826399780.67,
+    "debt_service": 90228297.74
   },
   {
     "scenario": "high_physical",
+    "display_name": "High Physical",
     "year": 2037,
     "dscr": 2.972,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 843203999.41,
+    "debt_service": 82408863.98
   },
   {
     "scenario": "high_physical",
+    "display_name": "High Physical",
     "year": 2038,
     "dscr": 2.972,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 860333145.28,
+    "debt_service": 74112444.75
   },
   {
     "scenario": "high_physical",
+    "display_name": "High Physical",
     "year": 2039,
     "dscr": 2.972,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 877793620.93,
+    "debt_service": 65309943.95
   },
   {
     "scenario": "high_physical",
+    "display_name": "High Physical",
     "year": 2040,
     "dscr": 2.972,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 895591956.44,
+    "debt_service": 55970490.61
   },
   {
     "scenario": "high_physical",
+    "display_name": "High Physical",
     "year": 2041,
     "dscr": 2.972,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 913734811.83,
+    "debt_service": 46061330.6
   },
   {
     "scenario": "high_physical",
+    "display_name": "High Physical",
     "year": 2042,
     "dscr": 2.972,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 925576363.3,
+    "debt_service": 35547711.84
   },
   {
     "scenario": "high_physical",
+    "display_name": "High Physical",
     "year": 2043,
     "dscr": 2.972,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 934226799.99,
+    "debt_service": 24392762.34
   },
   {
     "scenario": "high_physical",
+    "display_name": "High Physical",
     "year": 2044,
     "dscr": 2.972,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 942963741.05,
+    "debt_service": 12557360.91
   },
   {
     "scenario": "high_physical",
+    "display_name": "High Physical",
     "year": 2045,
     "dscr": 2.972,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 951788051.52,
+    "debt_service": 0.0
   },
   {
     "scenario": "high_physical",
+    "display_name": "High Physical",
     "year": 2046,
     "dscr": 2.972,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 960700605.1,
+    "debt_service": 0.0
   },
   {
     "scenario": "high_physical",
+    "display_name": "High Physical",
     "year": 2047,
     "dscr": 2.972,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 969702284.21,
+    "debt_service": 0.0
   },
   {
     "scenario": "high_physical",
+    "display_name": "High Physical",
     "year": 2048,
     "dscr": 2.972,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 978793980.12,
+    "debt_service": 0.0
   },
   {
     "scenario": "high_physical",
+    "display_name": "High Physical",
     "year": 2049,
     "dscr": 2.972,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 987976592.98,
+    "debt_service": 0.0
   },
   {
     "scenario": "high_physical",
+    "display_name": "High Physical",
     "year": 2050,
     "dscr": 2.972,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 997251031.97,
+    "debt_service": 0.0
   },
   {
     "scenario": "high_physical",
+    "display_name": "High Physical",
     "year": 2051,
     "dscr": 2.972,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1006618215.35,
+    "debt_service": 0.0
   },
   {
     "scenario": "high_physical",
+    "display_name": "High Physical",
     "year": 2052,
     "dscr": 2.972,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1016079070.56,
+    "debt_service": 0.0
   },
   {
     "scenario": "high_physical",
+    "display_name": "High Physical",
     "year": 2053,
     "dscr": 2.972,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1025634534.33,
+    "debt_service": 0.0
   },
   {
     "scenario": "high_physical",
+    "display_name": "High Physical",
     "year": 2054,
     "dscr": 2.972,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1035285552.74,
+    "debt_service": 0.0
   },
   {
     "scenario": "high_physical",
+    "display_name": "High Physical",
     "year": 2055,
     "dscr": 2.972,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1045033081.32,
+    "debt_service": 0.0
   },
   {
     "scenario": "high_physical",
+    "display_name": "High Physical",
     "year": 2056,
     "dscr": 2.972,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1054878085.2,
+    "debt_service": 0.0
   },
   {
     "scenario": "high_physical",
+    "display_name": "High Physical",
     "year": 2057,
     "dscr": 2.972,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1064821539.11,
+    "debt_service": 0.0
   },
   {
     "scenario": "high_physical",
+    "display_name": "High Physical",
     "year": 2058,
     "dscr": 2.972,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1074864427.56,
+    "debt_service": 0.0
   },
   {
     "scenario": "high_physical",
+    "display_name": "High Physical",
     "year": 2059,
     "dscr": 2.972,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1085007744.9,
+    "debt_service": 0.0
   },
   {
     "scenario": "high_physical",
+    "display_name": "High Physical",
     "year": 2060,
     "dscr": 2.972,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1095252495.41,
+    "debt_service": 0.0
   },
   {
     "scenario": "high_physical",
+    "display_name": "High Physical",
     "year": 2061,
     "dscr": 2.972,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1105599693.42,
+    "debt_service": 0.0
   },
   {
     "scenario": "high_physical",
+    "display_name": "High Physical",
     "year": 2062,
     "dscr": 2.972,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1116050363.42,
+    "debt_service": 0.0
   },
   {
     "scenario": "high_physical",
+    "display_name": "High Physical",
     "year": 2063,
     "dscr": 2.972,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1126605540.12,
+    "debt_service": 0.0
   },
   {
     "scenario": "high_physical",
+    "display_name": "High Physical",
     "year": 2064,
     "dscr": 2.972,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1137266268.58,
+    "debt_service": 0.0
   },
   {
     "scenario": "combined_moderate",
+    "display_name": "Combined Moderate",
     "year": 2025,
     "dscr": 2.637,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 577941214.82,
+    "debt_service": 151585000.0
   },
   {
     "scenario": "combined_moderate",
+    "display_name": "Combined Moderate",
     "year": 2026,
     "dscr": 2.637,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 590015032.35,
+    "debt_service": 147508325.07
   },
   {
     "scenario": "combined_moderate",
+    "display_name": "Combined Moderate",
     "year": 2027,
     "dscr": 2.637,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 602321332.11,
+    "debt_service": 143182972.97
   },
   {
     "scenario": "combined_moderate",
+    "display_name": "Combined Moderate",
     "year": 2028,
     "dscr": 2.637,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 614864684.96,
+    "debt_service": 138593774.4
   },
   {
     "scenario": "combined_moderate",
+    "display_name": "Combined Moderate",
     "year": 2029,
     "dscr": 2.637,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 627649752.65,
+    "debt_service": 133724634.71
   },
   {
     "scenario": "combined_moderate",
+    "display_name": "Combined Moderate",
     "year": 2030,
     "dscr": 2.637,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 640681289.57,
+    "debt_service": 128558477.5
   },
   {
     "scenario": "combined_moderate",
+    "display_name": "Combined Moderate",
     "year": 2031,
     "dscr": 2.637,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 653964144.66,
+    "debt_service": 123077184.7
   },
   {
     "scenario": "combined_moderate",
+    "display_name": "Combined Moderate",
     "year": 2032,
     "dscr": 2.637,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 667503263.24,
+    "debt_service": 117261533.03
   },
   {
     "scenario": "combined_moderate",
+    "display_name": "Combined Moderate",
     "year": 2033,
     "dscr": 2.637,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 681303689.0,
+    "debt_service": 111091126.62
   },
   {
     "scenario": "combined_moderate",
+    "display_name": "Combined Moderate",
     "year": 2034,
     "dscr": 2.637,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 695370565.92,
+    "debt_service": 104544325.42
   },
   {
     "scenario": "combined_moderate",
+    "display_name": "Combined Moderate",
     "year": 2035,
     "dscr": 2.637,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 709709140.29,
+    "debt_service": 97598169.34
   },
   {
     "scenario": "combined_moderate",
+    "display_name": "Combined Moderate",
     "year": 2036,
     "dscr": 2.637,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 724324762.77,
+    "debt_service": 90228297.74
   },
   {
     "scenario": "combined_moderate",
+    "display_name": "Combined Moderate",
     "year": 2037,
     "dscr": 2.637,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 739222890.45,
+    "debt_service": 82408863.98
   },
   {
     "scenario": "combined_moderate",
+    "display_name": "Combined Moderate",
     "year": 2038,
     "dscr": 2.637,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 754409088.99,
+    "debt_service": 74112444.75
   },
   {
     "scenario": "combined_moderate",
+    "display_name": "Combined Moderate",
     "year": 2039,
     "dscr": 2.637,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 769889034.81,
+    "debt_service": 65309943.95
   },
   {
     "scenario": "combined_moderate",
+    "display_name": "Combined Moderate",
     "year": 2040,
     "dscr": 2.637,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 785668517.27,
+    "debt_service": 55970490.61
   },
   {
     "scenario": "combined_moderate",
+    "display_name": "Combined Moderate",
     "year": 2041,
     "dscr": 2.637,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 801753440.96,
+    "debt_service": 46061330.6
   },
   {
     "scenario": "combined_moderate",
+    "display_name": "Combined Moderate",
     "year": 2042,
     "dscr": 2.637,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 818149827.98,
+    "debt_service": 35547711.84
   },
   {
     "scenario": "combined_moderate",
+    "display_name": "Combined Moderate",
     "year": 2043,
     "dscr": 2.637,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 834863820.3,
+    "debt_service": 24392762.34
   },
   {
     "scenario": "combined_moderate",
+    "display_name": "Combined Moderate",
     "year": 2044,
     "dscr": 2.637,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 851901682.18,
+    "debt_service": 12557360.91
   },
   {
     "scenario": "combined_moderate",
+    "display_name": "Combined Moderate",
     "year": 2045,
     "dscr": 2.637,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 869269802.57,
+    "debt_service": 0.0
   },
   {
     "scenario": "combined_moderate",
+    "display_name": "Combined Moderate",
     "year": 2046,
     "dscr": 2.637,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 886974697.65,
+    "debt_service": 0.0
   },
   {
     "scenario": "combined_moderate",
+    "display_name": "Combined Moderate",
     "year": 2047,
     "dscr": 2.637,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 905023013.34,
+    "debt_service": 0.0
   },
   {
     "scenario": "combined_moderate",
+    "display_name": "Combined Moderate",
     "year": 2048,
     "dscr": 2.637,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 923421527.92,
+    "debt_service": 0.0
   },
   {
     "scenario": "combined_moderate",
+    "display_name": "Combined Moderate",
     "year": 2049,
     "dscr": 2.637,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 942177154.67,
+    "debt_service": 0.0
   },
   {
     "scenario": "combined_moderate",
+    "display_name": "Combined Moderate",
     "year": 2050,
     "dscr": 2.637,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 961296944.55,
+    "debt_service": 0.0
   },
   {
     "scenario": "combined_moderate",
+    "display_name": "Combined Moderate",
     "year": 2051,
     "dscr": 2.637,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 980788088.99,
+    "debt_service": 0.0
   },
   {
     "scenario": "combined_moderate",
+    "display_name": "Combined Moderate",
     "year": 2052,
     "dscr": 2.637,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1000657922.7,
+    "debt_service": 0.0
   },
   {
     "scenario": "combined_moderate",
+    "display_name": "Combined Moderate",
     "year": 2053,
     "dscr": 2.637,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1020913926.5,
+    "debt_service": 0.0
   },
   {
     "scenario": "combined_moderate",
+    "display_name": "Combined Moderate",
     "year": 2054,
     "dscr": 2.637,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1037209404.42,
+    "debt_service": 0.0
   },
   {
     "scenario": "combined_moderate",
+    "display_name": "Combined Moderate",
     "year": 2055,
     "dscr": 2.637,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1046973845.93,
+    "debt_service": 0.0
   },
   {
     "scenario": "combined_moderate",
+    "display_name": "Combined Moderate",
     "year": 2056,
     "dscr": 2.637,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1056835931.85,
+    "debt_service": 0.0
   },
   {
     "scenario": "combined_moderate",
+    "display_name": "Combined Moderate",
     "year": 2057,
     "dscr": 2.637,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1066796638.63,
+    "debt_service": 0.0
   },
   {
     "scenario": "combined_moderate",
+    "display_name": "Combined Moderate",
     "year": 2058,
     "dscr": 2.637,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1076856952.48,
+    "debt_service": 0.0
   },
   {
     "scenario": "combined_moderate",
+    "display_name": "Combined Moderate",
     "year": 2059,
     "dscr": 2.637,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1087017869.46,
+    "debt_service": 0.0
   },
   {
     "scenario": "combined_aggressive",
+    "display_name": "Combined Aggressive",
     "year": 2025,
     "dscr": 2.091,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 445173656.34,
+    "debt_service": 151585000.0
   },
   {
     "scenario": "combined_aggressive",
+    "display_name": "Combined Aggressive",
     "year": 2026,
     "dscr": 2.091,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 454786758.71,
+    "debt_service": 147508325.07
   },
   {
     "scenario": "combined_aggressive",
+    "display_name": "Combined Aggressive",
     "year": 2027,
     "dscr": 2.091,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 464584962.05,
+    "debt_service": 143182972.97
   },
   {
     "scenario": "combined_aggressive",
+    "display_name": "Combined Aggressive",
     "year": 2028,
     "dscr": 2.091,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 474571905.68,
+    "debt_service": 138593774.4
   },
   {
     "scenario": "combined_aggressive",
+    "display_name": "Combined Aggressive",
     "year": 2029,
     "dscr": 2.091,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 484751301.23,
+    "debt_service": 133724634.71
   },
   {
     "scenario": "combined_aggressive",
+    "display_name": "Combined Aggressive",
     "year": 2030,
     "dscr": 2.091,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 495126934.13,
+    "debt_service": 128558477.5
   },
   {
     "scenario": "combined_aggressive",
+    "display_name": "Combined Aggressive",
     "year": 2031,
     "dscr": 2.091,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 505702665.08,
+    "debt_service": 123077184.7
   },
   {
     "scenario": "combined_aggressive",
+    "display_name": "Combined Aggressive",
     "year": 2032,
     "dscr": 2.091,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 516482431.51,
+    "debt_service": 117261533.03
   },
   {
     "scenario": "combined_aggressive",
+    "display_name": "Combined Aggressive",
     "year": 2033,
     "dscr": 2.091,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 527470249.17,
+    "debt_service": 111091126.62
   },
   {
     "scenario": "combined_aggressive",
+    "display_name": "Combined Aggressive",
     "year": 2034,
     "dscr": 2.091,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 538670213.68,
+    "debt_service": 104544325.42
   },
   {
     "scenario": "combined_aggressive",
+    "display_name": "Combined Aggressive",
     "year": 2035,
     "dscr": 2.091,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 550086502.1,
+    "debt_service": 97598169.34
   },
   {
     "scenario": "combined_aggressive",
+    "display_name": "Combined Aggressive",
     "year": 2036,
     "dscr": 2.091,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 561723374.59,
+    "debt_service": 90228297.74
   },
   {
     "scenario": "combined_aggressive",
+    "display_name": "Combined Aggressive",
     "year": 2037,
     "dscr": 2.091,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 573585176.05,
+    "debt_service": 82408863.98
   },
   {
     "scenario": "combined_aggressive",
+    "display_name": "Combined Aggressive",
     "year": 2038,
     "dscr": 2.091,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 585676337.84,
+    "debt_service": 74112444.75
   },
   {
     "scenario": "combined_aggressive",
+    "display_name": "Combined Aggressive",
     "year": 2039,
     "dscr": 2.091,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 598001379.48,
+    "debt_service": 65309943.95
   },
   {
     "scenario": "combined_aggressive",
+    "display_name": "Combined Aggressive",
     "year": 2040,
     "dscr": 2.091,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 610564910.43,
+    "debt_service": 55970490.61
   },
   {
     "scenario": "combined_aggressive",
+    "display_name": "Combined Aggressive",
     "year": 2041,
     "dscr": 2.091,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 623371631.88,
+    "debt_service": 46061330.6
   },
   {
     "scenario": "combined_aggressive",
+    "display_name": "Combined Aggressive",
     "year": 2042,
     "dscr": 2.091,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 636426338.6,
+    "debt_service": 35547711.84
   },
   {
     "scenario": "combined_aggressive",
+    "display_name": "Combined Aggressive",
     "year": 2043,
     "dscr": 2.091,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 649733920.8,
+    "debt_service": 24392762.34
   },
   {
     "scenario": "combined_aggressive",
+    "display_name": "Combined Aggressive",
     "year": 2044,
     "dscr": 2.091,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 663299366.02,
+    "debt_service": 12557360.91
   },
   {
     "scenario": "combined_aggressive",
+    "display_name": "Combined Aggressive",
     "year": 2045,
     "dscr": 2.091,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 677127761.13,
+    "debt_service": 0.0
   },
   {
     "scenario": "combined_aggressive",
+    "display_name": "Combined Aggressive",
     "year": 2046,
     "dscr": 2.091,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 691224294.26,
+    "debt_service": 0.0
   },
   {
     "scenario": "combined_aggressive",
+    "display_name": "Combined Aggressive",
     "year": 2047,
     "dscr": 2.091,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 705594256.85,
+    "debt_service": 0.0
   },
   {
     "scenario": "combined_aggressive",
+    "display_name": "Combined Aggressive",
     "year": 2048,
     "dscr": 2.091,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 720243045.74,
+    "debt_service": 0.0
   },
   {
     "scenario": "combined_aggressive",
+    "display_name": "Combined Aggressive",
     "year": 2049,
     "dscr": 2.091,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 735176165.23,
+    "debt_service": 0.0
   },
   {
     "scenario": "low_demand",
+    "display_name": "Low Demand",
     "year": 2025,
     "dscr": 2.102,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 666736644.0,
+    "debt_service": 151585000.0
   },
   {
     "scenario": "low_demand",
+    "display_name": "Low Demand",
     "year": 2026,
     "dscr": 2.102,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 653142183.96,
+    "debt_service": 147508325.07
   },
   {
     "scenario": "low_demand",
+    "display_name": "Low Demand",
     "year": 2027,
     "dscr": 2.102,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 639806891.18,
+    "debt_service": 143182972.97
   },
   {
     "scenario": "low_demand",
+    "display_name": "Low Demand",
     "year": 2028,
     "dscr": 2.102,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 626725721.87,
+    "debt_service": 138593774.4
   },
   {
     "scenario": "low_demand",
+    "display_name": "Low Demand",
     "year": 2029,
     "dscr": 2.102,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 613893731.44,
+    "debt_service": 133724634.71
   },
   {
     "scenario": "low_demand",
+    "display_name": "Low Demand",
     "year": 2030,
     "dscr": 2.102,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 601306072.61,
+    "debt_service": 128558477.5
   },
   {
     "scenario": "low_demand",
+    "display_name": "Low Demand",
     "year": 2031,
     "dscr": 2.102,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 588957993.42,
+    "debt_service": 123077184.7
   },
   {
     "scenario": "low_demand",
+    "display_name": "Low Demand",
     "year": 2032,
     "dscr": 2.102,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 576844835.4,
+    "debt_service": 117261533.03
   },
   {
     "scenario": "low_demand",
+    "display_name": "Low Demand",
     "year": 2033,
     "dscr": 2.102,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 564962031.66,
+    "debt_service": 111091126.62
   },
   {
     "scenario": "low_demand",
+    "display_name": "Low Demand",
     "year": 2034,
     "dscr": 2.102,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 553305105.12,
+    "debt_service": 104544325.42
   },
   {
     "scenario": "low_demand",
+    "display_name": "Low Demand",
     "year": 2035,
     "dscr": 2.102,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 541869666.75,
+    "debt_service": 97598169.34
   },
   {
     "scenario": "low_demand",
+    "display_name": "Low Demand",
     "year": 2036,
     "dscr": 2.102,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 530651413.77,
+    "debt_service": 90228297.74
   },
   {
     "scenario": "low_demand",
+    "display_name": "Low Demand",
     "year": 2037,
     "dscr": 2.102,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 519646127.99,
+    "debt_service": 82408863.98
   },
   {
     "scenario": "low_demand",
+    "display_name": "Low Demand",
     "year": 2038,
     "dscr": 2.102,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 508849674.12,
+    "debt_service": 74112444.75
   },
   {
     "scenario": "low_demand",
+    "display_name": "Low Demand",
     "year": 2039,
     "dscr": 2.102,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 498257998.15,
+    "debt_service": 65309943.95
   },
   {
     "scenario": "low_demand",
+    "display_name": "Low Demand",
     "year": 2040,
     "dscr": 2.102,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 487867125.7,
+    "debt_service": 55970490.61
   },
   {
     "scenario": "low_demand",
+    "display_name": "Low Demand",
     "year": 2041,
     "dscr": 2.102,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 477673160.49,
+    "debt_service": 46061330.6
   },
   {
     "scenario": "low_demand",
+    "display_name": "Low Demand",
     "year": 2042,
     "dscr": 2.102,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 467672282.79,
+    "debt_service": 35547711.84
   },
   {
     "scenario": "low_demand",
+    "display_name": "Low Demand",
     "year": 2043,
     "dscr": 2.102,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 457860747.87,
+    "debt_service": 24392762.34
   },
   {
     "scenario": "low_demand",
+    "display_name": "Low Demand",
     "year": 2044,
     "dscr": 2.102,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 448234884.56,
+    "debt_service": 12557360.91
   },
   {
     "scenario": "low_demand",
+    "display_name": "Low Demand",
     "year": 2045,
     "dscr": 2.102,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 438791093.78,
+    "debt_service": 0.0
   },
   {
     "scenario": "low_demand",
+    "display_name": "Low Demand",
     "year": 2046,
     "dscr": 2.102,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 429525847.09,
+    "debt_service": 0.0
   },
   {
     "scenario": "low_demand",
+    "display_name": "Low Demand",
     "year": 2047,
     "dscr": 2.102,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 420435685.36,
+    "debt_service": 0.0
   },
   {
     "scenario": "low_demand",
+    "display_name": "Low Demand",
     "year": 2048,
     "dscr": 2.102,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 411517217.32,
+    "debt_service": 0.0
   },
   {
     "scenario": "low_demand",
+    "display_name": "Low Demand",
     "year": 2049,
     "dscr": 2.102,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 402767118.27,
+    "debt_service": 0.0
   },
   {
     "scenario": "low_demand",
+    "display_name": "Low Demand",
     "year": 2050,
     "dscr": 2.102,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 394182128.75,
+    "debt_service": 0.0
   },
   {
     "scenario": "low_demand",
+    "display_name": "Low Demand",
     "year": 2051,
     "dscr": 2.102,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 385759053.27,
+    "debt_service": 0.0
   },
   {
     "scenario": "low_demand",
+    "display_name": "Low Demand",
     "year": 2052,
     "dscr": 2.102,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 377494759.0,
+    "debt_service": 0.0
   },
   {
     "scenario": "low_demand",
+    "display_name": "Low Demand",
     "year": 2053,
     "dscr": 2.102,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 369386174.58,
+    "debt_service": 0.0
   },
   {
     "scenario": "low_demand",
+    "display_name": "Low Demand",
     "year": 2054,
     "dscr": 2.102,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 361430288.87,
+    "debt_service": 0.0
   },
   {
     "scenario": "low_demand",
+    "display_name": "Low Demand",
     "year": 2055,
     "dscr": 2.102,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 353624149.8,
+    "debt_service": 0.0
   },
   {
     "scenario": "low_demand",
+    "display_name": "Low Demand",
     "year": 2056,
     "dscr": 2.102,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 345964863.16,
+    "debt_service": 0.0
   },
   {
     "scenario": "low_demand",
+    "display_name": "Low Demand",
     "year": 2057,
     "dscr": 2.102,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 338449591.48,
+    "debt_service": 0.0
   },
   {
     "scenario": "low_demand",
+    "display_name": "Low Demand",
     "year": 2058,
     "dscr": 2.102,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 331075552.92,
+    "debt_service": 0.0
   },
   {
     "scenario": "low_demand",
+    "display_name": "Low Demand",
     "year": 2059,
     "dscr": 2.102,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 323840020.14,
+    "debt_service": 0.0
   },
   {
     "scenario": "low_demand",
+    "display_name": "Low Demand",
     "year": 2060,
     "dscr": 2.102,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 316740319.26,
+    "debt_service": 0.0
   },
   {
     "scenario": "low_demand",
+    "display_name": "Low Demand",
     "year": 2061,
     "dscr": 2.102,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 309773828.77,
+    "debt_service": 0.0
   },
   {
     "scenario": "low_demand",
+    "display_name": "Low Demand",
     "year": 2062,
     "dscr": 2.102,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 302937978.52,
+    "debt_service": 0.0
   },
   {
     "scenario": "low_demand",
+    "display_name": "Low Demand",
     "year": 2063,
     "dscr": 2.102,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 296230248.7,
+    "debt_service": 0.0
   },
   {
     "scenario": "low_demand",
+    "display_name": "Low Demand",
     "year": 2064,
     "dscr": 2.102,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 289648168.85,
+    "debt_service": 0.0
   },
   {
     "scenario": "severe_drought",
+    "display_name": "Severe Drought",
     "year": 2025,
     "dscr": 2.988,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 665991266.82,
+    "debt_service": 151585000.0
   },
   {
     "scenario": "severe_drought",
+    "display_name": "Severe Drought",
     "year": 2026,
     "dscr": 2.988,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 679697004.84,
+    "debt_service": 147508325.07
   },
   {
     "scenario": "severe_drought",
+    "display_name": "Severe Drought",
     "year": 2027,
     "dscr": 2.988,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 693666647.82,
+    "debt_service": 143182972.97
   },
   {
     "scenario": "severe_drought",
+    "display_name": "Severe Drought",
     "year": 2028,
     "dscr": 2.988,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 707905384.46,
+    "debt_service": 138593774.4
   },
   {
     "scenario": "severe_drought",
+    "display_name": "Severe Drought",
     "year": 2029,
     "dscr": 2.988,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 722418506.57,
+    "debt_service": 133724634.71
   },
   {
     "scenario": "severe_drought",
+    "display_name": "Severe Drought",
     "year": 2030,
     "dscr": 2.988,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 737211411.18,
+    "debt_service": 128558477.5
   },
   {
     "scenario": "severe_drought",
+    "display_name": "Severe Drought",
     "year": 2031,
     "dscr": 2.988,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 752289602.59,
+    "debt_service": 123077184.7
   },
   {
     "scenario": "severe_drought",
+    "display_name": "Severe Drought",
     "year": 2032,
     "dscr": 2.988,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 767658694.58,
+    "debt_service": 117261533.03
   },
   {
     "scenario": "severe_drought",
+    "display_name": "Severe Drought",
     "year": 2033,
     "dscr": 2.988,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 783324412.52,
+    "debt_service": 111091126.62
   },
   {
     "scenario": "severe_drought",
+    "display_name": "Severe Drought",
     "year": 2034,
     "dscr": 2.988,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 799292595.68,
+    "debt_service": 104544325.42
   },
   {
     "scenario": "severe_drought",
+    "display_name": "Severe Drought",
     "year": 2035,
     "dscr": 2.988,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 815569199.44,
+    "debt_service": 97598169.34
   },
   {
     "scenario": "severe_drought",
+    "display_name": "Severe Drought",
     "year": 2036,
     "dscr": 2.988,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 832160297.66,
+    "debt_service": 90228297.74
   },
   {
     "scenario": "severe_drought",
+    "display_name": "Severe Drought",
     "year": 2037,
     "dscr": 2.988,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 849072085.03,
+    "debt_service": 82408863.98
   },
   {
     "scenario": "severe_drought",
+    "display_name": "Severe Drought",
     "year": 2038,
     "dscr": 2.988,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 866310879.49,
+    "debt_service": 74112444.75
   },
   {
     "scenario": "severe_drought",
+    "display_name": "Severe Drought",
     "year": 2039,
     "dscr": 2.988,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 883883124.66,
+    "debt_service": 65309943.95
   },
   {
     "scenario": "severe_drought",
+    "display_name": "Severe Drought",
     "year": 2040,
     "dscr": 2.988,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 901795392.43,
+    "debt_service": 55970490.61
   },
   {
     "scenario": "severe_drought",
+    "display_name": "Severe Drought",
     "year": 2041,
     "dscr": 2.988,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 918911429.85,
+    "debt_service": 46061330.6
   },
   {
     "scenario": "severe_drought",
+    "display_name": "Severe Drought",
     "year": 2042,
     "dscr": 2.988,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 927492646.39,
+    "debt_service": 35547711.84
   },
   {
     "scenario": "severe_drought",
+    "display_name": "Severe Drought",
     "year": 2043,
     "dscr": 2.988,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 936159675.1,
+    "debt_service": 24392762.34
   },
   {
     "scenario": "severe_drought",
+    "display_name": "Severe Drought",
     "year": 2044,
     "dscr": 2.988,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 944913374.09,
+    "debt_service": 12557360.91
   },
   {
     "scenario": "severe_drought",
+    "display_name": "Severe Drought",
     "year": 2045,
     "dscr": 2.988,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 953754610.07,
+    "debt_service": 0.0
   },
   {
     "scenario": "severe_drought",
+    "display_name": "Severe Drought",
     "year": 2046,
     "dscr": 2.988,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 962684258.41,
+    "debt_service": 0.0
   },
   {
     "scenario": "severe_drought",
+    "display_name": "Severe Drought",
     "year": 2047,
     "dscr": 2.988,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 971703203.24,
+    "debt_service": 0.0
   },
   {
     "scenario": "severe_drought",
+    "display_name": "Severe Drought",
     "year": 2048,
     "dscr": 2.988,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 980812337.51,
+    "debt_service": 0.0
   },
   {
     "scenario": "severe_drought",
+    "display_name": "Severe Drought",
     "year": 2049,
     "dscr": 2.988,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 990012563.12,
+    "debt_service": 0.0
   },
   {
     "scenario": "severe_drought",
+    "display_name": "Severe Drought",
     "year": 2050,
     "dscr": 2.988,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 999304791.0,
+    "debt_service": 0.0
   },
   {
     "scenario": "severe_drought",
+    "display_name": "Severe Drought",
     "year": 2051,
     "dscr": 2.988,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1008689941.15,
+    "debt_service": 0.0
   },
   {
     "scenario": "severe_drought",
+    "display_name": "Severe Drought",
     "year": 2052,
     "dscr": 2.988,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1018168942.8,
+    "debt_service": 0.0
   },
   {
     "scenario": "severe_drought",
+    "display_name": "Severe Drought",
     "year": 2053,
     "dscr": 2.988,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1027742734.47,
+    "debt_service": 0.0
   },
   {
     "scenario": "severe_drought",
+    "display_name": "Severe Drought",
     "year": 2054,
     "dscr": 2.988,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1037412264.05,
+    "debt_service": 0.0
   },
   {
     "scenario": "severe_drought",
+    "display_name": "Severe Drought",
     "year": 2055,
     "dscr": 2.988,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1047178488.93,
+    "debt_service": 0.0
   },
   {
     "scenario": "severe_drought",
+    "display_name": "Severe Drought",
     "year": 2056,
     "dscr": 2.988,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1057042376.06,
+    "debt_service": 0.0
   },
   {
     "scenario": "severe_drought",
+    "display_name": "Severe Drought",
     "year": 2057,
     "dscr": 2.988,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1067004902.07,
+    "debt_service": 0.0
   },
   {
     "scenario": "severe_drought",
+    "display_name": "Severe Drought",
     "year": 2058,
     "dscr": 2.988,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1077067053.33,
+    "debt_service": 0.0
   },
   {
     "scenario": "severe_drought",
+    "display_name": "Severe Drought",
     "year": 2059,
     "dscr": 2.988,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1087229826.1,
+    "debt_service": 0.0
   },
   {
     "scenario": "severe_drought",
+    "display_name": "Severe Drought",
     "year": 2060,
     "dscr": 2.988,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1097494226.6,
+    "debt_service": 0.0
   },
   {
     "scenario": "severe_drought",
+    "display_name": "Severe Drought",
     "year": 2061,
     "dscr": 2.988,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1107861271.11,
+    "debt_service": 0.0
   },
   {
     "scenario": "severe_drought",
+    "display_name": "Severe Drought",
     "year": 2062,
     "dscr": 2.988,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1118331986.06,
+    "debt_service": 0.0
   },
   {
     "scenario": "severe_drought",
+    "display_name": "Severe Drought",
     "year": 2063,
     "dscr": 2.988,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1128907408.16,
+    "debt_service": 0.0
   },
   {
     "scenario": "severe_drought",
+    "display_name": "Severe Drought",
     "year": 2064,
     "dscr": 2.988,
     "rating": "A",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 150,
+    "cost_of_debt": 0.0825,
+    "ebitda": 1139588584.48,
+    "debt_service": 0.0
   },
   {
     "scenario": "enhanced_11th_plan",
+    "display_name": "Enhanced 11th Plan",
     "year": 2025,
     "dscr": 0.671,
     "rating": "CCC",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 900,
+    "cost_of_debt": 0.1575,
+    "ebitda": 428414712.66,
+    "debt_service": 151585000.0
   },
   {
     "scenario": "enhanced_11th_plan",
+    "display_name": "Enhanced 11th Plan",
     "year": 2026,
     "dscr": 0.671,
     "rating": "CCC",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 900,
+    "cost_of_debt": 0.1575,
+    "ebitda": 377527790.7,
+    "debt_service": 147508325.07
   },
   {
     "scenario": "enhanced_11th_plan",
+    "display_name": "Enhanced 11th Plan",
     "year": 2027,
     "dscr": 0.671,
     "rating": "CCC",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 900,
+    "cost_of_debt": 0.1575,
+    "ebitda": 321720439.86,
+    "debt_service": 143182972.97
   },
   {
     "scenario": "enhanced_11th_plan",
+    "display_name": "Enhanced 11th Plan",
     "year": 2028,
     "dscr": 0.671,
     "rating": "CCC",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 900,
+    "cost_of_debt": 0.1575,
+    "ebitda": 268923101.76,
+    "debt_service": 138593774.4
   },
   {
     "scenario": "enhanced_11th_plan",
+    "display_name": "Enhanced 11th Plan",
     "year": 2029,
     "dscr": 0.671,
     "rating": "CCC",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 900,
+    "cost_of_debt": 0.1575,
+    "ebitda": 234638632.03,
+    "debt_service": 133724634.71
   },
   {
     "scenario": "enhanced_11th_plan",
+    "display_name": "Enhanced 11th Plan",
     "year": 2030,
     "dscr": 0.671,
     "rating": "CCC",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 900,
+    "cost_of_debt": 0.1575,
+    "ebitda": 185704005.97,
+    "debt_service": 128558477.5
   },
   {
     "scenario": "enhanced_11th_plan",
+    "display_name": "Enhanced 11th Plan",
     "year": 2031,
     "dscr": 0.671,
     "rating": "CCC",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 900,
+    "cost_of_debt": 0.1575,
+    "ebitda": 160868837.13,
+    "debt_service": 123077184.7
   },
   {
     "scenario": "enhanced_11th_plan",
+    "display_name": "Enhanced 11th Plan",
     "year": 2032,
     "dscr": 0.671,
     "rating": "CCC",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 900,
+    "cost_of_debt": 0.1575,
+    "ebitda": 141836717.95,
+    "debt_service": 117261533.03
   },
   {
     "scenario": "enhanced_11th_plan",
+    "display_name": "Enhanced 11th Plan",
     "year": 2033,
     "dscr": 0.671,
     "rating": "CCC",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 900,
+    "cost_of_debt": 0.1575,
+    "ebitda": 123444257.94,
+    "debt_service": 111091126.62
   },
   {
     "scenario": "enhanced_11th_plan",
+    "display_name": "Enhanced 11th Plan",
     "year": 2034,
     "dscr": 0.671,
     "rating": "CCC",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 900,
+    "cost_of_debt": 0.1575,
+    "ebitda": 105712466.34,
+    "debt_service": 104544325.42
   },
   {
     "scenario": "enhanced_11th_plan",
+    "display_name": "Enhanced 11th Plan",
     "year": 2035,
     "dscr": 0.671,
     "rating": "CCC",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 900,
+    "cost_of_debt": 0.1575,
+    "ebitda": 84242361.13,
+    "debt_service": 97598169.34
   },
   {
     "scenario": "enhanced_11th_plan",
+    "display_name": "Enhanced 11th Plan",
     "year": 2036,
     "dscr": 0.671,
     "rating": "CCC",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 900,
+    "cost_of_debt": 0.1575,
+    "ebitda": 63835447.05,
+    "debt_service": 90228297.74
   },
   {
     "scenario": "enhanced_11th_plan",
+    "display_name": "Enhanced 11th Plan",
     "year": 2037,
     "dscr": 0.671,
     "rating": "CCC",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 900,
+    "cost_of_debt": 0.1575,
+    "ebitda": 43648299.33,
+    "debt_service": 82408863.98
   },
   {
     "scenario": "enhanced_11th_plan",
+    "display_name": "Enhanced 11th Plan",
     "year": 2038,
     "dscr": 0.671,
     "rating": "CCC",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 900,
+    "cost_of_debt": 0.1575,
+    "ebitda": 24775720.46,
+    "debt_service": 74112444.75
   },
   {
     "scenario": "enhanced_11th_plan",
+    "display_name": "Enhanced 11th Plan",
     "year": 2039,
     "dscr": 0.671,
     "rating": "CCC",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 900,
+    "cost_of_debt": 0.1575,
+    "ebitda": -29290682.92,
+    "debt_service": 65309943.95
   },
   {
     "scenario": "enhanced_11th_plan",
+    "display_name": "Enhanced 11th Plan",
     "year": 2040,
     "dscr": 0.671,
     "rating": "CCC",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 900,
+    "cost_of_debt": 0.1575,
+    "ebitda": -73500000.0,
+    "debt_service": 55970490.61
   },
   {
     "scenario": "enhanced_combined",
+    "display_name": "Enhanced Combined",
     "year": 2025,
     "dscr": 0.668,
     "rating": "CCC",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 900,
+    "cost_of_debt": 0.1575,
+    "ebitda": 427101607.84,
+    "debt_service": 151585000.0
   },
   {
     "scenario": "enhanced_combined",
+    "display_name": "Enhanced Combined",
     "year": 2026,
     "dscr": 0.668,
     "rating": "CCC",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 900,
+    "cost_of_debt": 0.1575,
+    "ebitda": 376347815.8,
+    "debt_service": 147508325.07
   },
   {
     "scenario": "enhanced_combined",
+    "display_name": "Enhanced Combined",
     "year": 2027,
     "dscr": 0.668,
     "rating": "CCC",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 900,
+    "cost_of_debt": 0.1575,
+    "ebitda": 320686467.66,
+    "debt_service": 143182972.97
   },
   {
     "scenario": "enhanced_combined",
+    "display_name": "Enhanced Combined",
     "year": 2028,
     "dscr": 0.668,
     "rating": "CCC",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 900,
+    "cost_of_debt": 0.1575,
+    "ebitda": 268027257.48,
+    "debt_service": 138593774.4
   },
   {
     "scenario": "enhanced_combined",
+    "display_name": "Enhanced Combined",
     "year": 2029,
     "dscr": 0.668,
     "rating": "CCC",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 900,
+    "cost_of_debt": 0.1575,
+    "ebitda": 233832482.48,
+    "debt_service": 133724634.71
   },
   {
     "scenario": "enhanced_combined",
+    "display_name": "Enhanced Combined",
     "year": 2030,
     "dscr": 0.668,
     "rating": "CCC",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 900,
+    "cost_of_debt": 0.1575,
+    "ebitda": 185025878.75,
+    "debt_service": 128558477.5
   },
   {
     "scenario": "enhanced_combined",
+    "display_name": "Enhanced Combined",
     "year": 2031,
     "dscr": 0.668,
     "rating": "CCC",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 900,
+    "cost_of_debt": 0.1575,
+    "ebitda": 160255683.46,
+    "debt_service": 123077184.7
   },
   {
     "scenario": "enhanced_combined",
+    "display_name": "Enhanced Combined",
     "year": 2032,
     "dscr": 0.668,
     "rating": "CCC",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 900,
+    "cost_of_debt": 0.1575,
+    "ebitda": 141273355.94,
+    "debt_service": 117261533.03
   },
   {
     "scenario": "enhanced_combined",
+    "display_name": "Enhanced Combined",
     "year": 2033,
     "dscr": 0.668,
     "rating": "CCC",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 900,
+    "cost_of_debt": 0.1575,
+    "ebitda": 122929014.12,
+    "debt_service": 111091126.62
   },
   {
     "scenario": "enhanced_combined",
+    "display_name": "Enhanced Combined",
     "year": 2034,
     "dscr": 0.668,
     "rating": "CCC",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 900,
+    "cost_of_debt": 0.1575,
+    "ebitda": 105243612.27,
+    "debt_service": 104544325.42
   },
   {
     "scenario": "enhanced_combined",
+    "display_name": "Enhanced Combined",
     "year": 2035,
     "dscr": 0.668,
     "rating": "CCC",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 900,
+    "cost_of_debt": 0.1575,
+    "ebitda": 83829676.97,
+    "debt_service": 97598169.34
   },
   {
     "scenario": "enhanced_combined",
+    "display_name": "Enhanced Combined",
     "year": 2036,
     "dscr": 0.668,
     "rating": "CCC",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 900,
+    "cost_of_debt": 0.1575,
+    "ebitda": 63476151.27,
+    "debt_service": 90228297.74
   },
   {
     "scenario": "enhanced_combined",
+    "display_name": "Enhanced Combined",
     "year": 2037,
     "dscr": 0.668,
     "rating": "CCC",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 900,
+    "cost_of_debt": 0.1575,
+    "ebitda": 43341816.99,
+    "debt_service": 82408863.98
   },
   {
     "scenario": "enhanced_combined",
+    "display_name": "Enhanced Combined",
     "year": 2038,
     "dscr": 0.668,
     "rating": "CCC",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 900,
+    "cost_of_debt": 0.1575,
+    "ebitda": 24518612.39,
+    "debt_service": 74112444.75
   },
   {
     "scenario": "enhanced_combined",
+    "display_name": "Enhanced Combined",
     "year": 2039,
     "dscr": 0.668,
     "rating": "CCC",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 900,
+    "cost_of_debt": 0.1575,
+    "ebitda": -29406342.95,
+    "debt_service": 65309943.95
   },
   {
     "scenario": "enhanced_combined",
+    "display_name": "Enhanced Combined",
     "year": 2040,
     "dscr": 0.668,
     "rating": "CCC",
-    "rating_method": "approx_dscr_mapping",
-    "paper_grade_metric": false
+    "spread_bps": 900,
+    "cost_of_debt": 0.1575,
+    "ebitda": -73500000.0,
+    "debt_service": 55970490.61
   }
 ]

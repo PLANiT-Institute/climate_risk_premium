@@ -1,8 +1,8 @@
-# Cover Letter (Energy Policy)
+# Cover Letter (Climate Risk Management)
 
 Dear Editor,
 
-Please consider our manuscript, **"Quantifying Climate Risk Premium Under Korea's Coal Phase-Down: A Reproducible Single-Asset Case Study,"** for publication in *Energy Policy*.
+Please consider our manuscript, **"Quantifying Climate Risk Premium Under Korea's Coal Phase-Down: A Reproducible Single-Asset Case Study,"** for publication in *Climate Risk Management*.
 
 This submission addresses a policy-relevant question: how transition and physical climate channels propagate into project-level valuation and financing outcomes under a transparent, auditable workflow. Using the Samcheok case, we provide a reproducibility-first empirical framework where all quantitative claims are tied to frozen model artifacts with cryptographic hashes.
 
@@ -16,8 +16,8 @@ This manuscript is original, is not under consideration elsewhere, and all requi
 
 Primary reproducibility materials are included in:
 
-- `/Users/jinsu/Documents/GitHub/climate_risk_premium/paper_dev/02_results_freeze`
-- `/Users/jinsu/Documents/GitHub/climate_risk_premium/paper_dev/04_sources`
+- `paper_dev/02_results_freeze` (frozen outputs and manifest)
+- `paper_dev/04_sources` (claim and reference registries)
 
 Sincerely,
 

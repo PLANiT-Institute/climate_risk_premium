@@ -1,36 +1,68 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CRP Dashboard (Vercel)
 
-## Getting Started
+Production dashboard for the Climate Risk Premium model of Samcheok Blue Power (2,100 MW).
 
-First, run the development server:
+## What This App Shows
+
+- Scenario-level financial outputs: NPV, IRR, DSCR, LLCR
+- Credit outcomes: rating migration (AAA-D), spread, counterfactual CRP
+- Physical-risk channel (PLANiT): wildfire, drought, water risk conversion logic
+- Transition-risk channel: policy dispatch effects + enhanced 11th Basic Plan stress
+
+## Data Source Priority
+
+1. Supabase (`scenario_results`, `cashflow_yearly`, `credit_ratings`) when configured
+2. Local frozen JSON under `src/data/` as fallback
+
+This behavior is implemented in `src/lib/queries/*`.
+
+## Local Development
 
 ```bash
+cd crp-dashboard
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Build Check
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+cd crp-dashboard
+npm run build
+```
 
-## Learn More
+## Vercel Deployment
 
-To learn more about Next.js, take a look at the following resources:
+- Framework: Next.js (`vercel.json`)
+- Region: `icn1`
+- Security headers are applied globally
+- Optional ISR revalidation endpoint: `POST /api/revalidate`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Required Environment Variables (if Supabase is used)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `NEXT_PUBLIC_SITE_URL` (recommended, for metadata base URL)
+- `REVALIDATE_SECRET` (optional, for revalidate endpoint)
 
-## Deploy on Vercel
+If Supabase variables are absent, the dashboard automatically falls back to local JSON.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Project Structure
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `src/app/`: route pages
+- `src/components/`: chart, table, map, layout components
+- `src/lib/queries/`: data loading strategy (Supabase-first, local fallback)
+- `src/data/`: frozen scenario/cashflow/rating JSON snapshots
+- `archive/`: deprecated or unused assets
+
+## Syncing Model Results
+
+From repository root:
+
+```bash
+python scripts/regenerate_dashboard_data.py
+```
+
+This refreshes CSV outputs and dashboard JSON snapshots.

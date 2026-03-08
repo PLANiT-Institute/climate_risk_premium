@@ -6,7 +6,7 @@
 \usepackage{hyperref}
 \usepackage[utf8]{inputenc}
 
-\journal{Energy Policy}
+\journal{Climate Risk Management}
 
 \begin{document}
 
@@ -33,29 +33,40 @@ Climate risk premium \sep stranded assets \sep coal phase-down \sep project fina
 \end{frontmatter}
 
 \section{Introduction}
-Climate policy now affects infrastructure finance through explicit transition pathways, regulation-linked dispatch expectations, and credit repricing that feeds back into project economics. For coal assets in advanced and emerging Asian power systems, this interaction is especially acute because policy horizons and debt tenors overlap. The main research problem is therefore no longer whether climate risk matters, but how to translate policy pathways into auditable project-level financial metrics that can be interrogated by policymakers, lenders, and reviewers.
+Climate policy now affects infrastructure finance through explicit transition pathways, regulation-linked dispatch expectations, and credit repricing that feeds back into project economics \citep{giglio2021climate,battiston2017climate}. For coal assets in advanced and emerging Asian power systems, this interaction is especially acute because policy horizons and debt tenors overlap. The main research problem is therefore no longer whether climate risk matters, but how to translate policy pathways into auditable project-level financial metrics that can be interrogated by policymakers, lenders, and reviewers.
 
 This study addresses that problem with a reproducibility-first case design. We focus on Samcheok as a policy-relevant single case where transition exposure can be evaluated against plant-specific financial structure rather than sector averages. Single-case design is appropriate here because the objective is mechanism clarity under transparent assumptions, not immediate statistical generalization. The model architecture links scenario definitions, cash-flow projections, credit rating logic, and spread adjustments in one pipeline, then locks outputs into a frozen snapshot for manuscript use.
 
-The practical motivation is also editorial. Energy policy journals routinely receive high-level climate-finance claims that are not tied to deterministic, inspectable computation paths. We therefore invert the workflow: model production and governance constraints come first, manuscript prose comes second, and every headline number must survive script-based validation before submission. The result is a paper that treats reproducibility as part of the scientific contribution rather than as supplementary material.
+The practical motivation is also editorial. Climate risk journals routinely receive high-level climate-finance claims that are not tied to deterministic, inspectable computation paths. We therefore invert the workflow: model production and governance constraints come first, manuscript prose comes second, and every headline number must survive script-based validation before submission. The result is a paper that treats reproducibility as part of the scientific contribution rather than as supplementary material.
 
 \section{Contribution}
 This paper makes four contributions.
 
 First, it delivers a plant-level climate risk premium framework that is explicitly scenario-contract based. Only one admissible scenario set is allowed in the paper, and that set is defined in a repository-level interface contract. This removes post hoc scenario drift between code, figures, and manuscript tables.
 
-Second, it contributes methodological integration. The workflow combines transition scenarios, physical risk adjustments, debt/equity financing channels, and rating-linked spread implications in a single reproducible run. Existing climate-finance work often isolates these components, while this implementation keeps them mechanically connected at the cash-flow level \citep{caldecott2021stranded,vanvliet2016power}.
+Second, it contributes methodological integration. The workflow combines transition scenarios, physical risk adjustments, debt/equity financing channels, and rating-linked spread implications in a single reproducible run. Existing climate-finance work often isolates these components \citep{bolton2021investors,ilhan2021carbon}, while this implementation keeps them mechanically connected at the cash-flow level \citep{caldecott2021stranded,vanvliet2016power}.
 
 Third, it introduces evidence governance at the claim layer. Each quantitative or institutional statement is registered in a claim matrix and linked either to a hashed model artifact or to a primary source. Claims lacking traceability are either rewritten as hypotheses or excluded from submission.
 
 Fourth, it provides a robustness protocol aligned with policy interpretation. Instead of adding stochastic complexity with weakly justified priors, we execute a deterministic stress grid plus a placebo structure that can directly test whether the transition-dominance conclusion is fragile to plausible parameter variation.
+
+\section{Related Literature}
+This study connects three strands of the climate-finance literature.
+
+The first strand addresses the pricing of climate risk in financial markets. \citet{bolton2021investors} show that firms with higher carbon emissions earn higher stock returns, consistent with investors demanding compensation for carbon risk. \citet{ilhan2021carbon} find that the cost of option protection against downside tail risk is greater for carbon-intensive firms. \citet{giglio2021climate} survey the emerging climate-finance field and identify plant-level asset pricing as an open empirical gap. Our framework addresses that gap by translating climate scenarios into project-level valuation and credit metrics rather than portfolio-level risk premia.
+
+The second strand concerns stranded assets and the macroeconomic consequences of unburnable carbon. \citet{mcglade2015geographical} estimate that a third of oil reserves, half of gas reserves, and over 80\% of coal reserves must remain unused to meet the 2$^\circ$C target. \citet{mercure2018stranded} model the macroeconomic feedback from stranded fossil fuel assets and find that early policy action reduces systemic losses. \citet{caldecott2021stranded} provide a comprehensive taxonomy of stranding drivers. While this literature establishes the aggregate case for transition risk, it rarely develops auditable, plant-level financial models with governance controls. Our contribution is to operationalize the stranded-asset concept at the project-finance level with frozen, validator-enforced outputs.
+
+The third strand concerns disclosure and governance frameworks. The Task Force on Climate-related Financial Disclosures \citep{tcfd2017recommendations} calls for scenario-based financial analysis of climate risk. \citet{krueger2020importance} find that institutional investors consider climate risk important for portfolio management, yet current disclosure practices lack standardized quantitative backing. Our reproducibility-first design---scenario contracts, frozen outputs, claim-source traceability, and manuscript validation---provides a concrete template that aligns with the TCFD recommendation for scenario-based disclosure.
+
+To our knowledge, no prior study combines all three elements---plant-level project-finance CRP estimation, stranded-asset scenario analysis, and reproducibility governance---within a single auditable workflow.
 
 \section{Institutional Context}
 South Korea's power-sector transition discourse is shaped by domestic planning institutions and international coal phase-down narratives. For this manuscript, institutional context follows two strict rules. Rule one: policy statements are drawn from attributable primary sources, including official planning documents and institutional pages. Rule two: any context statement that cannot be sourced to a primary document is omitted from the main argument.
 
 This constraint has implications for writing style. We avoid broad, unreferenced claims about national policy direction and instead discuss only what is needed to interpret scenario design choices. The policy objective in this paper is not to adjudicate all Korean energy policy debates; it is to define a disciplined decision context in which scenario-based project valuation is meaningful.
 
-To that end, the paper references official or institutional materials for journal fit and policy framing, including Energy Policy submission requirements and coal-transition context resources \citep{energypolicyguide2026,energypolicyjournal2026,ppca2025,motie2025}. These references are used for process framing, while all financial magnitudes in the paper originate from frozen model outputs.
+To that end, the paper references official or institutional materials for journal fit and policy framing, including Climate Risk Management submission requirements and coal-transition context resources \citep{crmguide2026,crmjournal2026,ppca2025,motie2025}. Korea's coal phase-out trajectory has been analyzed in the energy policy literature \citep{yun2019korea,lee2023korea}, providing context for the scenario design in this study. These references are used for process framing, while all financial magnitudes in the paper originate from frozen model outputs.
 
 \section{Data}
 The data architecture contains three layers.
@@ -66,10 +77,12 @@ Layer 2 is reproducibility metadata. A machine-readable manifest records run tim
 
 Layer 3 is governance metadata. A claim registry tracks every main-text statement that carries numerical or policy meaning. A separate reference registry maps citation keys to primary URLs or persistent identifiers and links each source to claim IDs.
 
+Physical hazard adjustments are derived from CLIMADA v4 (wildfire, using NASA FIRMS satellite fire detection data) and OS-Climate PhysRisk (drought and water stress risk), with results frozen as CSV artifacts in the companion repository. The computation infrastructure and input data are provided in the \texttt{Physicalrisk\_PLANiT/} sub-project, which includes a single-command reproduction script and SHA-256 manifest for verification.
+
 These layers impose a hierarchy of evidence. If an output exists in frozen artifacts, the manuscript must use that number exactly. If a policy context statement cannot be linked to a primary source entry in the source registry, it is not admissible in the final version.
 
 \section{Model}
-The model is a project-finance representation where scenario pathways alter revenue, operating profile, and financing conditions. Let scenario $s$ produce annual net cash flow $CF_{t,s}$ and discount rate $r_s$. Net present value is
+The model is a project-finance representation where scenario pathways alter revenue, operating profile, and financing conditions \citep{yescombe2014principles,esty2004large}. Let scenario $s$ produce annual net cash flow $CF_{t,s}$ and discount rate $r_s$. Net present value is
 \begin{equation}
 NPV_s = \sum_{t=0}^{T} \frac{CF_{t,s}}{(1+r_s)^t}.
 \end{equation}
@@ -133,14 +146,14 @@ Three policy implications follow from the frozen and robustness-consistent evide
 
 First, transition-policy clarity is financially consequential at project level. If phase-down trajectories are expected but not reflected in financing assumptions, valuation and credit signals can be systematically biased.
 
-Second, disclosure governance matters as much as model sophistication. Policymakers and public finance institutions increasingly require climate-finance claims that are reproducible and auditable. This study provides a deployable template: scenario contract, frozen outputs, claim-source registry, and manuscript validator.
+Second, disclosure governance matters as much as model sophistication. Policymakers and public finance institutions increasingly require climate-finance claims that are reproducible and auditable \citep{tcfd2017recommendations}. This study provides a deployable template: scenario contract, frozen outputs, claim-source registry, and manuscript validator.
 
 Third, transition planning and financing design should be discussed jointly. When transition-driven spread penalties become large, policy instruments such as managed retirement contracts, transition-linked refinancing frameworks, and covenant redesign become central to reducing disorderly adjustment risk \citep{ngfs2024,iea2024coal}.
 
 \section{Limitations and Conclusion}
 This paper has clear limitations.
 
-It is a single-case study. External validity to other technologies, market structures, and regulatory environments is not automatic. The appropriate next step is a staged replication strategy across additional assets using the same governance stack.
+It is a single-case study. External validity to other technologies, market structures, and regulatory environments is not automatic \citep{mercure2018stranded}. The appropriate next step is a staged replication strategy across additional assets using the same governance stack.
 
 It is also deterministic in this submission version. We intentionally prioritize transparent sensitivity and placebo tests over probabilistic simulation to reduce assumption opacity. Future work can add uncertainty distributions once parameter priors are documented to publication-grade standards.
 
