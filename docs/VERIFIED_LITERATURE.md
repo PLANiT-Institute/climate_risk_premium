@@ -947,17 +947,17 @@ CLIMADA analysis was performed for Samcheok (37.44°N, 129.17°E):
 ```
 docs/
 ├── VERIFIED_LITERATURE.md       # This file - citation summary
-├── physical_risk.md             # Comprehensive model documentation
-├── MODEL_OVERVIEW.md            # Quick start guide
+├── MODEL_PROCESS_FULL.md        # Current production process guide
 ├── METHODOLOGY_EQUATIONS.md     # Detailed equations
+├── VULNERABILITY_FUNCTIONS.md   # Active hazard conversion formulas
 └── literature_review/
     ├── 02_flood_risk_methodology.md
     ├── 03_slr_methodology.md
     ├── 04_wildfire_methodology.md
     └── 05_compound_risk_methodology.md
 
-archive/deprecated_docs_2024/
-└── [9 archived summary files]
+docs/archive/deprecated_2026_03/
+└── MODEL_OVERVIEW.md            # Archived legacy quick-start doc
 ```
 
 ---
