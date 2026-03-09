@@ -55,13 +55,8 @@ Default parameters in `src/planit/config.py`:
 - `wildfire_outage_duration_hours = 24`
 - `hours_per_year = 8760`
 
-Fallback method:
-
-```text
-outage_rate = wildfire_aai_krw / total_asset_value_krw
-```
-
-used only when event-frequency metadata is unavailable (and fallback is enabled).
+If event-frequency metadata is unavailable, wildfire outage defaults to 0.0
+(or explicit CSV baseline when provided).
 
 ### Drought and water risk conversion
 
@@ -109,7 +104,7 @@ Optional runtime controls:
 Wildfire outage assumption overrides:
 - `CRP_WILDFIRE_OUTAGE_PROBABILITY` (default `0.10`)
 - `CRP_WILDFIRE_OUTAGE_DURATION_HOURS` (default `24`)
-- `CRP_WILDFIRE_OUTAGE_METHOD=event_probability|aai_ratio`
+- `CRP_WILDFIRE_OUTAGE_METHOD=event_probability`
 
 Notes:
 - With dynamic location (`CRP_PLANIT_LAT/LON`), pipeline uses live results without CSV backfill.

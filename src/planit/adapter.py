@@ -58,8 +58,6 @@ class PLANiTAdapter:
     -------------------
     * Wildfire (CLIMADA event probability):
         ``outage_rate = annual_event_frequency × outage_probability × (outage_duration_hours / hours_per_year)``
-      Fallback (if event-frequency metadata missing and fallback enabled):
-        ``outage_rate = aai_krw / total_asset_value_krw``
     * Drought (PhysRisk impact_mean):
         ``capacity_derate = impact_mean × drought_severity_scale``
     * Water Risk (PhysRisk impact_mean):
@@ -157,7 +155,7 @@ class PLANiTAdapter:
                 alt_wf_freq = self._interpolate_hazard(
                     wf_frequency_rows.get(alt, []), target_year, 0.0
                 )
-                if alt_wf_val is None and alt_wf_freq is None:
+                if alt_wf_freq is None:
                     continue
                 wf_val = alt_wf_val
                 wf_freq = alt_wf_freq
@@ -185,15 +183,13 @@ class PLANiTAdapter:
                 )
                 if wf_freq_source:
                     notes_parts.append(f"wildfire_freq_source={wf_freq_source}")
-            else:
-                notes_parts.append(f"wildfire_aai={wf_val:.0f}")
-                if wf_method == "aai_ratio_fallback":
-                    notes_parts.append("wildfire_method_fallback=aai_ratio")
             if wf_source_scenario != ssp:
                 notes_parts.append(f"wildfire_source_scenario={wf_source_scenario}")
         elif "outage_rate" in baseline:
             outage_rate = baseline["outage_rate"]
             notes_parts.append("wildfire=csv_fallback")
+        else:
+            notes_parts.append("wildfire_frequency_missing")
 
         # --- Drought (PhysRisk) → capacity_derate ---
         dr_rows = by_hazard_scenario.get("drought", {})
@@ -275,10 +271,10 @@ class PLANiTAdapter:
 
     def _compute_wildfire_outage_rate(
         self,
-        wildfire_aai: Optional[float],
+        _wildfire_legacy_value: Optional[float],
         event_frequency_per_year: Optional[float],
     ) -> Tuple[Optional[float], Optional[str]]:
-        """Compute wildfire outage_rate using configured method."""
+        """Compute wildfire outage_rate using event-frequency probability method."""
         method = str(self._config.wildfire_outage_method).strip().lower()
 
         if method == "event_probability" and event_frequency_per_year is not None:
@@ -287,14 +283,6 @@ class PLANiTAdapter:
             hours_per_year = max(1.0, float(self._config.hours_per_year))
             outage_rate = event_frequency_per_year * outage_prob * (outage_hours / hours_per_year)
             return min(1.0, max(0.0, outage_rate)), "event_probability"
-
-        if wildfire_aai is not None:
-            if method == "aai_ratio":
-                outage_rate = wildfire_aai / self._config.total_asset_value_krw
-                return min(1.0, max(0.0, outage_rate)), "aai_ratio"
-            if self._config.wildfire_allow_aai_fallback:
-                outage_rate = wildfire_aai / self._config.total_asset_value_krw
-                return min(1.0, max(0.0, outage_rate)), "aai_ratio_fallback"
 
         return None, None
 

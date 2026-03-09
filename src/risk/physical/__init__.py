@@ -98,7 +98,7 @@ def get_physical_risk_from_planit(
     Returns
     -------
     PhysicalAdjustments with:
-    - outage_rate: from CLIMADA wildfire AAI
+    - outage_rate: from CLIMADA wildfire event frequency
     - capacity_derate: 0.0 (drought removed)
     - efficiency_loss: from TemperatureModel (temperature + heat waves)
     - water_constrained_capacity: 1.0 (water_risk removed)

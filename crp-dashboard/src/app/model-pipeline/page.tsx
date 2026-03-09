@@ -249,7 +249,7 @@ export default function ModelPipelinePage() {
                 <div className="flex items-start gap-2">
                   <span className="font-mono text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded flex-shrink-0">Wildfire</span>
                   <span className="text-slate-600">
-                    CLIMADA-computed Annual Average Impact (AAI) per SSP × year anchor.
+                    CLIMADA wildfire event frequency metadata per SSP × year anchor.
                     CSV: <code className="text-xs bg-slate-200 px-1 rounded">wildfire_results_*.csv</code>
                   </span>
                 </div>
@@ -302,7 +302,7 @@ export default function ModelPipelinePage() {
                   <div className="space-y-3">
                     <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-center">
                       <p className="text-xs font-semibold text-red-700">CLIMADA</p>
-                      <p className="text-xs text-red-600 mt-1">Wildfire AAI</p>
+                      <p className="text-xs text-red-600 mt-1">Wildfire Event Frequency</p>
                     </div>
                     <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-center">
                       <p className="text-xs font-semibold text-amber-700">PhysRisk</p>
@@ -349,16 +349,16 @@ export default function ModelPipelinePage() {
             <div>
               <h3 className="text-sm font-semibold text-slate-700 mb-3">Conversion Formulas</h3>
               <EquationBlock
-                label="Wildfire: AAI → Outage Rate"
-                latex="\text{outage\_rate} = \frac{\text{AAI}}{4.879 \times 10^{12}} \quad \text{(asset-value normalization)}"
+                label="Wildfire: Event Frequency → Outage Rate"
+                latex="\text{outage\_rate} = f_{\text{event/yr}} \times p_{\text{outage|event}} \times \frac{h_{\text{outage}}}{8760}"
               />
               <EquationBlock
-                label="Drought: Impact Mean → Capacity Derate"
-                latex="\text{capacity\_derate} = \text{impact\_mean} \times 1.0"
+                label="Drought: Distribution Expected Impact → Capacity Derate"
+                latex="\text{capacity\_derate} = \mathbb{E}[\text{impact}] \times \text{drought\_severity\_scale}"
               />
               <EquationBlock
-                label="Water Risk: Impact Mean → Water Capacity"
-                latex="\text{water\_cap} = \max(0,\; 1 - \text{impact\_mean})"
+                label="Water Risk: Distribution Expected Impact → Water Capacity"
+                latex="\text{water\_cap} = \max(0,\; 1 - \mathbb{E}[\text{impact}])"
               />
             </div>
 

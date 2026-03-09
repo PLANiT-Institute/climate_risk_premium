@@ -128,13 +128,12 @@ class TestConversionFormulas:
         assert abs(adj["outage_rate"] - expected) < 1e-12
         assert "wildfire_freq_source=event_count/reference_years" in adj["notes"]
 
-    def test_wildfire_aai_to_outage_rate(self, adapter, default_config):
-        """Wildfire falls back to AAI/asset when frequency metadata is missing."""
-        aai = 1e9  # 1 billion KRW
-        results = [_make_result("wildfire", "ssp585", 2050, aai, unit="krw", source="climada")]
+    def test_wildfire_requires_frequency_metadata(self, adapter):
+        """Wildfire returns zero when frequency metadata is unavailable."""
+        results = [_make_result("wildfire", "ssp585", 2050, 1e9, unit="krw", source="climada")]
         adj = adapter.convert(results, 2050, "RCP8.5")
-        expected = aai / default_config.total_asset_value_krw
-        assert abs(adj["outage_rate"] - expected) < 1e-12
+        assert adj["outage_rate"] == 0.0
+        assert "wildfire_frequency_missing" in adj["notes"]
 
     def test_drought_converts_to_capacity_derate(self, adapter):
         """Drought impact_mean → capacity_derate."""
@@ -196,9 +195,12 @@ class TestConversionFormulas:
 
     def test_multi_hazard_conversion(self, adapter, default_config):
         """All active hazards are processed together."""
-        aai = 2e9
+        wf_freq = 1.4
         results = [
-            _make_result("wildfire", "ssp585", 2050, aai, unit="krw", source="climada"),
+            _make_result(
+                "wildfire", "ssp585", 2050, 0.0, unit="krw", source="climada",
+                event_frequency_per_year=wf_freq,
+            ),
             _make_result("flood", "ssp585", 2050, 0.003),
             _make_result("drought", "ssp585", 2050, 0.01),
             _make_result("heatwave", "ssp585", 2050, 0.005),
@@ -206,7 +208,11 @@ class TestConversionFormulas:
         ]
         adj = adapter.convert(results, 2050, "RCP8.5")
 
-        expected_outage = aai / default_config.total_asset_value_krw
+        expected_outage = (
+            wf_freq
+            * default_config.wildfire_outage_probability
+            * (default_config.wildfire_outage_duration_hours / default_config.hours_per_year)
+        )
         assert abs(adj["outage_rate"] - expected_outage) < 1e-10
         assert abs(adj["capacity_derate"] - 0.01) < 1e-12  # drought
         assert adj["efficiency_loss"] == 0.0  # heatwave not active
@@ -214,8 +220,12 @@ class TestConversionFormulas:
 
     def test_notes_indicate_planit_source(self, adapter):
         """Notes indicate PLANiT source."""
-        aai = 1e9
-        results = [_make_result("wildfire", "ssp585", 2050, aai, unit="krw", source="climada")]
+        results = [
+            _make_result(
+                "wildfire", "ssp585", 2050, 0.0, unit="krw", source="climada",
+                event_frequency_per_year=1.0,
+            )
+        ]
         adj = adapter.convert(results, 2050, "RCP8.5")
         assert "PLANiT" in adj["notes"]
         assert "ssp585" in adj["notes"]
@@ -229,64 +239,114 @@ class TestYearInterpolation:
 
     def test_exact_anchor_year(self, adapter, default_config):
         """Exact anchor year returns that value for wildfire."""
-        aai = 2e9  # 2 billion KRW
-        results = [_make_result("wildfire", "ssp585", 2050, aai, unit="krw", source="climada")]
+        wf_freq = 0.8
+        results = [
+            _make_result(
+                "wildfire", "ssp585", 2050, 0.0, unit="krw", source="climada",
+                event_frequency_per_year=wf_freq,
+            )
+        ]
         adj = adapter.convert(results, 2050, "RCP8.5")
-        expected = aai / default_config.total_asset_value_krw
+        expected = (
+            wf_freq
+            * default_config.wildfire_outage_probability
+            * (default_config.wildfire_outage_duration_hours / default_config.hours_per_year)
+        )
         assert abs(adj["outage_rate"] - expected) < 1e-12
 
     def test_between_anchors(self, adapter, default_config):
         """Interpolates linearly between anchors for wildfire."""
-        aai_2030 = 1e9
-        aai_2050 = 3e9
+        f_2030 = 0.5
+        f_2050 = 1.5
         results = [
-            _make_result("wildfire", "ssp585", 2030, aai_2030, unit="krw", source="climada"),
-            _make_result("wildfire", "ssp585", 2050, aai_2050, unit="krw", source="climada"),
+            _make_result(
+                "wildfire", "ssp585", 2030, 0.0, unit="krw", source="climada",
+                event_frequency_per_year=f_2030,
+            ),
+            _make_result(
+                "wildfire", "ssp585", 2050, 0.0, unit="krw", source="climada",
+                event_frequency_per_year=f_2050,
+            ),
         ]
         adj = adapter.convert(results, 2040, "RCP8.5")
-        # midpoint: (1e9 + 3e9) / 2 = 2e9
-        expected = 2e9 / default_config.total_asset_value_krw
+        expected_freq = 1.0
+        expected = (
+            expected_freq
+            * default_config.wildfire_outage_probability
+            * (default_config.wildfire_outage_duration_hours / default_config.hours_per_year)
+        )
         assert abs(adj["outage_rate"] - expected) < 1e-12
 
     def test_before_first_anchor_blends_from_baseline(self, adapter, default_config):
         """Year before first anchor blends from baseline (2024) to first anchor."""
-        aai_2030 = 1.2e9
-        results = [_make_result("wildfire", "ssp585", 2030, aai_2030, unit="krw", source="climada")]
+        f_2030 = 1.2
+        results = [
+            _make_result(
+                "wildfire", "ssp585", 2030, 0.0, unit="krw", source="climada",
+                event_frequency_per_year=f_2030,
+            )
+        ]
         csv_baseline = {"outage_rate": 0.0}
         adj = adapter.convert(results, 2027, "RCP8.5", csv_baseline)
-        # weight = (2027 - 2024) / (2030 - 2024) = 3/6 = 0.5
-        # value = 0.0 + 0.5 * (aai_2030 - 0.0) = 0.6e9
-        expected = 0.6e9 / default_config.total_asset_value_krw
+        expected_freq = 0.6  # half-way from 0.0 to 1.2
+        expected = (
+            expected_freq
+            * default_config.wildfire_outage_probability
+            * (default_config.wildfire_outage_duration_hours / default_config.hours_per_year)
+        )
         assert abs(adj["outage_rate"] - expected) < 1e-12
 
     def test_at_2024_returns_zero_baseline(self, adapter):
         """Year 2024 returns zero (PLANiT blending starts from 0 at 2024)."""
-        aai = 1e9
-        results = [_make_result("wildfire", "ssp585", 2030, aai, unit="krw", source="climada")]
+        results = [
+            _make_result(
+                "wildfire", "ssp585", 2030, 0.0, unit="krw", source="climada",
+                event_frequency_per_year=1.0,
+            )
+        ]
         adj = adapter.convert(results, 2024, "RCP8.5")
         assert adj["outage_rate"] == 0.0
 
     def test_after_last_anchor_holds(self, adapter, default_config):
         """Year after last anchor holds the last value."""
-        aai = 4e9
-        results = [_make_result("wildfire", "ssp585", 2060, aai, unit="krw", source="climada")]
+        wf_freq = 1.7
+        results = [
+            _make_result(
+                "wildfire", "ssp585", 2060, 0.0, unit="krw", source="climada",
+                event_frequency_per_year=wf_freq,
+            )
+        ]
         adj = adapter.convert(results, 2070, "RCP8.5")
-        expected = aai / default_config.total_asset_value_krw
+        expected = (
+            wf_freq
+            * default_config.wildfire_outage_probability
+            * (default_config.wildfire_outage_duration_hours / default_config.hours_per_year)
+        )
         assert abs(adj["outage_rate"] - expected) < 1e-12
 
     def test_yearly_arrays(self, adapter, default_config):
         """convert_yearly produces correct length and interpolated arrays."""
-        aai_2030 = 1e9
-        aai_2050 = 2e9
+        f_2030 = 1.0
+        f_2050 = 2.0
         results = [
-            _make_result("wildfire", "ssp585", 2030, aai_2030, unit="krw", source="climada"),
-            _make_result("wildfire", "ssp585", 2050, aai_2050, unit="krw", source="climada"),
+            _make_result(
+                "wildfire", "ssp585", 2030, 0.0, unit="krw", source="climada",
+                event_frequency_per_year=f_2030,
+            ),
+            _make_result(
+                "wildfire", "ssp585", 2050, 0.0, unit="krw", source="climada",
+                event_frequency_per_year=f_2050,
+            ),
         ]
         arrays = adapter.convert_yearly(results, 2024, 2060, "RCP8.5")
         assert len(arrays["years"]) == 37  # 2024..2060 inclusive
         assert arrays["outage_rates"][0] == 0.0  # baseline at 2024
-        # 2040 is index 16 (2040 - 2024), midpoint value = 1.5e9
-        expected = 1.5e9 / default_config.total_asset_value_krw
+        expected_freq = 1.5
+        expected = (
+            expected_freq
+            * default_config.wildfire_outage_probability
+            * (default_config.wildfire_outage_duration_hours / default_config.hours_per_year)
+        )
         assert abs(arrays["outage_rates"][16] - expected) < 1e-12
 
     def test_duplicate_year_rows_are_averaged(self, default_config):
@@ -333,7 +393,12 @@ class TestFallback:
 
     def test_wildfire_scenario_mismatch_uses_fallback(self, adapter):
         """Wildfire scenario mismatch uses deterministic fallback SSP."""
-        results = [_make_result("wildfire", "ssp245", 2050, 1e9, unit="krw", source="climada")]
+        results = [
+            _make_result(
+                "wildfire", "ssp245", 2050, 0.0, unit="krw", source="climada",
+                event_frequency_per_year=1.0,
+            )
+        ]
         adj = adapter.convert(results, 2050, "RCP8.5")
         assert adj["outage_rate"] > 0.0
         assert "wildfire_scenario_fallback=ssp245" in adj["notes"]
@@ -399,25 +464,29 @@ class TestConfig:
     def test_defaults_all_hazards(self):
         """Config defaults to all available hazards."""
         cfg = PLANiTIntegrationConfig()
-        assert cfg.total_asset_value_krw == 4.879e12
         assert cfg.target_asset == "삼척화력발전소"
         assert cfg.planit_hazards == ["wildfire", "drought", "water_risk"]
         assert cfg.csv_fallback_hazards == []
+        assert cfg.wildfire_outage_method == "event_probability"
 
     def test_custom_config(self):
         cfg = PLANiTIntegrationConfig(
-            total_asset_value_krw=1e12,
+            wildfire_outage_probability=0.2,
         )
-        assert cfg.total_asset_value_krw == 1e12
+        assert cfg.wildfire_outage_probability == 0.2
 
-    def test_wildfire_with_custom_asset_value(self, default_config):
-        """Wildfire conversion respects custom asset value."""
-        config = PLANiTIntegrationConfig(total_asset_value_krw=1e12)
+    def test_wildfire_with_custom_probability(self):
+        """Wildfire conversion respects custom outage probability."""
+        config = PLANiTIntegrationConfig(wildfire_outage_probability=0.25)
         adapter = PLANiTAdapter(config)
-        aai = 1e9  # 1 billion KRW
-        results = [_make_result("wildfire", "ssp585", 2050, aai, unit="krw", source="climada")]
+        results = [
+            _make_result(
+                "wildfire", "ssp585", 2050, 0.0, unit="krw", source="climada",
+                event_frequency_per_year=1.0,
+            )
+        ]
         adj = adapter.convert(results, 2050, "RCP8.5")
-        expected = aai / 1e12  # 0.001
+        expected = 0.25 * (config.wildfire_outage_duration_hours / config.hours_per_year)
         assert abs(adj["outage_rate"] - expected) < 1e-12
 
 
@@ -499,27 +568,23 @@ class TestWildfireVulnerability:
         vuln = WildfireVulnerability()
         assert vuln.calculate_damage_ratio(10000) > 0.99
 
-    def test_aai_calculation(self):
-        """AAI calculation with event distribution."""
-        from src.planit.vulnerability import WildfireVulnerability
-        vuln = WildfireVulnerability()
-        # 10% chance of FWI=500 event
-        aai = vuln.calculate_aai(1e12, {500: 0.10})
-        # damage_ratio at FWI=500 ≈ 0.60
-        expected = 1e12 * vuln.calculate_damage_ratio(500) * 0.10
-        assert abs(aai - expected) < 1e-6
-
-    def test_aai_to_outage_rate_conversion(self):
-        """AAI to outage_rate conversion."""
-        from src.planit.vulnerability import wildfire_aai_to_outage_rate
-        rate = wildfire_aai_to_outage_rate(1e9, 4.879e12)
-        expected = 1e9 / 4.879e12
+    def test_event_frequency_to_outage_rate_conversion(self):
+        """Event frequency converts to outage_rate."""
+        from src.planit.vulnerability import wildfire_event_frequency_to_outage_rate
+        rate = wildfire_event_frequency_to_outage_rate(
+            annual_event_frequency_per_year=1.0,
+            outage_probability=0.10,
+            outage_duration_hours=24.0,
+            hours_per_year=8760.0,
+        )
+        expected = 0.10 * (24.0 / 8760.0)
         assert abs(rate - expected) < 1e-15
 
-    def test_aai_to_outage_rate_zero_asset_value(self):
-        """Zero asset value should return 0."""
-        from src.planit.vulnerability import wildfire_aai_to_outage_rate
-        assert wildfire_aai_to_outage_rate(1e9, 0) == 0.0
+    def test_event_frequency_to_outage_rate_clamps(self):
+        """Outage-rate helper clamps invalid values."""
+        from src.planit.vulnerability import wildfire_event_frequency_to_outage_rate
+        # Negative inputs should be clamped to 0.
+        assert wildfire_event_frequency_to_outage_rate(-1.0, -0.5, -10.0, 0.0) == 0.0
 
     def test_damage_curve_output(self):
         """Damage curve returns valid data points."""
@@ -568,7 +633,7 @@ class TestCSVLoader:
         assert all(r.source == "physrisk" for r in drought)
 
     def test_wildfire_replicated_across_anchors(self):
-        """Wildfire AAI replicated across all anchor years."""
+        """Wildfire rows replicated across all anchor years."""
         from src.planit.runner import PLANiTRunner
         from pathlib import Path
         results_dir = str(Path(__file__).parent.parent / "Physicalrisk_PLANiT/data/results")

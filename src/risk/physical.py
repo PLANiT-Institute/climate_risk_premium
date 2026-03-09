@@ -1,7 +1,7 @@
 """
 Physical risk adjustments (wildfire, drought, water risk).
 
-PLANiT is the sole physical risk source.  CLIMADA (wildfire AAI) and
+PLANiT is the sole physical risk source.  CLIMADA (wildfire event frequency) and
 PhysRisk (drought/water_risk impact_mean) results are loaded from
 pre-computed CSVs and converted via the PLANiT adapter.
 """

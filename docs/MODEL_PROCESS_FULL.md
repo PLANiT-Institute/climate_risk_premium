@@ -27,7 +27,7 @@
 `Physicalrisk_PLANiT/data/results/` 예시:
 
 - `wildfire_results_*.csv`
-  - `hazard_type, scenario, aai_krw, n_events, max_event_impact`
+  - `hazard_type, scenario, annual_frequency_per_year, n_events, years_covered`
 - `drought_results_*.csv`, `water_risk_results_*.csv`
   - `hazard_type, scenario, year, asset, impact_mean, impact_std`
 
@@ -82,9 +82,9 @@
 
 ### wildfire (CLIMADA)
 
-- 의미: 산불 위험으로 인한 연간 기대 손실(AAI, KRW)
+- 의미: 산불 이벤트의 연간 발생 빈도(및 이벤트 수)
 - 변환:
-  - `outage_rate = AAI_KRW / total_asset_value_krw`
+  - `outage_rate = annual_event_frequency_per_year × outage_probability × (outage_duration_hours / 8760)`
 - 코드: `src/planit/adapter.py`
 
 ### drought (PhysRisk)

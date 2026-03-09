@@ -211,9 +211,9 @@ Damage Ratio (%)
 
 ## Slide 8: From Damage to Financial Impact
 
-**Step 1: Calculate Annual Average Impact (AAI)**
+**Step 1: Calculate Annual Average Impact (Legacy Impact)**
 ```
-AAI = Σ (exposure_value × damage_ratio × annual_probability)
+Legacy Impact = Σ (exposure_value × damage_ratio × annual_probability)
 ```
 
 **Step 2: Convert to Outage Rate**
@@ -223,7 +223,7 @@ outage_rate = AAI_KRW / total_asset_value_KRW
 ```
 
 **Example (RCP8.5, 2050):**
-- CLIMADA returns AAI = 1.95 billion KRW
+- CLIMADA returns Legacy Impact = 1.95 billion KRW
 - outage_rate = 1.95B / 4,879B = 0.0004 = 0.04%
 - Interpretation: 0.04% of annual generation lost to wildfire
 
@@ -625,7 +625,7 @@ def run_hazard(self, hazard_type, scenarios):
 ```
 Level 1: PLANiT Available
 ├── Run CLIMADA for wildfire
-├── Get AAI → convert to outage_rate
+├── Get Legacy Impact → convert to outage_rate
 └── Combine with Temperature Model
 
 Level 2: PLANiT Unavailable
@@ -796,14 +796,14 @@ class ImpfWildfire(ImpactFunc):
 
 ---
 
-## Slide 29: Annual Average Impact (AAI) Calculation
+## Slide 29: Annual Average Impact (Legacy Impact) Calculation
 
 ### From Damage Ratio to Expected Loss
 
-**AAI Formula (CLIMADA standard):**
+**Legacy Impact Formula (CLIMADA standard):**
 
 ```
-AAI = Σᵢ [ E × DR(Iᵢ) × P(Iᵢ) ]
+Legacy Impact = Σᵢ [ E × DR(Iᵢ) × P(Iᵢ) ]
 
 Where:
 - E = Exposure value (asset value in KRW)
@@ -827,8 +827,8 @@ Annual fire probability distribution (from FIRMS data):
 │  60+ (Ext)    │  0.01         │  5.6%+             │
 └─────────────────────────────────────────────────────┘
 
-AAI Calculation:
-AAI = 4.879×10¹² × [(0.85 × 0.000024) + (0.10 × 0.0096)
+Legacy Impact Calculation:
+Legacy Impact = 4.879×10¹² × [(0.85 × 0.000024) + (0.10 × 0.0096)
                    + (0.04 × 0.021) + (0.01 × 0.056)]
     = 4.879×10¹² × [0.0000204 + 0.00096 + 0.00084 + 0.00056]
     = 4.879×10¹² × 0.002384
@@ -837,7 +837,7 @@ AAI = 4.879×10¹² × [(0.85 × 0.000024) + (0.10 × 0.0096)
 
 **Converting to Outage Rate:**
 ```
-outage_rate = AAI / E
+outage_rate = Legacy Impact / E
             = 11.63 × 10⁹ / 4.879 × 10¹²
             = 0.00238
             = 0.24% (baseline, no climate change)
@@ -859,10 +859,10 @@ FWI Intensity:       1.0x       1.3x       1.8x
 Fire Season Length:  150 days   +20 days   +40 days
 ```
 
-**Scaled AAI Formula:**
+**Scaled Legacy Impact Formula:**
 
 ```
-AAI(year, scenario) = AAI_baseline × CF_fire(year, scenario)
+Legacy Impact(year, scenario) = AAI_baseline × CF_fire(year, scenario)
 
 Where CF_fire is the climate factor:
 ┌────────────────────────────────────────────────┐
@@ -879,7 +879,7 @@ Where CF_fire is the climate factor:
 
 **Example (RCP8.5, 2050):**
 ```
-AAI(2050, RCP8.5) = 11.63 × 10⁹ × 1.80
+Legacy Impact(2050, RCP8.5) = 11.63 × 10⁹ × 1.80
                   = 20.93 billion KRW / year
 
 outage_rate(2050) = 20.93 × 10⁹ / 4.879 × 10¹²
@@ -1537,7 +1537,7 @@ Uncertainty Sources:
 
 ╭───────────────╮   ╭───────────────╮   ╭───────────────╮   ╭───────────────╮
 │ 🛰️ NASA FIRMS │   │ 🔥 CLIMADA    │   │ 📊 Normalize  │   │ 📈 Outage    │
-│ Satellite     │──►│ Wildfire      │──►│ AAI / CAPEX   │──►│ Rate: 0.43%  │
+│ Satellite     │──►│ Wildfire      │──►│ Legacy Impact / CAPEX   │──►│ Rate: 0.43%  │
 │ 2001-2023     │   │ ImpfWildfire  │   │               │   │              │
 ╰───────────────╯   ╰───────────────╯   ╰───────────────╯   ╰───────────────╯
 
@@ -1573,7 +1573,7 @@ Uncertainty Sources:
 
 | Term | Definition |
 |------|------------|
-| **AAI** | Annual Average Impact (expected loss per year) |
+| **Legacy Impact** | Annual Average Impact (expected loss per year) |
 | **CLIMADA** | CLIMate ADAptation - ETH Zurich risk model |
 | **FWI** | Fire Weather Index - fire danger metric |
 | **PhysRisk** | OS-Climate physical risk API |
