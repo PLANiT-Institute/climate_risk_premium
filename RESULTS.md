@@ -56,11 +56,8 @@ Example:
 - if annual frequency = 1.0 event/year,
 - outage_rate = 1.0 x 0.10 x (24/8760) = 0.000274 (0.0274%).
 
-Fallback (when frequency metadata is missing):
-
-```text
-outage_rate = wildfire_aai_krw / total_asset_value_krw
-```
+When frequency metadata is missing, wildfire outage is treated as 0.0
+(or explicit baseline fallback if provided in the calling context).
 
 ### 3.2 Drought -> capacity derate
 
@@ -111,7 +108,7 @@ For dynamic location mode, pipeline uses live rows directly (no CSV backfill).
 
 ## 6. Practical interpretation
 
-- This model is not forcing AAI into all hazards.
+- This model is not forcing wildfire risk through monetary-loss normalization.
 - Wildfire is treated as event-probability-driven outage when event frequency exists.
 - Drought/water-risk are treated as expected operational stress from PhysRisk distributions/means.
 - Financial impact is produced through the same cashflow/rating engine used for transition risk.

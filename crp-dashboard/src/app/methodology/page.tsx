@@ -8,9 +8,9 @@ const INPUT_TABLE = [
   { group: "Plant", item: "CAPEX", value: "4,900M USD", source: "data/raw/plant_parameters.csv" },
   { group: "Transition", item: "Policy scenarios", value: "baseline/moderate/aggressive", source: "data/raw/policy.csv" },
   { group: "Transition", item: "Enhanced plan", value: "11th plan trajectory", source: "data/raw/enhanced_korea_power_plan.csv" },
-  { group: "Physical", item: "Wildfire AAI", value: "CLIMADA output", source: "Physicalrisk_PLANiT/data/results/*.csv" },
-  { group: "Physical", item: "Drought impact_mean", value: "PhysRisk output", source: "Physicalrisk_PLANiT/data/results/*.csv" },
-  { group: "Physical", item: "Water impact_mean", value: "PhysRisk output", source: "Physicalrisk_PLANiT/data/results/*.csv" },
+  { group: "Physical", item: "Wildfire event frequency", value: "CLIMADA output", source: "Physicalrisk_PLANiT/data/results/*.csv" },
+  { group: "Physical", item: "Drought impact distribution", value: "PhysRisk output", source: "Physicalrisk_PLANiT/data/results/*.csv" },
+  { group: "Physical", item: "Water risk impact distribution", value: "PhysRisk output", source: "Physicalrisk_PLANiT/data/results/*.csv" },
 ];
 
 export default function MethodologyPage() {
@@ -44,16 +44,16 @@ Counterfactual Financing Impact (CRP in bps)`}</pre>
       <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
         <h2 className="text-lg font-semibold text-slate-800 mb-4">Physical Risk Conversion Equations</h2>
         <EquationBlock
-          label="Wildfire (CLIMADA AAI → outage_rate)"
-          latex="\text{outage\_rate} = \frac{AAI_{KRW}}{\text{total\_asset\_value}_{KRW}}"
+          label="Wildfire (CLIMADA event frequency → outage_rate)"
+          latex="\text{outage\_rate} = f_{\text{event/yr}} \times p_{\text{outage|event}} \times \frac{h_{\text{outage}}}{8760}"
         />
         <EquationBlock
-          label="Drought (PhysRisk impact_mean → derate)"
-          latex="\text{capacity\_derate} = \text{impact\_mean} \times \text{drought\_severity\_scale}"
+          label="Drought (PhysRisk expected impact → derate)"
+          latex="\text{capacity\_derate} = \mathbb{E}[\text{impact}] \times \text{drought\_severity\_scale}"
         />
         <EquationBlock
-          label="Water Risk (PhysRisk impact_mean → hard cap)"
-          latex="\text{water\_constrained\_capacity} = \max(0,\;1-\text{impact\_mean})"
+          label="Water Risk (PhysRisk expected impact → hard cap)"
+          latex="\text{water\_constrained\_capacity} = \max(0,\;1-\mathbb{E}[\text{impact}])"
         />
         <p className="text-xs text-slate-500 mt-3">
           Note: interpolation between anchor years is linear; pre-anchor years blend from baseline.

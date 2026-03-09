@@ -29,7 +29,7 @@ class PLANiTHazardResult:
     asset: str             # Asset name from PLANiT
     value: float           # Primary impact value
     std: float             # Standard deviation (0 if unavailable)
-    unit: str              # e.g. "krw" for AAI, "fraction" for impact_mean
+    unit: str              # e.g. "krw" for legacy monetary impact, "fraction" for impact_mean
     source: str            # "climada" or "physrisk"
     # Optional metadata used for probability-based outage conversion.
     event_frequency_per_year: Optional[float] = None
@@ -67,7 +67,7 @@ class PLANiTRunner:
     ``main`` module can be imported without installing it as a package.
     """
 
-    # CLIMADA hazards return AAI in KRW; PhysRisk hazards return impact_mean (fraction)
+    # CLIMADA wildfire rows include event-frequency metadata; PhysRisk rows return impact_mean (fraction)
     CLIMADA_HAZARDS = {"wildfire", "fire"}
     PHYSRISK_HAZARDS = {"drought", "flood", "heatwave", "coastal_inundation", "water_risk"}
 
@@ -566,13 +566,13 @@ class PLANiTRunner:
         """Load PLANiT results from pre-computed CSV files.
 
         This allows using PLANiT outputs without CLIMADA/PhysRisk installed.
-        Reads wildfire (CLIMADA AAI), drought, and water_risk (PhysRisk
+        Reads wildfire (CLIMADA event-frequency metadata), drought, and water_risk (PhysRisk
         impact_mean) CSVs from ``results_dir``.
 
         Args:
             results_dir: Path to ``Physicalrisk_PLANiT/data/results/``.
             target_asset: Korean asset name to filter PhysRisk rows.
-            anchor_years: Years to replicate wildfire AAI across
+            anchor_years: Years to replicate wildfire metadata rows across
                 (default: [2030, 2040, 2050, 2060]).
 
         Returns:
@@ -616,12 +616,12 @@ class PLANiTRunner:
                     return None
             return out
 
-        # --- Wildfire (CLIMADA): hazard_type, scenario, aai_krw ---
+        # --- Wildfire (CLIMADA): hazard_type, scenario, annual_frequency_per_year, n_events ---
         for p in sorted(rdir.glob("wildfire_results_*.csv")):
             with open(p, encoding="utf-8") as f:
                 for row in csv.DictReader(f):
                     scenario_raw = row.get("scenario", "").strip()
-                    aai = float(row.get("aai_krw", 0))
+                    legacy_impact = float(row.get("legacy_impact_krw", 0) or 0)
                     scenario = scenario_raw  # already "historical" / "ssp126"
                     annual_freq = _parse_optional_float(row, "annual_frequency_per_year")
                     event_count = _parse_optional_float(row, "n_events")
@@ -633,7 +633,7 @@ class PLANiTRunner:
                             scenario=scenario,
                             year=year,
                             asset=target_asset,
-                            value=aai,
+                            value=legacy_impact,
                             std=0.0,
                             unit="krw",
                             source="climada",
@@ -709,7 +709,7 @@ class PLANiTRunner:
     def _parse_climada_results(
         self, raw: Dict[str, Any], hazard: str, target_asset: str
     ) -> List[PLANiTHazardResult]:
-        """Parse CLIMADA wildfire results (AAI + event-frequency metadata)."""
+        """Parse CLIMADA wildfire results (event-frequency metadata)."""
         results = []
         def _to_optional_float(v: Any) -> Optional[float]:
             if v in (None, ""):
@@ -722,7 +722,7 @@ class PLANiTRunner:
         for scenario_key, scenario_data in raw.get("scenarios", {}).items():
             if "error" in scenario_data:
                 continue
-            aai = scenario_data.get("aai", 0.0)
+            legacy_impact = scenario_data.get("legacy_impact_krw", 0.0)
             annual_freq = _to_optional_float(scenario_data.get("annual_frequency_per_year"))
             event_count = _to_optional_float(scenario_data.get("n_events"))
             reference_years = _to_optional_float(scenario_data.get("years_covered"))
@@ -733,7 +733,7 @@ class PLANiTRunner:
                     scenario=scenario_key,
                     year=year,
                     asset=target_asset,
-                    value=float(aai),
+                    value=float(legacy_impact),
                     std=0.0,
                     unit="krw",
                     source="climada",

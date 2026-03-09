@@ -16,17 +16,17 @@ const HAZARD_NOTES = [
   {
     hazard: "Wildfire",
     source: "CLIMADA via PLANiT",
-    formula: "outage_rate = AAI_KRW / total_asset_value_krw",
+    formula: "outage_rate = annual_frequency × outage_probability × outage_duration_hours / hours_per_year",
   },
   {
     hazard: "Drought",
     source: "PhysRisk via PLANiT",
-    formula: "capacity_derate = impact_mean × drought_severity_scale",
+    formula: "capacity_derate = expected_impact_from_distribution × drought_severity_scale",
   },
   {
     hazard: "Water Risk",
     source: "PhysRisk via PLANiT",
-    formula: "water_constrained_capacity = max(0, 1 - impact_mean)",
+    formula: "water_constrained_capacity = max(0, 1 - expected_impact_from_distribution)",
   },
 ];
 

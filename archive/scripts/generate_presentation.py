@@ -597,7 +597,7 @@ def make_planit_framework(prs):
     # Pipeline diagram using shapes
     # Row 1: Data sources
     sources = [
-        ("CLIMADA\n(Wildfire AAI)", Inches(0.5)),
+        ("CLIMADA\n(Wildfire Legacy Impact)", Inches(0.5)),
         ("OS-Climate PhysRisk\n(Drought)", Inches(0.5)),
         ("OS-Climate PhysRisk\n(Water Risk)", Inches(0.5)),
     ]
@@ -801,8 +801,8 @@ def make_hazard_interpretation(prs):
     # Conversion table
     hazard_data = [
         ["Hazard", "Raw Output", "Conversion Formula", "Example"],
-        ["Wildfire", "AAI (KRW)",
-         "outage_rate = AAI / replacement_value (4.879T)",
+        ["Wildfire", "Legacy Impact (KRW)",
+         "outage_rate = Legacy Impact / replacement_value (4.879T)",
          "67.9M KRW \u2192 0.001%"],
         ["Drought", "impact_mean",
          "capacity_derate = impact_mean \u00d7 1.0",
@@ -864,7 +864,7 @@ def make_physical_scenarios(prs):
     comp_data = [
         ["Source", "Wildfire", "Flood", "Notes"],
         ["PLANiT (site-specific)", "0.001%", "n/a",
-         "CLIMADA AAI for Samcheok coordinates"],
+         "CLIMADA Legacy Impact for Samcheok coordinates"],
         ["Literature (Korea avg)", "0.055%", "0.003%",
          "Kim et al. 2025 / Kang & Lee 2024"],
         ["Ratio", "55x lower", "n/a",

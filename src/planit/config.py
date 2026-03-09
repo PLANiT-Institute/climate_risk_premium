@@ -15,7 +15,6 @@ class PLANiTIntegrationConfig:
         planit_config_path: Path to PLANiT's unified_config.yaml
         planit_results_dir: Path to pre-computed PLANiT result CSVs
         target_asset: Korean name of the target asset in PLANiT results
-        total_asset_value_krw: Total asset value in KRW (for AAI → rate conversion)
         cache_dir: Directory for cached PLANiT results
         cache_ttl_hours: Cache time-to-live in hours
         enabled: Whether PLANiT integration is active
@@ -26,7 +25,7 @@ class PLANiTIntegrationConfig:
         heat_efficiency_scale: Scaling factor for heatwave impact_mean → efficiency_loss
         flood_outage_scale: Scaling factor for flood impact_mean → outage_rate
         wildfire_outage_method: Wildfire outage conversion method
-            ("event_probability" or "aai_ratio")
+            ("event_probability")
         wildfire_outage_probability: Conditional probability that a wildfire
             event causes generation outage (0-1)
         wildfire_outage_duration_hours: Expected outage duration (hours) when
@@ -34,8 +33,6 @@ class PLANiTIntegrationConfig:
         hours_per_year: Hours used to convert expected outage hours to outage rate
         wildfire_frequency_reference_years: Reference years for inferring
             annual event frequency from event_count when frequency is missing
-        wildfire_allow_aai_fallback: Allow fallback to AAI/asset conversion
-            when event-frequency data is unavailable
         drought_use_distribution: Use PhysRisk impact distribution (if available)
             instead of raw impact_mean
         water_risk_use_distribution: Use PhysRisk impact distribution (if available)
@@ -44,7 +41,6 @@ class PLANiTIntegrationConfig:
     planit_config_path: str = "Physicalrisk_PLANiT/config/unified_config.yaml"
     planit_results_dir: str = "Physicalrisk_PLANiT/data/results"
     target_asset: str = "삼척화력발전소"
-    total_asset_value_krw: float = 4.879e12
     cache_dir: str = "data/cache/planit"
     cache_ttl_hours: float = 24.0
     enabled: bool = True
@@ -67,14 +63,13 @@ class PLANiTIntegrationConfig:
     wildfire_outage_duration_hours: float = 24.0
     hours_per_year: float = 8760.0
     wildfire_frequency_reference_years: float = 20.0
-    wildfire_allow_aai_fallback: bool = True
     drought_use_distribution: bool = True
     water_risk_use_distribution: bool = True
 
     def __post_init__(self) -> None:
         """Apply optional environment variable overrides."""
         raw = os.getenv("CRP_WILDFIRE_OUTAGE_METHOD", "").strip().lower()
-        if raw in {"event_probability", "aai_ratio"}:
+        if raw in {"event_probability"}:
             self.wildfire_outage_method = raw
 
         raw = os.getenv("CRP_WILDFIRE_OUTAGE_PROBABILITY", "").strip()
@@ -88,12 +83,6 @@ class PLANiTIntegrationConfig:
         raw = os.getenv("CRP_WILDFIRE_HOURS_PER_YEAR", "").strip()
         if raw:
             self.hours_per_year = max(1.0, float(raw))
-
-        raw = os.getenv("CRP_WILDFIRE_ALLOW_AAI_FALLBACK", "").strip().lower()
-        if raw in {"1", "true", "yes", "y", "on"}:
-            self.wildfire_allow_aai_fallback = True
-        elif raw in {"0", "false", "no", "n", "off"}:
-            self.wildfire_allow_aai_fallback = False
 
     def get_planit_config_path(self, base_dir: Optional[str] = None) -> Path:
         """Resolve absolute path to PLANiT config."""
