@@ -36,6 +36,7 @@ npm run build
 ## Vercel Deployment
 
 - Framework: Next.js (`vercel.json`)
+- Vercel project **Root Directory**: `crp-dashboard`
 - Region: `icn1`
 - Security headers are applied globally
 - Optional ISR revalidation endpoint: `POST /api/revalidate`

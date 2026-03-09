@@ -56,7 +56,9 @@ class PLANiTAdapter:
 
     Conversion formulas
     -------------------
-    * Wildfire (CLIMADA AAI):
+    * Wildfire (CLIMADA event probability):
+        ``outage_rate = annual_event_frequency × outage_probability × (outage_duration_hours / hours_per_year)``
+      Fallback (if event-frequency metadata missing and fallback enabled):
         ``outage_rate = aai_krw / total_asset_value_krw``
     * Drought (PhysRisk impact_mean):
         ``capacity_derate = impact_mean × drought_severity_scale``
@@ -100,16 +102,38 @@ class PLANiTAdapter:
         ssp = map_scenario(crp_scenario)
         baseline = csv_baseline or {}
 
-        # Group results by hazard → list of (year, value)
-        by_hazard: Dict[str, List[Tuple[int, float]]] = {}
+        # Group results by hazard/scenario → list of (year, value)
+        by_hazard_scenario: Dict[str, Dict[str, List[Tuple[int, float]]]] = {}
+        # Wildfire-specific frequency metadata for probability-based outage.
+        wf_frequency_rows: Dict[str, List[Tuple[int, float]]] = {}
+        wf_frequency_source: Dict[str, str] = {}
+        # PhysRisk distribution-derived expected impacts and disruption probabilities.
+        dist_expected_rows: Dict[str, Dict[str, List[Tuple[int, float]]]] = {
+            "drought": {},
+            "water_risk": {},
+        }
+        dist_prob_rows: Dict[str, Dict[str, List[Tuple[int, float]]]] = {
+            "drought": {},
+            "water_risk": {},
+        }
         target_asset = self._config.target_asset
         for r in results:
-            if r.scenario != ssp:
-                continue
             if target_asset and r.asset:
                 if target_asset not in r.asset and r.asset not in target_asset:
                     continue
-            by_hazard.setdefault(r.hazard_type, []).append((r.year, r.value))
+            hmap = by_hazard_scenario.setdefault(r.hazard_type, {})
+            hmap.setdefault(r.scenario, []).append((r.year, r.value))
+            if r.hazard_type == "wildfire":
+                wf_freq, wf_freq_source = self._extract_wildfire_frequency(r)
+                if wf_freq is not None:
+                    wf_frequency_rows.setdefault(r.scenario, []).append((r.year, wf_freq))
+                    wf_frequency_source.setdefault(r.scenario, wf_freq_source)
+            if r.hazard_type in dist_expected_rows:
+                d_expected, d_prob_nonzero = self._distribution_expected_and_prob_nonzero(r)
+                if d_expected is not None:
+                    dist_expected_rows[r.hazard_type].setdefault(r.scenario, []).append((r.year, d_expected))
+                if d_prob_nonzero is not None:
+                    dist_prob_rows[r.hazard_type].setdefault(r.scenario, []).append((r.year, d_prob_nonzero))
 
         outage_rate = 0.0
         capacity_derate = 0.0
@@ -118,28 +142,103 @@ class PLANiTAdapter:
         notes_parts: List[str] = []
 
         # --- Wildfire (CLIMADA) → outage_rate ---
-        wf_val = self._interpolate_hazard(
-            by_hazard.get("wildfire", []), target_year, baseline.get("outage_rate", 0.0)
-        )
-        if wf_val is not None:
-            outage_rate = wf_val / self._config.total_asset_value_krw
-            notes_parts.append(f"wildfire_aai={wf_val:.0f}")
+        wf_rows = by_hazard_scenario.get("wildfire", {})
+        wf_val = None
+        wf_freq = None
+        wf_source_scenario = ssp
+        wf_freq_source = None
+
+        # If requested SSP wildfire is missing, use deterministic fallback order.
+        if wf_rows:
+            for alt in self._wildfire_fallback_order(ssp):
+                alt_wf_val = self._interpolate_hazard(
+                    wf_rows.get(alt, []), target_year, baseline.get("outage_rate", 0.0)
+                )
+                alt_wf_freq = self._interpolate_hazard(
+                    wf_frequency_rows.get(alt, []), target_year, 0.0
+                )
+                if alt_wf_val is None and alt_wf_freq is None:
+                    continue
+                wf_val = alt_wf_val
+                wf_freq = alt_wf_freq
+                wf_source_scenario = alt
+                wf_freq_source = wf_frequency_source.get(alt)
+                if alt == ssp:
+                    break
+                notes_parts.append(f"wildfire_scenario_fallback={alt}")
+                logger.warning(
+                    "Wildfire scenario %s missing; using fallback scenario %s for year %s",
+                    ssp, alt, target_year,
+                )
+                break
+
+        wf_outage_rate, wf_method = self._compute_wildfire_outage_rate(wf_val, wf_freq)
+        if wf_outage_rate is not None:
+            outage_rate = wf_outage_rate
+            if wf_method == "event_probability":
+                notes_parts.append(f"wildfire_event_freq={wf_freq:.6f}/yr")
+                notes_parts.append(
+                    f"wildfire_outage_prob={self._config.wildfire_outage_probability:.3f}"
+                )
+                notes_parts.append(
+                    f"wildfire_outage_duration_h={self._config.wildfire_outage_duration_hours:.1f}"
+                )
+                if wf_freq_source:
+                    notes_parts.append(f"wildfire_freq_source={wf_freq_source}")
+            else:
+                notes_parts.append(f"wildfire_aai={wf_val:.0f}")
+                if wf_method == "aai_ratio_fallback":
+                    notes_parts.append("wildfire_method_fallback=aai_ratio")
+            if wf_source_scenario != ssp:
+                notes_parts.append(f"wildfire_source_scenario={wf_source_scenario}")
         elif "outage_rate" in baseline:
             outage_rate = baseline["outage_rate"]
             notes_parts.append("wildfire=csv_fallback")
 
         # --- Drought (PhysRisk) → capacity_derate ---
-        dr_val = self._interpolate_hazard(
-            by_hazard.get("drought", []), target_year, baseline.get("capacity_derate", 0.0)
+        dr_rows = by_hazard_scenario.get("drought", {})
+        dr_mean = self._interpolate_hazard(
+            dr_rows.get(ssp, []), target_year, baseline.get("capacity_derate", 0.0)
         )
+        dr_dist = self._interpolate_hazard(
+            dist_expected_rows["drought"].get(ssp, []), target_year, baseline.get("capacity_derate", 0.0)
+        )
+        dr_prob_nonzero = self._interpolate_hazard(
+            dist_prob_rows["drought"].get(ssp, []), target_year, 0.0
+        )
+        dr_val = dr_mean
+        if self._config.drought_use_distribution and dr_dist is not None:
+            dr_val = dr_dist
+            notes_parts.append("drought_metric=distribution_expected")
+            if dr_prob_nonzero is not None:
+                notes_parts.append(f"drought_prob_nonzero={dr_prob_nonzero:.4f}")
+        elif dr_mean is not None:
+            notes_parts.append("drought_metric=impact_mean")
         if dr_val is not None:
             capacity_derate = dr_val * self._config.drought_severity_scale
             notes_parts.append(f"drought_impact={dr_val:.6f}")
 
         # --- Water Risk (PhysRisk) → water_constrained_capacity ---
-        wr_val = self._interpolate_hazard(
-            by_hazard.get("water_risk", []), target_year, baseline.get("water_constrained_capacity_loss", 0.0)
+        wr_rows = by_hazard_scenario.get("water_risk", {})
+        wr_mean = self._interpolate_hazard(
+            wr_rows.get(ssp, []), target_year, baseline.get("water_constrained_capacity_loss", 0.0)
         )
+        wr_dist = self._interpolate_hazard(
+            dist_expected_rows["water_risk"].get(ssp, []),
+            target_year,
+            baseline.get("water_constrained_capacity_loss", 0.0),
+        )
+        wr_prob_nonzero = self._interpolate_hazard(
+            dist_prob_rows["water_risk"].get(ssp, []), target_year, 0.0
+        )
+        wr_val = wr_mean
+        if self._config.water_risk_use_distribution and wr_dist is not None:
+            wr_val = wr_dist
+            notes_parts.append("water_risk_metric=distribution_expected")
+            if wr_prob_nonzero is not None:
+                notes_parts.append(f"water_risk_prob_nonzero={wr_prob_nonzero:.4f}")
+        elif wr_mean is not None:
+            notes_parts.append("water_risk_metric=impact_mean")
         if wr_val is not None:
             water_constrained_capacity = max(0.0, 1.0 - wr_val)
             notes_parts.append(f"water_risk_impact={wr_val:.6f}")
@@ -151,6 +250,99 @@ class PLANiTAdapter:
             "water_constrained_capacity": water_constrained_capacity,
             "notes": f"PLANiT ({ssp} y{target_year}): " + ", ".join(notes_parts),
         }
+
+    def _extract_wildfire_frequency(
+        self, row: PLANiTHazardResult
+    ) -> Tuple[Optional[float], Optional[str]]:
+        """Extract annual wildfire event frequency per year from row metadata."""
+        if row.event_frequency_per_year is not None:
+            return max(0.0, float(row.event_frequency_per_year)), "annual_frequency_per_year"
+
+        if row.event_count is None:
+            return None, None
+
+        reference_years = row.reference_years
+        if reference_years is not None and reference_years > 0:
+            freq = float(row.event_count) / float(reference_years)
+            return max(0.0, freq), "event_count/reference_years"
+
+        fallback_years = float(self._config.wildfire_frequency_reference_years)
+        if fallback_years > 0:
+            freq = float(row.event_count) / fallback_years
+            return max(0.0, freq), f"event_count/{fallback_years:g}y"
+
+        return None, None
+
+    def _compute_wildfire_outage_rate(
+        self,
+        wildfire_aai: Optional[float],
+        event_frequency_per_year: Optional[float],
+    ) -> Tuple[Optional[float], Optional[str]]:
+        """Compute wildfire outage_rate using configured method."""
+        method = str(self._config.wildfire_outage_method).strip().lower()
+
+        if method == "event_probability" and event_frequency_per_year is not None:
+            outage_prob = min(1.0, max(0.0, float(self._config.wildfire_outage_probability)))
+            outage_hours = max(0.0, float(self._config.wildfire_outage_duration_hours))
+            hours_per_year = max(1.0, float(self._config.hours_per_year))
+            outage_rate = event_frequency_per_year * outage_prob * (outage_hours / hours_per_year)
+            return min(1.0, max(0.0, outage_rate)), "event_probability"
+
+        if wildfire_aai is not None:
+            if method == "aai_ratio":
+                outage_rate = wildfire_aai / self._config.total_asset_value_krw
+                return min(1.0, max(0.0, outage_rate)), "aai_ratio"
+            if self._config.wildfire_allow_aai_fallback:
+                outage_rate = wildfire_aai / self._config.total_asset_value_krw
+                return min(1.0, max(0.0, outage_rate)), "aai_ratio_fallback"
+
+        return None, None
+
+    @staticmethod
+    def _distribution_expected_and_prob_nonzero(
+        row: PLANiTHazardResult,
+    ) -> Tuple[Optional[float], Optional[float]]:
+        """Return expected impact and non-zero disruption probability from bins."""
+        edges = row.impact_bin_edges
+        probs = row.impact_probabilities
+        if not edges or not probs:
+            return None, None
+        n = min(len(probs), len(edges) - 1)
+        if n <= 0:
+            return None, None
+
+        expected = 0.0
+        prob_nonzero = 0.0
+        for i in range(n):
+            try:
+                p = max(0.0, float(probs[i]))
+                lo = float(edges[i])
+                hi = float(edges[i + 1])
+            except (ValueError, TypeError, IndexError):
+                return None, None
+            mid = 0.5 * (lo + hi)
+            expected += mid * p
+            if hi > 0.0:
+                prob_nonzero += p
+
+        return max(0.0, expected), min(1.0, max(0.0, prob_nonzero))
+
+    @staticmethod
+    def _wildfire_fallback_order(ssp: str) -> List[str]:
+        """Fallback order for missing wildfire SSP rows.
+
+        Rationale:
+        - Keep requested scenario first.
+        - Prefer adjacent/nearby SSP paths before historical.
+        - Avoid zeroing wildfire when CSV snapshots are sparse.
+        """
+        if ssp == "ssp585":
+            return ["ssp585", "ssp245", "ssp126", "historical"]
+        if ssp == "ssp245":
+            return ["ssp245", "ssp126", "historical"]
+        if ssp == "ssp126":
+            return ["ssp126", "historical"]
+        return [ssp, "ssp585", "ssp245", "ssp126", "historical"]
 
     def convert_yearly(
         self,
@@ -206,10 +398,12 @@ class PLANiTAdapter:
         if not year_values:
             return None
 
-        # Sort by year
-        sorted_pts = sorted(year_values, key=lambda x: x[0])
-        yrs = [p[0] for p in sorted_pts]
-        vals = [p[1] for p in sorted_pts]
+        # Sort and aggregate duplicate years (e.g., multiple grid assets).
+        buckets: Dict[int, List[float]] = {}
+        for year, value in year_values:
+            buckets.setdefault(int(year), []).append(float(value))
+        yrs = sorted(buckets.keys())
+        vals = [float(np.mean(buckets[y])) for y in yrs]
 
         # Before first anchor → blend from baseline
         if target_year <= 2024:

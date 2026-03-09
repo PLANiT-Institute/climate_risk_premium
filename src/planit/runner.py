@@ -6,6 +6,7 @@ import importlib
 import inspect
 import json
 import logging
+import math
 import os
 import pkgutil
 import sys
@@ -30,6 +31,14 @@ class PLANiTHazardResult:
     std: float             # Standard deviation (0 if unavailable)
     unit: str              # e.g. "krw" for AAI, "fraction" for impact_mean
     source: str            # "climada" or "physrisk"
+    # Optional metadata used for probability-based outage conversion.
+    event_frequency_per_year: Optional[float] = None
+    event_count: Optional[float] = None
+    reference_years: Optional[float] = None
+    impact_bin_edges: Optional[List[float]] = None
+    impact_probabilities: Optional[List[float]] = None
+    impact_exceedance_values: Optional[List[float]] = None
+    impact_exceedance_probabilities: Optional[List[float]] = None
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -41,6 +50,13 @@ class PLANiTHazardResult:
             "std": self.std,
             "unit": self.unit,
             "source": self.source,
+            "event_frequency_per_year": self.event_frequency_per_year,
+            "event_count": self.event_count,
+            "reference_years": self.reference_years,
+            "impact_bin_edges": self.impact_bin_edges,
+            "impact_probabilities": self.impact_probabilities,
+            "impact_exceedance_values": self.impact_exceedance_values,
+            "impact_exceedance_probabilities": self.impact_exceedance_probabilities,
         }
 
 
@@ -68,6 +84,7 @@ class PLANiTRunner:
         """Lazily add PLANiT src to sys.path and import main module."""
         if self._planit_main is not None:
             return
+        self._ensure_local_venv_site_packages()
         self._ensure_distutils_compat()
         self._ensure_pandas_deprecate_kwarg_compat()
         self._ensure_contextily_stamen_compat()
@@ -82,6 +99,18 @@ class PLANiTRunner:
         self._planit_load_config = planit_load_config
         self._planit_run = planit_run
         self._planit_main = True
+
+    def _ensure_local_venv_site_packages(self) -> None:
+        """Add local .venv site-packages to sys.path for live PLANiT imports."""
+        venv = Path(self._base_dir) / ".venv"
+        pyver = f"python{sys.version_info.major}.{sys.version_info.minor}"
+        candidates = [
+            venv / "lib" / pyver / "site-packages",
+            venv / "Lib" / "site-packages",
+        ]
+        for path in candidates:
+            if path.exists() and str(path) not in sys.path:
+                sys.path.insert(0, str(path))
 
     @staticmethod
     def _ensure_distutils_compat():
@@ -302,6 +331,7 @@ class PLANiTRunner:
         asset_name = os.getenv("CRP_PLANIT_ASSET_NAME", "user_input_site").strip() or "user_input_site"
         capacity_mw = float(os.getenv("CRP_PLANIT_CAPACITY_MW", "2100"))
         half_size_deg = float(os.getenv("CRP_PLANIT_SITE_HALF_SIZE_DEG", "0.01"))
+        include_grid = self._env_bool("CRP_PLANIT_INCLUDE_GRID", True)
 
         polygon = [
             [lon - half_size_deg, lat - half_size_deg],
@@ -310,20 +340,76 @@ class PLANiTRunner:
             [lon - half_size_deg, lat + half_size_deg],
             [lon - half_size_deg, lat - half_size_deg],
         ]
+        features: List[Dict[str, Any]] = [
+            {
+                "type": "Feature",
+                "properties": {
+                    "name": asset_name,
+                    "capacity_mw": capacity_mw,
+                    "type": "Coal/Steam/Recirculating",
+                    "source": "user_input",
+                },
+                "geometry": {"type": "Polygon", "coordinates": [polygon]},
+            }
+        ]
+
+        if include_grid:
+            substation_name = (
+                os.getenv("CRP_PLANIT_SUBSTATION_NAME", f"{asset_name}_substation").strip()
+                or f"{asset_name}_substation"
+            )
+            substation_voltage_kv = float(os.getenv("CRP_PLANIT_SUBSTATION_VOLTAGE_KV", "345"))
+            line_name = (
+                os.getenv("CRP_PLANIT_LINE_NAME", f"{asset_name} transmission corridor").strip()
+                or f"{asset_name} transmission corridor"
+            )
+
+            sub_lat_raw = os.getenv("CRP_PLANIT_SUBSTATION_LAT", "").strip()
+            sub_lon_raw = os.getenv("CRP_PLANIT_SUBSTATION_LON", "").strip()
+            if sub_lat_raw and sub_lon_raw:
+                try:
+                    sub_lat = float(sub_lat_raw)
+                    sub_lon = float(sub_lon_raw)
+                except ValueError:
+                    logger.warning(
+                        "Invalid CRP_PLANIT_SUBSTATION_LAT/LON; falling back to distance/bearing offset."
+                    )
+                    sub_lat_raw, sub_lon_raw = "", ""
+            if not sub_lat_raw or not sub_lon_raw:
+                distance_km = float(os.getenv("CRP_PLANIT_SUBSTATION_DISTANCE_KM", "30"))
+                bearing_deg = float(os.getenv("CRP_PLANIT_SUBSTATION_BEARING_DEG", "235"))
+                sub_lat, sub_lon = self._offset_lat_lon_km(lat, lon, distance_km, bearing_deg)
+
+            features.extend(
+                [
+                    {
+                        "type": "Feature",
+                        "properties": {
+                            "name": substation_name,
+                            "type": "substation",
+                            "source": "user_input",
+                            "voltage_kv": substation_voltage_kv,
+                        },
+                        "geometry": {"type": "Point", "coordinates": [sub_lon, sub_lat]},
+                    },
+                    {
+                        "type": "Feature",
+                        "properties": {
+                            "name": line_name,
+                            "type": "transmission_line",
+                            "source": "user_input",
+                        },
+                        "geometry": {
+                            "type": "LineString",
+                            "coordinates": [[lon, lat, 0.0], [sub_lon, sub_lat, 0.0]],
+                        },
+                    },
+                ]
+            )
+
         geojson = {
             "type": "FeatureCollection",
-            "features": [
-                {
-                    "type": "Feature",
-                    "properties": {
-                        "name": asset_name,
-                        "capacity_mw": capacity_mw,
-                        "type": "Coal/Steam/Recirculating",
-                        "source": "user_input",
-                    },
-                    "geometry": {"type": "Polygon", "coordinates": [polygon]},
-                }
-            ],
+            "features": features,
         }
 
         dynamic_geojson_path = self._config.get_cache_dir(self._base_dir) / "dynamic_site.geojson"
@@ -332,11 +418,39 @@ class PLANiTRunner:
 
         project = cfg.setdefault("project", {})
         project["geojson_source"] = str(dynamic_geojson_path)
-        self._config.target_asset = asset_name
+        target_mode = os.getenv(
+            "CRP_PLANIT_TARGET_ASSET_MODE",
+            "all" if include_grid else "plant",
+        ).strip().lower()
+        if target_mode in {"all", "aggregate", "grid"}:
+            self._config.target_asset = ""
+        else:
+            self._config.target_asset = asset_name
         logger.info(
-            "Applied dynamic location override for PLANiT (asset=%s, lat=%.6f, lon=%.6f)",
-            asset_name, lat, lon,
+            "Applied dynamic location override for PLANiT (asset=%s, lat=%.6f, lon=%.6f, include_grid=%s, target_mode=%s)",
+            asset_name, lat, lon, include_grid, target_mode,
         )
+
+    @staticmethod
+    def _env_bool(name: str, default: bool) -> bool:
+        """Parse common true/false env var forms."""
+        raw = os.getenv(name, "").strip().lower()
+        if not raw:
+            return default
+        if raw in {"1", "true", "yes", "y", "on"}:
+            return True
+        if raw in {"0", "false", "no", "n", "off"}:
+            return False
+        return default
+
+    @staticmethod
+    def _offset_lat_lon_km(lat: float, lon: float, distance_km: float, bearing_deg: float) -> tuple[float, float]:
+        """Approximate destination point using local km→degree conversion."""
+        theta = math.radians(bearing_deg)
+        d_lat = (distance_km / 111.0) * math.cos(theta)
+        cos_lat = max(1e-6, abs(math.cos(math.radians(lat))))
+        d_lon = (distance_km / (111.0 * cos_lat)) * math.sin(theta)
+        return lat + d_lat, lon + d_lon
 
     def run_hazard(
         self,
@@ -470,6 +584,38 @@ class PLANiTRunner:
         rdir = Path(results_dir)
         results: List[PLANiTHazardResult] = []
 
+        def _parse_optional_float(row: Dict[str, Any], key: str) -> Optional[float]:
+            raw = row.get(key, None)
+            if raw in (None, ""):
+                return None
+            try:
+                return float(raw)
+            except (ValueError, TypeError):
+                return None
+
+        def _parse_optional_float_list(row: Dict[str, Any], key: str) -> Optional[List[float]]:
+            raw = row.get(key, None)
+            if raw in (None, ""):
+                return None
+            values: Any = raw
+            if isinstance(values, str):
+                text = values.strip()
+                if not text:
+                    return None
+                try:
+                    values = json.loads(text)
+                except Exception:
+                    return None
+            if not isinstance(values, list):
+                return None
+            out: List[float] = []
+            for v in values:
+                try:
+                    out.append(float(v))
+                except (ValueError, TypeError):
+                    return None
+            return out
+
         # --- Wildfire (CLIMADA): hazard_type, scenario, aai_krw ---
         for p in sorted(rdir.glob("wildfire_results_*.csv")):
             with open(p, encoding="utf-8") as f:
@@ -477,6 +623,9 @@ class PLANiTRunner:
                     scenario_raw = row.get("scenario", "").strip()
                     aai = float(row.get("aai_krw", 0))
                     scenario = scenario_raw  # already "historical" / "ssp126"
+                    annual_freq = _parse_optional_float(row, "annual_frequency_per_year")
+                    event_count = _parse_optional_float(row, "n_events")
+                    reference_years = _parse_optional_float(row, "years_covered")
                     # Replicate across anchor years (CLIMADA has no year dim)
                     for year in anchor_years:
                         results.append(PLANiTHazardResult(
@@ -488,6 +637,9 @@ class PLANiTRunner:
                             std=0.0,
                             unit="krw",
                             source="climada",
+                            event_frequency_per_year=annual_freq,
+                            event_count=event_count,
+                            reference_years=reference_years,
                         ))
             break  # use newest file only
 
@@ -512,6 +664,10 @@ class PLANiTRunner:
 
                         impact_mean = float(row.get("impact_mean", 0))
                         impact_std = float(row.get("impact_std", 0))
+                        impact_bin_edges = _parse_optional_float_list(row, "impact_bin_edges")
+                        impact_probabilities = _parse_optional_float_list(row, "impact_probabilities")
+                        impact_exceedance_values = _parse_optional_float_list(row, "impact_exceedance_values")
+                        impact_exceedance_probabilities = _parse_optional_float_list(row, "impact_exceedance_probabilities")
 
                         results.append(PLANiTHazardResult(
                             hazard_type=hazard_name,
@@ -522,6 +678,10 @@ class PLANiTRunner:
                             std=impact_std,
                             unit="fraction",
                             source="physrisk",
+                            impact_bin_edges=impact_bin_edges,
+                            impact_probabilities=impact_probabilities,
+                            impact_exceedance_values=impact_exceedance_values,
+                            impact_exceedance_probabilities=impact_exceedance_probabilities,
                         ))
                 break  # use newest file only
 
@@ -549,12 +709,23 @@ class PLANiTRunner:
     def _parse_climada_results(
         self, raw: Dict[str, Any], hazard: str, target_asset: str
     ) -> List[PLANiTHazardResult]:
-        """Parse CLIMADA wildfire results (AAI per scenario)."""
+        """Parse CLIMADA wildfire results (AAI + event-frequency metadata)."""
         results = []
+        def _to_optional_float(v: Any) -> Optional[float]:
+            if v in (None, ""):
+                return None
+            try:
+                return float(v)
+            except (ValueError, TypeError):
+                return None
+
         for scenario_key, scenario_data in raw.get("scenarios", {}).items():
             if "error" in scenario_data:
                 continue
             aai = scenario_data.get("aai", 0.0)
+            annual_freq = _to_optional_float(scenario_data.get("annual_frequency_per_year"))
+            event_count = _to_optional_float(scenario_data.get("n_events"))
+            reference_years = _to_optional_float(scenario_data.get("years_covered"))
             # CLIMADA wildfire has no year dimension — apply to all anchor years
             for year in self._config.anchor_years:
                 results.append(PLANiTHazardResult(
@@ -566,6 +737,9 @@ class PLANiTRunner:
                     std=0.0,
                     unit="krw",
                     source="climada",
+                    event_frequency_per_year=annual_freq,
+                    event_count=event_count,
+                    reference_years=reference_years,
                 ))
         return results
 
@@ -574,6 +748,19 @@ class PLANiTRunner:
     ) -> List[PLANiTHazardResult]:
         """Parse PhysRisk results (impact_mean per scenario/year/asset)."""
         results = []
+        def _to_optional_float_list(values: Any) -> Optional[List[float]]:
+            if values is None:
+                return None
+            if not isinstance(values, list):
+                return None
+            out: List[float] = []
+            for v in values:
+                try:
+                    out.append(float(v))
+                except (ValueError, TypeError):
+                    return None
+            return out
+
         for entry in raw.get("asset_impacts", []):
             asset_name = entry.get("asset", "")
             # Match target asset (partial match on Korean name)
@@ -586,6 +773,10 @@ class PLANiTRunner:
             year = entry.get("year", 0)
             impact_mean = entry.get("impact_mean", 0.0)
             impact_std = entry.get("impact_std", 0.0)
+            impact_bin_edges = _to_optional_float_list(entry.get("impact_bin_edges"))
+            impact_probabilities = _to_optional_float_list(entry.get("impact_probabilities"))
+            impact_exceedance_values = _to_optional_float_list(entry.get("impact_exceedance_values"))
+            impact_exceedance_probabilities = _to_optional_float_list(entry.get("impact_exceedance_probabilities"))
 
             results.append(PLANiTHazardResult(
                 hazard_type=hazard,
@@ -596,6 +787,10 @@ class PLANiTRunner:
                 std=float(impact_std),
                 unit="fraction",
                 source="physrisk",
+                impact_bin_edges=impact_bin_edges,
+                impact_probabilities=impact_probabilities,
+                impact_exceedance_values=impact_exceedance_values,
+                impact_exceedance_probabilities=impact_exceedance_probabilities,
             ))
 
         return results
