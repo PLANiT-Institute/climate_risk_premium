@@ -28,7 +28,7 @@ def adapter(default_config):
     return PLANiTAdapter(default_config)
 
 
-def _make_result(hazard, scenario, year, value, unit="fraction", source="physrisk"):
+def _make_result(hazard, scenario, year, value, unit="fraction", source="physrisk", **extra):
     return PLANiTHazardResult(
         hazard_type=hazard,
         scenario=scenario,
@@ -38,6 +38,7 @@ def _make_result(hazard, scenario, year, value, unit="fraction", source="physris
         std=0.0,
         unit=unit,
         source=source,
+        **extra,
     )
 
 
@@ -67,6 +68,13 @@ class TestScenarioMapping:
         assert map_scenario("Rcp4.5") == "ssp245"
 
 
+class TestPlanitConfigEnvOverrides:
+    def test_wildfire_probability_env_override(self, monkeypatch):
+        monkeypatch.setenv("CRP_WILDFIRE_OUTAGE_PROBABILITY", "0.25")
+        cfg = PLANiTIntegrationConfig()
+        assert abs(cfg.wildfire_outage_probability - 0.25) < 1e-12
+
+
 # ===========================================================================
 # Conversion Formula Tests
 # ===========================================================================
@@ -74,8 +82,54 @@ class TestScenarioMapping:
 class TestConversionFormulas:
     """Test multi-hazard conversion (wildfire + drought + water_risk)."""
 
+    def test_wildfire_event_probability_to_outage_rate(self, adapter, default_config):
+        """Wildfire outage uses event-frequency probability method when metadata exists."""
+        results = [
+            _make_result(
+                "wildfire",
+                "ssp585",
+                2050,
+                1e9,
+                unit="krw",
+                source="climada",
+                event_frequency_per_year=1.2,
+            )
+        ]
+        adj = adapter.convert(results, 2050, "RCP8.5")
+        expected = (
+            1.2
+            * default_config.wildfire_outage_probability
+            * (default_config.wildfire_outage_duration_hours / default_config.hours_per_year)
+        )
+        assert abs(adj["outage_rate"] - expected) < 1e-12
+        assert "wildfire_event_freq=1.200000/yr" in adj["notes"]
+
+    def test_wildfire_event_count_infers_frequency(self, adapter, default_config):
+        """Wildfire event_count/reference_years can infer annual frequency."""
+        results = [
+            _make_result(
+                "wildfire",
+                "ssp585",
+                2050,
+                1e9,
+                unit="krw",
+                source="climada",
+                event_count=10,
+                reference_years=20,
+            )
+        ]
+        adj = adapter.convert(results, 2050, "RCP8.5")
+        expected_freq = 0.5
+        expected = (
+            expected_freq
+            * default_config.wildfire_outage_probability
+            * (default_config.wildfire_outage_duration_hours / default_config.hours_per_year)
+        )
+        assert abs(adj["outage_rate"] - expected) < 1e-12
+        assert "wildfire_freq_source=event_count/reference_years" in adj["notes"]
+
     def test_wildfire_aai_to_outage_rate(self, adapter, default_config):
-        """Wildfire AAI (KRW) → outage_rate = AAI / total_asset_value."""
+        """Wildfire falls back to AAI/asset when frequency metadata is missing."""
         aai = 1e9  # 1 billion KRW
         results = [_make_result("wildfire", "ssp585", 2050, aai, unit="krw", source="climada")]
         adj = adapter.convert(results, 2050, "RCP8.5")
@@ -88,11 +142,45 @@ class TestConversionFormulas:
         adj = adapter.convert(results, 2050, "RCP8.5")
         assert abs(adj["capacity_derate"] - 0.05) < 1e-12
 
+    def test_drought_distribution_expected_overrides_mean(self, adapter):
+        """If distribution is present, drought uses probability-weighted expected impact."""
+        results = [
+            _make_result(
+                "drought",
+                "ssp585",
+                2050,
+                0.05,
+                impact_bin_edges=[0.0, 0.2, 0.4],
+                impact_probabilities=[0.5, 0.5],
+            )
+        ]
+        adj = adapter.convert(results, 2050, "RCP8.5")
+        # Expected = 0.1*0.5 + 0.3*0.5 = 0.2
+        assert abs(adj["capacity_derate"] - 0.2) < 1e-12
+        assert "drought_metric=distribution_expected" in adj["notes"]
+
     def test_water_risk_converts_to_water_constraint(self, adapter):
         """Water risk impact_mean → water_constrained_capacity = 1 - impact."""
         results = [_make_result("water_risk", "ssp585", 2050, 0.1)]
         adj = adapter.convert(results, 2050, "RCP8.5")
         assert abs(adj["water_constrained_capacity"] - 0.9) < 1e-12
+
+    def test_water_distribution_expected_overrides_mean(self, adapter):
+        """If distribution is present, water risk uses probability-weighted expected impact."""
+        results = [
+            _make_result(
+                "water_risk",
+                "ssp585",
+                2050,
+                0.1,
+                impact_bin_edges=[0.0, 0.1, 0.3],
+                impact_probabilities=[0.25, 0.75],
+            )
+        ]
+        adj = adapter.convert(results, 2050, "RCP8.5")
+        # Expected = 0.05*0.25 + 0.2*0.75 = 0.1625
+        assert abs(adj["water_constrained_capacity"] - (1 - 0.1625)) < 1e-12
+        assert "water_risk_metric=distribution_expected" in adj["notes"]
 
     def test_heatwave_not_active(self, adapter):
         """Heatwave not in active hazards - efficiency_loss stays 0.0."""
@@ -201,6 +289,18 @@ class TestYearInterpolation:
         expected = 1.5e9 / default_config.total_asset_value_krw
         assert abs(arrays["outage_rates"][16] - expected) < 1e-12
 
+    def test_duplicate_year_rows_are_averaged(self, default_config):
+        """When multiple assets share same year/scenario, values are averaged."""
+        cfg = PLANiTIntegrationConfig(**default_config.__dict__)
+        cfg.target_asset = ""  # include all assets
+        adapter = PLANiTAdapter(cfg)
+        results = [
+            _make_result("drought", "ssp585", 2050, 0.01),
+            _make_result("drought", "ssp585", 2050, 0.03),
+        ]
+        adj = adapter.convert(results, 2050, "RCP8.5")
+        assert abs(adj["capacity_derate"] - 0.02) < 1e-12
+
 
 # ===========================================================================
 # Fallback Behavior Tests
@@ -231,12 +331,19 @@ class TestFallback:
         assert adj["efficiency_loss"] == 0.0
         assert adj["water_constrained_capacity"] == 1.0
 
-    def test_scenario_mismatch_falls_through(self, adapter):
-        """Results for wrong scenario are ignored."""
+    def test_wildfire_scenario_mismatch_uses_fallback(self, adapter):
+        """Wildfire scenario mismatch uses deterministic fallback SSP."""
         results = [_make_result("wildfire", "ssp245", 2050, 1e9, unit="krw", source="climada")]
         adj = adapter.convert(results, 2050, "RCP8.5")
-        # ssp245 doesn't match RCP8.5 → ssp585, so no data → defaults to 0
-        assert adj["outage_rate"] == 0.0
+        assert adj["outage_rate"] > 0.0
+        assert "wildfire_scenario_fallback=ssp245" in adj["notes"]
+        assert "wildfire_source_scenario=ssp245" in adj["notes"]
+
+    def test_non_wildfire_scenario_mismatch_keeps_defaults(self, adapter):
+        """Drought and water_risk do not use cross-SSP fallback."""
+        results = [_make_result("drought", "ssp245", 2050, 0.2)]
+        adj = adapter.convert(results, 2050, "RCP8.5")
+        assert adj["capacity_derate"] == 0.0
 
     def test_notes_indicate_csv_fallback(self, adapter):
         """Notes indicate csv_fallback when no wildfire data."""
@@ -469,6 +576,94 @@ class TestCSVLoader:
         wf_ssp126 = [r for r in results if r.hazard_type == "wildfire" and r.scenario == "ssp126"]
         years = {r.year for r in wf_ssp126}
         assert years == {2030, 2040, 2050, 2060}
+
+    def test_physrisk_distribution_columns_loaded_when_present(self, tmp_path):
+        """Optional PhysRisk distribution columns are parsed from CSV when present."""
+        from src.planit.runner import PLANiTRunner
+
+        drought_csv = tmp_path / "drought_results_20990101_000000.csv"
+        drought_csv.write_text(
+            "\n".join(
+                [
+                    "hazard_type,scenario,year,asset,impact_mean,impact_std,impact_bin_edges,impact_probabilities,impact_exceedance_values,impact_exceedance_probabilities",
+                    'drought,ssp585_2050,2050,삼척화력발전소,0.05,0.01,"[0.0, 0.2, 0.4]","[0.25, 0.75]","[0.1, 0.2, 0.3]","[0.9, 0.5, 0.1]"',
+                ]
+            ),
+            encoding="utf-8",
+        )
+
+        results = PLANiTRunner.load_results_from_csv(str(tmp_path))
+        drought_rows = [r for r in results if r.hazard_type == "drought" and r.scenario == "ssp585" and r.year == 2050]
+        assert len(drought_rows) == 1
+
+        row = drought_rows[0]
+        assert row.impact_bin_edges == [0.0, 0.2, 0.4]
+        assert row.impact_probabilities == [0.25, 0.75]
+        assert row.impact_exceedance_values == [0.1, 0.2, 0.3]
+        assert row.impact_exceedance_probabilities == [0.9, 0.5, 0.1]
+
+
+class TestDynamicLocationGeoJSON:
+    """Test dynamic location geojson generation with optional grid assets."""
+
+    def test_dynamic_location_includes_grid_by_default(self, tmp_path, monkeypatch):
+        from src.planit.runner import PLANiTRunner
+
+        cfg = PLANiTIntegrationConfig(cache_dir="data/cache/planit_test_dynamic")
+        runner = PLANiTRunner(cfg, base_dir=str(tmp_path))
+        planit_cfg = {"project": {}}
+
+        monkeypatch.setenv("CRP_PLANIT_LAT", "37.4404")
+        monkeypatch.setenv("CRP_PLANIT_LON", "129.1671")
+        monkeypatch.setenv("CRP_PLANIT_ASSET_NAME", "samcheok_dynamic")
+
+        runner._apply_dynamic_location_override(planit_cfg)
+
+        dynamic_geojson_path = cfg.get_cache_dir(str(tmp_path)) / "dynamic_site.geojson"
+        data = json.loads(dynamic_geojson_path.read_text(encoding="utf-8"))
+        features = data.get("features", [])
+        geom_types = sorted(f.get("geometry", {}).get("type", "") for f in features)
+
+        assert len(features) == 3
+        assert geom_types == ["LineString", "Point", "Polygon"]
+        assert cfg.target_asset == ""
+
+    def test_dynamic_location_grid_can_be_disabled(self, tmp_path, monkeypatch):
+        from src.planit.runner import PLANiTRunner
+
+        cfg = PLANiTIntegrationConfig(cache_dir="data/cache/planit_test_dynamic")
+        runner = PLANiTRunner(cfg, base_dir=str(tmp_path))
+        planit_cfg = {"project": {}}
+
+        monkeypatch.setenv("CRP_PLANIT_LAT", "37.4404")
+        monkeypatch.setenv("CRP_PLANIT_LON", "129.1671")
+        monkeypatch.setenv("CRP_PLANIT_ASSET_NAME", "samcheok_dynamic")
+        monkeypatch.setenv("CRP_PLANIT_INCLUDE_GRID", "0")
+
+        runner._apply_dynamic_location_override(planit_cfg)
+
+        dynamic_geojson_path = cfg.get_cache_dir(str(tmp_path)) / "dynamic_site.geojson"
+        data = json.loads(dynamic_geojson_path.read_text(encoding="utf-8"))
+        features = data.get("features", [])
+        geom_types = sorted(f.get("geometry", {}).get("type", "") for f in features)
+
+        assert len(features) == 1
+        assert geom_types == ["Polygon"]
+
+    def test_dynamic_location_target_mode_plant(self, tmp_path, monkeypatch):
+        from src.planit.runner import PLANiTRunner
+
+        cfg = PLANiTIntegrationConfig(cache_dir="data/cache/planit_test_dynamic")
+        runner = PLANiTRunner(cfg, base_dir=str(tmp_path))
+        planit_cfg = {"project": {}}
+
+        monkeypatch.setenv("CRP_PLANIT_LAT", "37.4404")
+        monkeypatch.setenv("CRP_PLANIT_LON", "129.1671")
+        monkeypatch.setenv("CRP_PLANIT_ASSET_NAME", "samcheok_dynamic")
+        monkeypatch.setenv("CRP_PLANIT_TARGET_ASSET_MODE", "plant")
+
+        runner._apply_dynamic_location_override(planit_cfg)
+        assert cfg.target_asset == "samcheok_dynamic"
 
 
 # ===========================================================================

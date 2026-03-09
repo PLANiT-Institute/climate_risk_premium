@@ -1,118 +1,123 @@
 # RESULTS.md
 
-## Project Result Deep Explanation
+## 1. What this file explains
 
-This document explains what the model produced, why those results occur, and how to interpret them for decision-making.
+This document explains:
 
-## 1) Scope of This Result Set
+1. What the current model run produced
+2. How physical risk inputs are converted into financial impacts
+3. Why transition scenarios dominate value loss in the current calibration
 
-- Asset: Samcheok Blue Power (2,100 MW coal)
-- Output source: `results/scenario_comparison.csv`, `results/credit_ratings.csv`
-- Run family: canonical frozen run currently tracked in this repository
+Primary source table: `results/scenario_comparison.csv`.
 
-The model combines:
+## 2. Scenario outcomes (current canonical outputs)
 
-- Transition channel: dispatch/pathway constraints and enhanced policy stress
-- Physical channel: PLANiT-based wildfire, drought, water risk adjustments
-- Financial channel: cashflow → DSCR/LLCR/NPV → rating → spread/WACC → CRP
+| Scenario | NPV (USD mn) | Delta vs Baseline (USD mn) | IRR | Min DSCR | Rating | Counterfactual CRP (bps) |
+|---|---:|---:|---:|---:|---|---:|
+| baseline | 4,628.9 | 0.0 | 16.51% | 2.56 | AA | -50 |
+| moderate_transition | 3,533.8 | -1,095.1 | 14.63% | 2.27 | AA | -50 |
+| aggressive_transition | 1,368.7 | -3,260.2 | 10.86% | 1.82 | A | 0 |
+| moderate_physical | 4,597.1 | -31.9 | 16.46% | 2.56 | AA | -50 |
+| high_physical | 4,563.3 | -65.7 | 16.39% | 2.55 | AA | -50 |
+| combined_moderate | 3,511.1 | -1,117.8 | 14.59% | 2.26 | AA | -50 |
+| combined_aggressive | 1,328.3 | -3,300.7 | 10.76% | 1.80 | A | 0 |
+| low_demand | 1,993.8 | -2,635.1 | 12.70% | 1.66 | A | 0 |
+| severe_drought | 4,606.8 | -22.2 | 16.49% | 2.56 | AA | -50 |
+| enhanced_11th_plan | -1,890.7 | -6,519.7 | -8.18% | -0.34 | CC | 1,020 |
+| enhanced_combined | -1,896.4 | -6,525.3 | -8.23% | -0.34 | CC | 1,020 |
 
-## 2) Headline Outcomes (Current Canonical Files)
+Summary:
+- Baseline to enhanced_combined swing is about **6,525.3 USD mn**.
+- Physical-only deltas are small relative to transition-policy deltas in this run.
 
-- Baseline NPV: **$4,628.9M**
-- Worst-case NPV (enhanced_combined): **-$1,895.9M**
-- Total value swing (best-to-worst): **$6,524.8M**
-- Baseline rating: **AA**
-- Severe policy rating: **CC**
-- Enhanced-policy counterfactual CRP: **1,020 bps**
+## 3. Physical risk conversion logic used in this repository
 
-Interpretation:
+The CRP model uses PLANiT as the physical-risk gateway.
 
-- The dominant loss mechanism is transition policy stress, not physical hazard stress.
-- Physical-only scenarios reduce value modestly in this calibration.
+- Wildfire data source: CLIMADA (through PLANiT)
+- Drought and water-risk data source: PhysRisk/OS-Climate (through PLANiT)
 
-## 3) Scenario-by-Scenario Reading
+### 3.1 Wildfire -> outage rate
 
-### Baseline
+Primary conversion in `src/planit/adapter.py`:
 
-- NPV: 4,628.9M
-- IRR: 16.51%
-- Avg DSCR: 2.99x
-- Rating: AA
+```text
+outage_rate = annual_event_frequency_per_year
+              x wildfire_outage_probability
+              x (wildfire_outage_duration_hours / hours_per_year)
+```
 
-Meaning: healthy project-finance profile under base assumptions.
+Default parameters (`src/planit/config.py`):
+- `wildfire_outage_probability = 0.10`
+- `wildfire_outage_duration_hours = 24`
+- `hours_per_year = 8760`
 
-### Transition stress
+Example:
+- if annual frequency = 1.0 event/year,
+- outage_rate = 1.0 x 0.10 x (24/8760) = 0.000274 (0.0274%).
 
-- `moderate_transition`: NPV **-1,095.1M** vs baseline
-- `aggressive_transition`: NPV **-3,260.2M** vs baseline
+Fallback (when frequency metadata is missing):
 
-Meaning: dispatch and policy pressure reduce earnings power directly, then propagate to lower coverage and weaker valuation.
+```text
+outage_rate = wildfire_aai_krw / total_asset_value_krw
+```
 
-### Physical stress (PLANiT path)
+### 3.2 Drought -> capacity derate
 
-- `moderate_physical`: NPV **-29.9M** vs baseline
-- `high_physical`: NPV **-63.3M** vs baseline
-- `severe_drought`: NPV **-19.8M** vs baseline
+When distribution is provided, model uses expected value from bins:
 
-Meaning: in the current parameterization, physical risk is present but second-order compared to transition policy effects.
+```text
+expected_impact = sum( midpoint(bin_i) x probability_i )
+capacity_derate = expected_impact x drought_severity_scale
+```
 
-### Combined stress
+If distribution is not available, it uses `impact_mean`.
 
-- `combined_moderate`: NPV 3,512.8M
-- `combined_aggressive`: NPV 1,329.7M
+### 3.3 Water risk -> constrained capacity
 
-Meaning: combined outcomes are close to transition-dominant behavior; physical deltas are relatively small around transition trajectories.
+```text
+expected_impact = sum( midpoint(bin_i) x probability_i )
+water_constrained_capacity = max(0, 1 - expected_impact)
+```
 
-### Enhanced 11th plan stress
+If distribution is not available, it uses `impact_mean`.
 
-- `enhanced_11th_plan`: NPV **-1,890.7M**, rating **CC**, CRP **1,020 bps**
-- `enhanced_combined`: NPV **-1,895.9M**, rating **CC**, CRP **1,020 bps**
+### 3.4 Time handling
 
-Meaning: when policy stress is severe enough, credit quality shifts to distress regime and cost of capital reprices sharply.
+PLANiT hazard anchors are interpolated linearly across years (default 2030/2040/2050/2060),
+with a baseline blend from year 2024 before first anchor.
 
-## 4) Why the Results Look Like This
+## 4. Why financial results move
 
-### 4.1 Mechanical chain in the model
+End-to-end chain:
 
-1. Risk assumptions lower effective generation or raise costs.
-2. EBITDA declines.
-3. DSCR/coverage weaken.
-4. Rating deteriorates.
-5. Spread and WACC rise.
-6. NPV and financing conditions worsen further.
+1. Physical and transition factors modify generation/cost assumptions.
+2. EBITDA and CFADS change.
+3. DSCR/LLCR move.
+4. Credit rating and spread move.
+5. WACC and valuation (NPV/IRR) move.
 
-This is the practical "credit feedback" loop captured in the pipeline.
+In this calibration, transition scenarios directly reduce dispatch/utilization over many years,
+so transition loss dominates physical-only loss.
 
-### 4.2 Why transition dominates in this run
+## 5. Live location behavior (validated)
 
-- Transition scenarios directly compress utilization over many years.
-- Enhanced plan stress can push coverage near/below debt-service comfort thresholds.
-- Physical-risk conversion terms (wildfire outage, drought derate, water cap) are non-zero but currently small relative to transition-induced cashflow compression.
+With:
+- `CRP_PLANIT_MODE=live`
+- `CRP_PLANIT_LAT/LON` provided
 
-## 5) What CRP Means Here
+the runner generates a dynamic site GeoJSON and executes PLANiT runtime calls for the input location.
+For dynamic location mode, pipeline uses live rows directly (no CSV backfill).
 
-This repository reports counterfactual CRP using an A-rated no-climate-risk reference.
+## 6. Practical interpretation
 
-- Counterfactual baseline spread: 150 bps (A)
-- Scenario spread comes from rating mapping
-- Financing layer computes WACC differential; CRP is expressed in bps
+- This model is not forcing AAI into all hazards.
+- Wildfire is treated as event-probability-driven outage when event frequency exists.
+- Drought/water-risk are treated as expected operational stress from PhysRisk distributions/means.
+- Financial impact is produced through the same cashflow/rating engine used for transition risk.
 
-So a large CRP (e.g., 1,020 bps) should be read as a financing repricing signal under stressed climate-policy conditions.
+## 7. Validation status in this update
 
-## 6) Key Decision Insights
-
-- For near-term risk management, policy/transition monitoring is the primary lever.
-- Physical-risk live integration still matters for site-specific updates, but in current calibration it is not the first-order value driver.
-- Credit outcomes are nonlinear: rating can remain stable for mild stress, then fall quickly under stronger policy constraints.
-
-## 7) Limits and Cautions
-
-- Results are model- and calibration-dependent, not universal constants.
-- Physical module quality depends on PLANiT input coverage, scenario-year anchors, and asset matching.
-- Some values in dashboard views are presentation-focused; regulatory claims should rely on files under `results/` and frozen manifests under `paper_dev/`.
-
-## 8) Reproducibility Pointers
-
-- Run model output refresh: `python scripts/regenerate_dashboard_data.py`
-- Authoritative tables: `results/scenario_comparison.csv`, `results/credit_ratings.csv`
-- Full process doc: `docs/MODEL_PROCESS_FULL.md`
+- PLANiT integration tests: pass (`tests/test_planit_integration.py`)
+- CLIMADA integration tests: pass (`tests/test_climada_integration.py`)
+- Live smoke checks performed for wildfire, drought, water_risk with dynamic location inputs
