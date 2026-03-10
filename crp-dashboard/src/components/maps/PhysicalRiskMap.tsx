@@ -1,8 +1,9 @@
 "use client";
 
-import { MapContainer, TileLayer, LayersControl } from "react-leaflet";
-import { useEffect, useState } from "react";
-import type { FeatureCollection, Feature, Polygon, LineString, Point } from "geojson";
+import { MapContainer, TileLayer, LayersControl, useMap } from "react-leaflet";
+import { useEffect, useMemo, useState } from "react";
+import { latLngBounds } from "leaflet";
+import type { FeatureCollection, Feature, Polygon, LineString, Point, Position } from "geojson";
 import "leaflet/dist/leaflet.css";
 
 import PowerPlantLayer from "./layers/PowerPlantLayer";
@@ -24,6 +25,116 @@ interface Props {
   showControls?: boolean;
 }
 
+const DEFAULT_CENTER: [number, number] = [37.408, 129.174];
+const REGIONAL_LINE_THRESHOLD_KM = 90;
+const LOCAL_765_SEGMENT_RADIUS_KM = 22;
+
+function toLatLng(coord: Position): [number, number] {
+  return [coord[1], coord[0]];
+}
+
+function haversineKm(a: Position, b: Position): number {
+  const [lat1, lon1] = toLatLng(a);
+  const [lat2, lon2] = toLatLng(b);
+  const toRad = (deg: number) => (deg * Math.PI) / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const rLat1 = toRad(lat1);
+  const rLat2 = toRad(lat2);
+  const h =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(rLat1) * Math.cos(rLat2) * Math.sin(dLon / 2) ** 2;
+
+  return 6371 * (2 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h)));
+}
+
+function trimRegionalLine(feature: Feature<LineString, TransmissionLineProperties>) {
+  const coords = feature.geometry.coordinates;
+  if (coords.length < 2) return feature;
+
+  const start = coords[0];
+  const end = coords[coords.length - 1];
+  const spanKm = haversineKm(start, end);
+  if (spanKm <= REGIONAL_LINE_THRESHOLD_KM) return feature;
+
+  const localCoords: Position[] = [];
+  for (const coord of coords) {
+    const isLocal = haversineKm(start, coord) <= LOCAL_765_SEGMENT_RADIUS_KM;
+    if (isLocal || localCoords.length < 2) {
+      localCoords.push(coord);
+      continue;
+    }
+    break;
+  }
+
+  if (localCoords.length < 2 || localCoords.length === coords.length) return feature;
+
+  return {
+    ...feature,
+    properties: {
+      ...feature.properties,
+      name: feature.properties?.name || "765kV Regional Corridor (Local Segment)",
+    },
+    geometry: {
+      ...feature.geometry,
+      coordinates: localCoords,
+    },
+  };
+}
+
+interface AutoFitBoundsProps {
+  powerPlant?: Feature<Polygon, PowerPlantProperties>;
+  substation?: Feature<Point, SubstationProperties>;
+  transmissionRoute?: Feature<LineString, TransmissionLineProperties>;
+  transmission765kV?: Feature<LineString, TransmissionLineProperties>;
+}
+
+function AutoFitBounds({
+  powerPlant,
+  substation,
+  transmissionRoute,
+  transmission765kV,
+}: AutoFitBoundsProps) {
+  const map = useMap();
+
+  useEffect(() => {
+    const points: [number, number][] = [];
+
+    if (powerPlant) {
+      for (const ring of powerPlant.geometry.coordinates) {
+        for (const coord of ring) points.push([coord[1], coord[0]]);
+      }
+    }
+
+    if (substation) {
+      const [lon, lat] = substation.geometry.coordinates;
+      points.push([lat, lon]);
+    }
+
+    if (transmissionRoute) {
+      for (const coord of transmissionRoute.geometry.coordinates) {
+        points.push([coord[1], coord[0]]);
+      }
+    }
+
+    if (transmission765kV) {
+      for (const coord of transmission765kV.geometry.coordinates) {
+        points.push([coord[1], coord[0]]);
+      }
+    }
+
+    if (points.length < 2) return;
+
+    map.fitBounds(latLngBounds(points), {
+      padding: [20, 20],
+      maxZoom: 11,
+      animate: false,
+    });
+  }, [map, powerPlant, substation, transmissionRoute, transmission765kV]);
+
+  return null;
+}
+
 export default function PhysicalRiskMap({
   scenario,
   onScenarioChange,
@@ -42,25 +153,42 @@ export default function PhysicalRiskMap({
       .catch((err) => setError(err.message));
   }, []);
 
-  // Samcheok plant center coordinates
-  const center: [number, number] = [37.408, 129.174];
-
   // Parse features by type
-  const powerPlant = geoData?.features.find(
-    (f) => f.geometry.type === "Polygon" && f.properties?.capacity_mw
-  ) as Feature<Polygon, PowerPlantProperties> | undefined;
+  const powerPlant = useMemo(
+    () =>
+      geoData?.features.find(
+        (f) => f.geometry.type === "Polygon" && f.properties?.capacity_mw
+      ) as Feature<Polygon, PowerPlantProperties> | undefined,
+    [geoData]
+  );
 
-  const substation = geoData?.features.find(
-    (f) => f.geometry.type === "Point" && f.properties?.type === "substation"
-  ) as Feature<Point, SubstationProperties> | undefined;
+  const substation = useMemo(
+    () =>
+      geoData?.features.find(
+        (f) => f.geometry.type === "Point" && f.properties?.type === "substation"
+      ) as Feature<Point, SubstationProperties> | undefined,
+    [geoData]
+  );
 
-  const transmission765kV = geoData?.features.find(
-    (f) => f.geometry.type === "LineString" && f.properties?.voltage_kv === 765
-  ) as Feature<LineString, TransmissionLineProperties> | undefined;
+  const transmissionRoute = useMemo(
+    () =>
+      geoData?.features.find(
+        (f) => f.geometry.type === "LineString" && f.properties?.from && f.properties?.to
+      ) as Feature<LineString, TransmissionLineProperties> | undefined,
+    [geoData]
+  );
 
-  const transmissionRoute = geoData?.features.find(
-    (f) => f.geometry.type === "LineString" && f.properties?.from && f.properties?.to
-  ) as Feature<LineString, TransmissionLineProperties> | undefined;
+  const transmission765kV = useMemo(() => {
+    const line = geoData?.features.find(
+      (f) => f.geometry.type === "LineString" && f.properties?.voltage_kv === 765
+    ) as Feature<LineString, TransmissionLineProperties> | undefined;
+
+    return line ? trimRegionalLine(line) : undefined;
+  }, [geoData]);
+
+  const center: [number, number] = powerPlant?.properties?.center_lat && powerPlant?.properties?.center_lon
+    ? [powerPlant.properties.center_lat, powerPlant.properties.center_lon]
+    : DEFAULT_CENTER;
 
   if (error) {
     return (
@@ -104,6 +232,13 @@ export default function PhysicalRiskMap({
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
+        <AutoFitBounds
+          powerPlant={powerPlant}
+          substation={substation}
+          transmissionRoute={transmissionRoute}
+          transmission765kV={transmission765kV}
+        />
+
         <LayersControl position="topright">
           {/* Hazard Zone Overlay */}
           <LayersControl.Overlay checked name="Risk Zone">
@@ -119,7 +254,7 @@ export default function PhysicalRiskMap({
 
           {/* 765kV Transmission Line */}
           {transmission765kV && (
-            <LayersControl.Overlay checked name="765kV Line">
+            <LayersControl.Overlay checked name="765kV Corridor (Local)">
               <TransmissionLayer feature={transmission765kV} lineType="765kV" />
             </LayersControl.Overlay>
           )}

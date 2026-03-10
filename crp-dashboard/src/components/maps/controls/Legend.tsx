@@ -31,7 +31,7 @@ export default function Legend({ scenario }: LegendProps) {
               className="w-4 h-1 rounded"
               style={{ backgroundColor: ASSET_COLORS.transmission765kV }}
             />
-            <span className="text-slate-700">765kV Transmission</span>
+            <span className="text-slate-700">765kV Corridor (Local)</span>
           </div>
           <div className="flex items-center gap-2">
             <div
