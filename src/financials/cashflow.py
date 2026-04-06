@@ -47,6 +47,7 @@ class CashFlowTimeSeries:
     capex: np.ndarray
     free_cash_flow: np.ndarray
     capacity_factor: np.ndarray
+    final_cf: np.ndarray
     carbon_costs: np.ndarray = field(default=None)  # type: ignore[arg-type]
 
     def __post_init__(self) -> None:
@@ -72,6 +73,7 @@ class CashFlowTimeSeries:
             "capex": self.capex.tolist(),
             "free_cash_flow": self.free_cash_flow.tolist(),
             "capacity_factor": self.capacity_factor.tolist(),
+            "final_cf": self.final_cf.tolist(),
             "carbon_costs": self.carbon_costs.tolist(),
         }
 
@@ -295,6 +297,8 @@ def compute_cashflows_timeseries(
 
     fcf = nopat + depreciation - capex
 
+    final_cf_series = cf_series * (1 - outage_rates)
+
     return CashFlowTimeSeries(
         years=years,
         revenue=revenue,
@@ -312,6 +316,7 @@ def compute_cashflows_timeseries(
         capex=capex,
         free_cash_flow=fcf,
         capacity_factor=cf_series,
+        final_cf=final_cf_series,
         carbon_costs=carbon_costs,
     )
 
