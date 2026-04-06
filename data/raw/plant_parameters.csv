@@ -1,6 +1,6 @@
 param_name,value,unit,description
 capacity_mw,2100,MW,Total capacity (2 units x 1050MW)
-capacity_factor,0.85,decimal,Base load capacity factor
+capacity_factor,0.60,decimal,Base load capacity factor
 efficiency,0.39,decimal,Supercritical efficiency (3.412/8.8)
 fuel_cost_per_mwh,45.0,USD/MWh,Approximate coal cost
 variable_opex,5.0,USD/MWh,Variable O&M
@@ -24,6 +24,6 @@ depreciation_years,20,years,Depreciation schedule
 inflation_rate,0.02,decimal,Long-term inflation target
 power_price_per_mwh,80.0,USD/MWh,Wholesale electricity price
 heat_rate_mmbtu_mwh,8.8,MMBtu/MWh,Heat rate for supercritical coal plant
-fuel_price_per_mmbtu,3.2,USD/MMBtu,Coal fuel price
+fuel_price_per_mmbtu,5.74,USD/MMBtu,Coal fuel price
 emissions_tCO2_per_mwh,0.82,tCO2/MWh,Carbon emission intensity (SC coal at 8.8 heat rate)
 discount_rate,0.08,decimal,Project discount rate for NPV
