@@ -49,10 +49,13 @@ class CashFlowTimeSeries:
     capacity_factor: np.ndarray
     final_cf: np.ndarray
     carbon_costs: np.ndarray = field(default=None)  # type: ignore[arg-type]
+    dscr: np.ndarray = field(default=None)  # type: ignore[arg-type]
 
     def __post_init__(self) -> None:
         if self.carbon_costs is None:
             self.carbon_costs = np.zeros_like(self.years, dtype=float)
+        if self.dscr is None:
+            self.dscr = np.zeros_like(self.years, dtype=float)
 
     def to_dict(self) -> Dict[str, List[float]]:
         """Convert to dict for CSV export."""
@@ -75,6 +78,7 @@ class CashFlowTimeSeries:
             "capacity_factor": self.capacity_factor.tolist(),
             "final_cf": self.final_cf.tolist(),
             "carbon_costs": self.carbon_costs.tolist(),
+            "dscr": self.dscr.tolist(),
         }
 
 
@@ -253,6 +257,7 @@ def compute_cashflows_timeseries(
     interest_expense = np.zeros(n_years)
     balance = debt_amount
 
+    annual_ds = 0.0
     if debt_interest > 0 and debt_tenor > 0:
         # Calculate level annual payment (Annuity)
         annual_ds = -npf.pmt(debt_interest, debt_tenor, debt_amount)
@@ -297,6 +302,13 @@ def compute_cashflows_timeseries(
 
     fcf = nopat + depreciation - capex
 
+    # DSCR (second pass, after tax_expense and capex are both defined)
+    cfads = ebitda - tax_expense - capex
+    dscr_series = np.zeros(n_years)
+    if annual_ds > 0:
+        n_debt = min(n_years, debt_tenor)
+        dscr_series[:n_debt] = cfads[:n_debt] / annual_ds
+
     final_cf_series = cf_series * (1 - outage_rates)
 
     return CashFlowTimeSeries(
@@ -318,6 +330,7 @@ def compute_cashflows_timeseries(
         capacity_factor=cf_series,
         final_cf=final_cf_series,
         carbon_costs=carbon_costs,
+        dscr=dscr_series,
     )
 
 
