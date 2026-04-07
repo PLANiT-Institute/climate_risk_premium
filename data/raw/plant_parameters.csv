@@ -8,9 +8,9 @@ fixed_opex_per_kw,35.0,USD/kW-yr,Fixed O&M
 variable_opex_per_mwh,4.5,USD/MWh,Variable O&M per MWh (alternative)
 total_capex_million,3550,USD Million,Total project cost (4.9T KRW at 1380 KRW/USD Feb 2026)
 construction_years,5,years,Construction duration
-debt_fraction,0.70,decimal,Estimated debt financing share
-equity_fraction,0.30,decimal,Estimated equity share
-debt_interest_rate,0.061,decimal,Recent bond yield (6.1%)
+debt_fraction,0.80,decimal,Estimated debt financing share
+equity_fraction,0.20,decimal,Estimated equity share
+debt_interest_rate,0.05,decimal,Recent bond yield (6.1%)
 debt_schedule_file,debt_repayment_schedule.csv,filename,Custom repayment profile
 debt_tenor_years,20,years,Loan repayment period (fallback)
 risk_free_rate,0.035,decimal,Korea 10Y Treasury

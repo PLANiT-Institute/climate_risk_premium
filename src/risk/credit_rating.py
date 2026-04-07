@@ -371,28 +371,22 @@ def assess_credit_rating(metrics: RatingMetrics) -> RatingAssessment:
     rounded_score = round(weighted_score)
     rounded_score = max(1, min(10, rounded_score))  # Clamp to valid range
 
-    # Distress override: if any critical metric is in distress, ensure rating reflects it
-    critical_metrics = ["dscr", "coverage", "profitability"]
-    distress_ratings = [
-        component_ratings[m] for m in critical_metrics if component_ratings[m].value >= 7
-    ]
-
-    if distress_ratings:
-        # At least one critical metric is distressed
-        worst_distress = max(distress_ratings, key=lambda r: r.value)
-        # Weighted score cannot be better than worst distressed critical metric
-        rounded_score = max(rounded_score, worst_distress.value)
+    if metrics.dscr < 0:
+        rounded_score = Rating.D.value
+        rationale = f"Overall D: DSCR negative ({metrics.dscr:.3f})"
+    elif metrics.dscr < 1.0:
+        rounded_score = min(10, rounded_score + 1)
         overall_rating = Rating(rounded_score)
         rationale = (
-            f"Overall {overall_rating}: Distress-driven rating "
-            f"(critical metric in distress: {worst_distress.name})"
+            f"Overall {overall_rating}: Weighted average downgraded 1 notch "
+            f"(DSCR={metrics.dscr:.3f} < 1.0)"
         )
     else:
-        overall_rating = Rating(rounded_score)
         rationale = (
-            f"Overall {overall_rating}: Weighted average "
-            f"(Policy/Industry=AA fixed, Coverage={component_ratings['coverage']}, profitability={component_ratings['profitability']})"
+            f"Overall {Rating(rounded_score)}: Weighted average "
+            f"(DSCR={metrics.dscr:.3f} ≥ 1.0, no override)"
         )
+    overall_rating = Rating(rounded_score)
 
     return RatingAssessment(
         overall_rating=overall_rating,
