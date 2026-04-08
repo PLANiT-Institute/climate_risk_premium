@@ -30,7 +30,7 @@ def sample_plant_params():
 def dummy_scenarios():
     trans = TransitionScenario("Test", 0, 40)
     trans_adj = TransitionAdjustments(0.5, 40)
-    phys_adj = PhysicalAdjustments(0, 0, 0, 1.0)
+    phys_adj = PhysicalAdjustments(0, 0)
     return trans, trans_adj, phys_adj
 
 def test_depreciation(sample_plant_params, dummy_scenarios):

@@ -40,10 +40,7 @@ def test_physical_adjustments(plant_params):
 
     # Engine returns PhysicalAdjustments with non-negative values
     assert adj.outage_rate >= 0.0
-    assert adj.capacity_derate >= 0.0
     assert adj.efficiency_loss >= 0.0
-    assert adj.water_constrained_capacity > 0.0
-    assert adj.water_constrained_capacity <= 1.0
 
 
 def test_expected_loss_calculation():

@@ -87,7 +87,7 @@ class TestFinancialMetrics:
     def test_npv_positive_for_profitable_plant(self, standard_plant):
         trans = TransitionScenario("Test", 0, 40)
         trans_adj = TransitionAdjustments(0.5, 20)
-        phys_adj = PhysicalAdjustments(0, 0, 0, 1.0)
+        phys_adj = PhysicalAdjustments(0, 0)
 
         cf = compute_cashflows_timeseries(standard_plant, trans, trans_adj, phys_adj)
         metrics = calculate_metrics(cf, standard_plant)
@@ -97,7 +97,7 @@ class TestFinancialMetrics:
     def test_irr_positive_for_profitable_plant(self, standard_plant):
         trans = TransitionScenario("Test", 0, 40)
         trans_adj = TransitionAdjustments(0.5, 20)
-        phys_adj = PhysicalAdjustments(0, 0, 0, 1.0)
+        phys_adj = PhysicalAdjustments(0, 0)
 
         cf = compute_cashflows_timeseries(standard_plant, trans, trans_adj, phys_adj)
         metrics = calculate_metrics(cf, standard_plant)
@@ -107,7 +107,7 @@ class TestFinancialMetrics:
     def test_dscr_above_one_for_healthy_plant(self, standard_plant):
         trans = TransitionScenario("Test", 0, 40)
         trans_adj = TransitionAdjustments(0.5, 20)
-        phys_adj = PhysicalAdjustments(0, 0, 0, 1.0)
+        phys_adj = PhysicalAdjustments(0, 0)
 
         cf = compute_cashflows_timeseries(standard_plant, trans, trans_adj, phys_adj)
         metrics = calculate_metrics(cf, standard_plant)
@@ -118,7 +118,7 @@ class TestFinancialMetrics:
     def test_payback_period_exists(self, standard_plant):
         trans = TransitionScenario("Test", 0, 40)
         trans_adj = TransitionAdjustments(0.5, 20)
-        phys_adj = PhysicalAdjustments(0, 0, 0, 1.0)
+        phys_adj = PhysicalAdjustments(0, 0)
 
         cf = compute_cashflows_timeseries(standard_plant, trans, trans_adj, phys_adj)
         metrics = calculate_metrics(cf, standard_plant)
@@ -130,7 +130,7 @@ class TestFinancialMetrics:
     def test_metrics_to_dict(self, standard_plant):
         trans = TransitionScenario("Test", 0, 40)
         trans_adj = TransitionAdjustments(0.5, 20)
-        phys_adj = PhysicalAdjustments(0, 0, 0, 1.0)
+        phys_adj = PhysicalAdjustments(0, 0)
 
         cf = compute_cashflows_timeseries(standard_plant, trans, trans_adj, phys_adj)
         metrics = calculate_metrics(cf, standard_plant)
@@ -146,7 +146,7 @@ class TestFinancialMetrics:
     def test_llcr_positive_for_healthy_plant(self, standard_plant):
         trans = TransitionScenario("Test", 0, 40)
         trans_adj = TransitionAdjustments(0.5, 20)
-        phys_adj = PhysicalAdjustments(0, 0, 0, 1.0)
+        phys_adj = PhysicalAdjustments(0, 0)
 
         cf = compute_cashflows_timeseries(standard_plant, trans, trans_adj, phys_adj)
         metrics = calculate_metrics(cf, standard_plant)
@@ -161,8 +161,8 @@ class TestMetricsWithRisk:
         trans = TransitionScenario("Test", 0, 40)
         trans_adj = TransitionAdjustments(0.5, 20)
 
-        phys_safe = PhysicalAdjustments(0, 0, 0, 1.0)
-        phys_risky = PhysicalAdjustments(0.10, 0.05, 0.05, 0.9)
+        phys_safe = PhysicalAdjustments(0, 0)
+        phys_risky = PhysicalAdjustments(0.10, 0.05)
 
         cf_safe = compute_cashflows_timeseries(standard_plant, trans, trans_adj, phys_safe)
         cf_risky = compute_cashflows_timeseries(standard_plant, trans, trans_adj, phys_risky)

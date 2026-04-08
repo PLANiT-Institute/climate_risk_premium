@@ -286,10 +286,7 @@ class TestEnhancedTransitionIntegration:
         transition_adj = TransitionAdjustments(
             capacity_factor=0.65, operating_years=14, notes="test"
         )
-        physical_adj = PhysicalAdjustments(
-            outage_rate=0.0, capacity_derate=0.0,
-            efficiency_loss=0.0, water_constrained_capacity=1.0,
-        )
+        physical_adj = PhysicalAdjustments(outage_rate=0.0, efficiency_loss=0.0)
         transition_scenario = TransitionScenario(
             name="test", dispatch_priority_penalty=0.0, retirement_years=40,
         )
@@ -344,10 +341,7 @@ class TestEnhancedTransitionIntegration:
         transition_adj = TransitionAdjustments(
             capacity_factor=0.65, operating_years=10, notes="test"
         )
-        physical_adj = PhysicalAdjustments(
-            outage_rate=0.0, capacity_derate=0.0,
-            efficiency_loss=0.0, water_constrained_capacity=1.0,
-        )
+        physical_adj = PhysicalAdjustments(outage_rate=0.0, efficiency_loss=0.0)
         transition_scenario = TransitionScenario(
             name="test", dispatch_priority_penalty=0.0, retirement_years=40,
         )
