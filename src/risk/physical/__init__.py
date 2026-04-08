@@ -7,7 +7,7 @@ Integrates:
 3. Vulnerability (Damage functions)
 """
 from typing import Dict, Any, Optional
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import numpy as np
 
 # Export new submodules
@@ -22,6 +22,7 @@ class PhysicalAdjustments:
     capacity_derate: float
     efficiency_loss: float
     water_constrained_capacity: float = 1.0
+    water_temp_disruption: float = 0.0
     notes: str = ""
 
 @dataclass
@@ -31,20 +32,23 @@ class YearlyPhysicalAdjustments:
     capacity_derates: np.ndarray
     efficiency_losses: np.ndarray
     water_constraints: np.ndarray
+    water_temp_disruptions: np.ndarray = field(default_factory=lambda: np.array([]))
     scenario_name: str = ""
 
     def get_adjustment_for_year(self, year: int) -> PhysicalAdjustments:
         if year in self.years:
             idx = np.where(self.years == year)[0][0]
+            wt = float(self.water_temp_disruptions[idx]) if idx < len(self.water_temp_disruptions) else 0.0
             return PhysicalAdjustments(
                 outage_rate=self.outage_rates[idx],
                 capacity_derate=self.capacity_derates[idx],
                 efficiency_loss=self.efficiency_losses[idx],
                 water_constrained_capacity=self.water_constraints[idx],
+                water_temp_disruption=wt,
                 notes=f"{self.scenario_name} year {year}"
             )
         # Fallback/Interpolation logic could go here
-        return PhysicalAdjustments(0, 0, 0, 1.0, "Out of range")
+        return PhysicalAdjustments(0, 0, 0, 1.0, 0.0, "Out of range")
 
 class PhysicalRiskEngine:
     def __init__(self):
