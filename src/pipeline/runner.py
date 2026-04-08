@@ -36,6 +36,7 @@ from src.risk.physical import get_physical_risk_scenario, PhysicalAdjustments
 from src.planit import PLANiTRunner, PLANiTAdapter, PLANiTIntegrationConfig
 from src.models.physical.wri_thermal import WaterTemperatureModel
 from src.models.physical.temperature import TemperatureModel, CoolingType
+from src.models.physical.wildfire import WildfireModel
 
 # Conditional import for enhanced 11th Basic Plan
 try:
@@ -126,6 +127,7 @@ class CRPModelRunner:
         self._planit_adapter = PLANiTAdapter(self._planit_config)
         self._wt_model_by_scenario: Dict[str, WaterTemperatureModel] = {}
         self._temp_model_by_scenario: Dict[str, TemperatureModel] = {}
+        self._wf_model_by_scenario: Dict[str, WildfireModel] = {}
 
     def _load_planit_results(self) -> List[Any]:
         """Load PLANiT hazard results.
@@ -302,8 +304,7 @@ class CRPModelRunner:
         """Load physical scenario, combining parametric models and PLANiT adapter.
 
         Pipeline (as of feat/wri-thermal-integration):
-          outage_rate              ← PLANiT adapter (currently 0 — will be replaced by
-                                     WildfireModel in the next commit)
+          outage_rate              ← WildfireModel (KFS/CLIMADA baseline × climate factor)
           efficiency_loss          ← TemperatureModel (air + SST → Rankine efficiency)
           water_temp_disruption    ← WaterTemperatureModel (WRI seawater intake curves)
           capacity_derate          ← PLANiT adapter (drought; 0 pending Commit 3 removal)
@@ -321,6 +322,11 @@ class CRPModelRunner:
             self._planit_results, target_year, crp_label
         )
 
+        # WildfireModel: KFS/CLIMADA baseline × KFS climate scaling factor → outage_rate
+        if crp_label not in self._wf_model_by_scenario:
+            self._wf_model_by_scenario[crp_label] = WildfireModel(scenario=crp_label)
+        outage_rate = self._wf_model_by_scenario[crp_label].calculate_outage_rate(target_year)
+
         # TemperatureModel: air temp + SST rise → Rankine cycle efficiency loss
         temp_rcp = self._CRP_TO_TEMP_RCP.get(crp_label, "RCP4.5")
         if temp_rcp not in self._temp_model_by_scenario:
@@ -335,7 +341,7 @@ class CRPModelRunner:
         water_temp_disruption = self._wt_model_by_scenario[crp_label].calculate_disruption(target_year)
 
         return PhysicalAdjustments(
-            outage_rate=adj["outage_rate"],
+            outage_rate=outage_rate,
             capacity_derate=adj["capacity_derate"],
             efficiency_loss=efficiency_loss,
             water_constrained_capacity=adj["water_constrained_capacity"],
