@@ -50,12 +50,18 @@ class CashFlowTimeSeries:
     final_cf: np.ndarray
     carbon_costs: np.ndarray = field(default=None)  # type: ignore[arg-type]
     dscr: np.ndarray = field(default=None)  # type: ignore[arg-type]
+    water_temp_disruption: np.ndarray = field(default=None)  # type: ignore[arg-type]
+    lost_revenue_from_water_temp: np.ndarray = field(default=None)  # type: ignore[arg-type]
 
     def __post_init__(self) -> None:
         if self.carbon_costs is None:
             self.carbon_costs = np.zeros_like(self.years, dtype=float)
         if self.dscr is None:
             self.dscr = np.zeros_like(self.years, dtype=float)
+        if self.water_temp_disruption is None:
+            self.water_temp_disruption = np.zeros_like(self.years, dtype=float)
+        if self.lost_revenue_from_water_temp is None:
+            self.lost_revenue_from_water_temp = np.zeros_like(self.years, dtype=float)
 
     def to_dict(self) -> Dict[str, List[float]]:
         """Convert to dict for CSV export."""
@@ -79,6 +85,8 @@ class CashFlowTimeSeries:
             "final_cf": self.final_cf.tolist(),
             "carbon_costs": self.carbon_costs.tolist(),
             "dscr": self.dscr.tolist(),
+            "water_temp_disruption": self.water_temp_disruption.tolist(),
+            "lost_revenue_from_water_temp": self.lost_revenue_from_water_temp.tolist(),
         }
 
 
@@ -151,6 +159,12 @@ def compute_cashflows_timeseries(
                 for y in years
             ]
         )
+        water_temp_disruptions = np.array(
+            [
+                yearly_physical_adj.get_adjustment_for_year(int(y)).water_temp_disruption
+                for y in years
+            ]
+        )
     else:
         # Static physical risks (same for all years)
         outage_rates = np.full(n_years, physical_adj.outage_rate)
@@ -158,6 +172,9 @@ def compute_cashflows_timeseries(
         efficiency_losses = np.full(n_years, physical_adj.efficiency_loss)
         water_constraints = np.full(
             n_years, getattr(physical_adj, "water_constrained_capacity", 1.0)
+        )
+        water_temp_disruptions = np.full(
+            n_years, getattr(physical_adj, "water_temp_disruption", 0.0)
         )
 
     # === CAPACITY FACTOR CALCULATION ===
@@ -188,7 +205,7 @@ def compute_cashflows_timeseries(
 
     # Actual generation (after outages reduce availability)
     # Outage = fraction of time plant is unavailable
-    actual_mwh = potential_mwh * (1 - outage_rates)
+    actual_mwh = potential_mwh * (1 - outage_rates) * (1 - water_temp_disruptions)
 
     # Revenue is based on ACTUAL generation (outages reduce revenue)
     if market_scenario:
@@ -224,6 +241,7 @@ def compute_cashflows_timeseries(
     # This is the revenue we would have earned but didn't due to outages
     # We track this separately for transparency, but it's already reflected in reduced revenue
     lost_revenue_from_outages = potential_mwh * outage_rates * prices  # Lost revenue from outages
+    lost_revenue_from_water_temp = potential_mwh * (1 - outage_rates) * water_temp_disruptions * prices
 
     total_costs = fuel_costs + variable_opex + fixed_opex + carbon_costs
     # Note: lost_revenue_from_outages NOT included in total_costs - it's informational only
@@ -331,6 +349,8 @@ def compute_cashflows_timeseries(
         final_cf=final_cf_series,
         carbon_costs=carbon_costs,
         dscr=dscr_series,
+        water_temp_disruption=water_temp_disruptions,
+        lost_revenue_from_water_temp=lost_revenue_from_water_temp,
     )
 
 

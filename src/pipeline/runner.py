@@ -34,6 +34,7 @@ from src.financials import compute_cashflows_timeseries, calculate_metrics, Cash
 from src.scenarios.korea_power_plan import load_korea_power_plan_scenarios
 from src.risk.physical import get_physical_risk_scenario, PhysicalAdjustments
 from src.planit import PLANiTRunner, PLANiTAdapter, PLANiTIntegrationConfig
+from src.models.physical.wri_thermal import WaterTemperatureModel
 
 # Conditional import for enhanced 11th Basic Plan
 try:
@@ -122,6 +123,7 @@ class CRPModelRunner:
         self._planit_config = PLANiTIntegrationConfig()
         self._planit_results = self._load_planit_results()
         self._planit_adapter = PLANiTAdapter(self._planit_config)
+        self._wt_model_by_scenario: Dict[str, WaterTemperatureModel] = {}
 
     def _load_planit_results(self) -> List[Any]:
         """Load PLANiT hazard results.
@@ -302,11 +304,18 @@ class CRPModelRunner:
         adj = self._planit_adapter.convert(
             self._planit_results, target_year, crp_label
         )
+
+        # WRI water temperature disruption (intake seawater → forced curtailment)
+        if crp_label not in self._wt_model_by_scenario:
+            self._wt_model_by_scenario[crp_label] = WaterTemperatureModel(scenario=crp_label)
+        water_temp_disruption = self._wt_model_by_scenario[crp_label].calculate_disruption(target_year)
+
         return PhysicalAdjustments(
             outage_rate=adj["outage_rate"],
             capacity_derate=adj["capacity_derate"],
             efficiency_loss=adj["efficiency_loss"],
             water_constrained_capacity=adj["water_constrained_capacity"],
+            water_temp_disruption=water_temp_disruption,
             notes=adj["notes"],
         )
 
@@ -377,6 +386,7 @@ class CRPModelRunner:
             "physical_derate": physical_adj.capacity_derate,
             "physical_efficiency_loss": physical_adj.efficiency_loss,
             "physical_water": physical_adj.water_constrained_capacity,
+            "physical_water_temp": physical_adj.water_temp_disruption,
         }
 
         return RiskComponentResult(
@@ -494,6 +504,7 @@ class CRPModelRunner:
             capacity_derate=0.0,
             efficiency_loss=0.0,
             water_constrained_capacity=1.0,
+            water_temp_disruption=0.0,
             notes="No physical risk (baseline)",
         )
 
