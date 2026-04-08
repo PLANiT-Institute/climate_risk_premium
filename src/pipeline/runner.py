@@ -35,6 +35,7 @@ from src.scenarios.korea_power_plan import load_korea_power_plan_scenarios
 from src.risk.physical import get_physical_risk_scenario, PhysicalAdjustments
 from src.planit import PLANiTRunner, PLANiTAdapter, PLANiTIntegrationConfig
 from src.models.physical.wri_thermal import WaterTemperatureModel
+from src.models.physical.temperature import TemperatureModel, CoolingType
 
 # Conditional import for enhanced 11th Basic Plan
 try:
@@ -124,6 +125,7 @@ class CRPModelRunner:
         self._planit_results = self._load_planit_results()
         self._planit_adapter = PLANiTAdapter(self._planit_config)
         self._wt_model_by_scenario: Dict[str, WaterTemperatureModel] = {}
+        self._temp_model_by_scenario: Dict[str, TemperatureModel] = {}
 
     def _load_planit_results(self) -> List[Any]:
         """Load PLANiT hazard results.
@@ -287,11 +289,25 @@ class CRPModelRunner:
             retirement_years=40,
         )
 
-    def _load_physical_scenario(self, scenario_name: str) -> PhysicalAdjustments:
-        """Load physical scenario via PLANiT adapter.
+    # Canonical mapping from SSP/CRP labels to TemperatureModel RCP keys.
+    # ALL_TEMPERATURE_PROJECTIONS only has "RCP4.5" and "RCP8.5".
+    # SSP1-2.6 is most comparable to RCP4.5 (both ~2.6 W/m²).
+    _CRP_TO_TEMP_RCP: Dict[str, str] = {
+        "SSP1-2.6": "RCP4.5",
+        "RCP4.5":   "RCP4.5",
+        "RCP8.5":   "RCP8.5",
+    }
 
-        Maps CRP scenario names to SSP scenarios, then converts PLANiT
-        hazard results (wildfire, drought, water_risk) into PhysicalAdjustments.
+    def _load_physical_scenario(self, scenario_name: str) -> PhysicalAdjustments:
+        """Load physical scenario, combining parametric models and PLANiT adapter.
+
+        Pipeline (as of feat/wri-thermal-integration):
+          outage_rate              ← PLANiT adapter (currently 0 — will be replaced by
+                                     WildfireModel in the next commit)
+          efficiency_loss          ← TemperatureModel (air + SST → Rankine efficiency)
+          water_temp_disruption    ← WaterTemperatureModel (WRI seawater intake curves)
+          capacity_derate          ← PLANiT adapter (drought; 0 pending Commit 3 removal)
+          water_constrained_capacity ← PLANiT adapter (water_risk; 1.0 pending removal)
         """
         ssp, target_year = PHYSICAL_SCENARIO_SSP_MAP.get(
             scenario_name, ("ssp126", 2024)
@@ -305,6 +321,14 @@ class CRPModelRunner:
             self._planit_results, target_year, crp_label
         )
 
+        # TemperatureModel: air temp + SST rise → Rankine cycle efficiency loss
+        temp_rcp = self._CRP_TO_TEMP_RCP.get(crp_label, "RCP4.5")
+        if temp_rcp not in self._temp_model_by_scenario:
+            self._temp_model_by_scenario[temp_rcp] = TemperatureModel(
+                rcp=temp_rcp, cooling_type=CoolingType.ONCE_THROUGH
+            )
+        efficiency_loss = self._temp_model_by_scenario[temp_rcp].calculate_efficiency_loss(target_year).total_derate
+
         # WRI water temperature disruption (intake seawater → forced curtailment)
         if crp_label not in self._wt_model_by_scenario:
             self._wt_model_by_scenario[crp_label] = WaterTemperatureModel(scenario=crp_label)
@@ -313,7 +337,7 @@ class CRPModelRunner:
         return PhysicalAdjustments(
             outage_rate=adj["outage_rate"],
             capacity_derate=adj["capacity_derate"],
-            efficiency_loss=adj["efficiency_loss"],
+            efficiency_loss=efficiency_loss,
             water_constrained_capacity=adj["water_constrained_capacity"],
             water_temp_disruption=water_temp_disruption,
             notes=adj["notes"],
