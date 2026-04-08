@@ -21,6 +21,8 @@ PROJECT_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 from src.pipeline.runner import CRPModelRunner
+from src.financials import calculate_debt_service
+from src.risk import assess_credit_rating, calculate_rating_metrics_from_financials
 
 
 def csv_to_json(csv_path: Path, json_path: Path) -> None:
@@ -94,18 +96,32 @@ SCENARIO_DISPLAY = {
 BASE_RATE = 0.0675  # 6.75% base interest rate
 
 
-def generate_yearly_ratings(results: dict, output_path: Path) -> None:
+def generate_yearly_ratings(results: dict, output_path: Path, plant_params: dict) -> None:
     """Generate yearly ratings data from scenario results.
 
     Produces fields matching the CreditRatingRow TypeScript interface:
       scenario, display_name, year, dscr, rating, spread_bps,
       cost_of_debt, ebitda, debt_service
 
-    Note:
-        This output is dashboard-only and uses an approximate DSCR-to-rating
-        mapping. Paper-grade ratings should be taken from frozen scenario
-        outputs (`scenario_comparison.csv` / `credit_ratings.csv`).
+    Uses full assess_credit_rating() per year with a 1-year timelag override:
+      - If previous year DSCR < 0  → force current year to D
+      - If previous year DSCR 0–1  → downgrade current year by 1 notch
+      - If previous year DSCR >= 1 → no override
     """
+    total_capex = float(plant_params.get("total_capex_million", 3550)) * 1e6
+    debt_fraction = float(plant_params.get("debt_fraction", 0.80))
+    debt_rate = float(plant_params.get("debt_interest_rate", 0.05))
+    debt_tenor = int(plant_params.get("debt_tenor_years", 20))
+    depreciation_years = int(plant_params.get("depreciation_years", 20))
+    capacity_mw = float(plant_params.get("capacity_mw", 2100))
+
+    # Pre-compute amortisation schedule once (principal paid each year)
+    debt_struct = calculate_debt_service(total_capex, debt_fraction, debt_rate, debt_tenor)
+    # Cumulative principal repaid after year i (0-indexed)
+    cumulative_principal = debt_struct.principal_schedule.cumsum()
+
+    RATING_ORDER = ["AAA", "AA", "A", "BBB", "BB", "B", "CCC", "CC", "C", "D"]
+
     yearly_data = []
 
     for scenario_name, result in results.items():
@@ -114,41 +130,59 @@ def generate_yearly_ratings(results: dict, output_path: Path) -> None:
 
         cf = result.cashflow
         years = cf.years
-        dscr_values = (
-            cf.dscr
-            if hasattr(cf, "dscr")
-            else [result.metrics.avg_dscr] * len(years)
-        )
 
         display_name = SCENARIO_DISPLAY.get(scenario_name, scenario_name)
 
-        for i, year in enumerate(years):
-            # Approximate rating from DSCR
-            dscr = dscr_values[i] if i < len(dscr_values) else result.metrics.avg_dscr
+        prev_dscr = None
 
-            # Simple rating approximation based on DSCR
-            if dscr >= 2.0:
-                rating = "A"
-            elif dscr >= 1.5:
-                rating = "BBB"
-            elif dscr >= 1.2:
-                rating = "BB"
-            elif dscr >= 1.0:
-                rating = "B"
+        for i, year in enumerate(years):
+            dscr_i = float(cf.dscr[i]) if i < len(cf.dscr) else 0.0
+            ebitda = float(cf.ebitda[i]) if i < len(cf.ebitda) else 0.0
+            debt_service = float(cf.interest_expense[i]) if i < len(cf.interest_expense) else 0.0
+
+            # Per-year balance sheet reconstruction
+            if i < debt_tenor:
+                debt_outstanding_i = (total_capex * debt_fraction
+                                      - (cumulative_principal[i - 1] if i > 0 else 0.0))
             else:
-                rating = "CCC"
+                debt_outstanding_i = 0.0
+
+            fixed_assets_i = total_capex * max(0.0, 1 - i / depreciation_years)
+            total_equity_i = max(0.0, fixed_assets_i - debt_outstanding_i)
+            total_assets_i = max(fixed_assets_i, debt_outstanding_i)
+
+            rating_metrics = calculate_rating_metrics_from_financials(
+                capacity_mw=capacity_mw,
+                ebitda=ebitda,
+                fixed_assets=total_assets_i,
+                interest_expense=debt_service,
+                total_debt=debt_outstanding_i,
+                cash_and_equivalents=max(0.0, ebitda * 0.1),
+                total_equity=total_equity_i,
+                total_assets=total_assets_i,
+                dscr=dscr_i,
+            )
+            assessment = assess_credit_rating(rating_metrics)
+            rating = assessment.overall_rating.name
+
+            # 1-year timelag override: previous year's DSCR affects this year's rating
+            if prev_dscr is not None:
+                if prev_dscr < 0:
+                    rating = "D"
+                elif prev_dscr < 1.0:
+                    idx = RATING_ORDER.index(rating)
+                    rating = RATING_ORDER[min(idx + 1, len(RATING_ORDER) - 1)]
+
+            prev_dscr = dscr_i
 
             spread_bps = RATING_SPREAD_MAP.get(rating, 900)
             cost_of_debt = round(BASE_RATE + spread_bps / 10000, 6)
-
-            ebitda = float(cf.ebitda[i]) if i < len(cf.ebitda) else 0.0
-            debt_service = float(cf.interest_expense[i]) if i < len(cf.interest_expense) else 0.0
 
             yearly_data.append({
                 "scenario": scenario_name,
                 "display_name": display_name,
                 "year": int(year),
-                "dscr": round(float(dscr), 3),
+                "dscr": round(dscr_i, 3),
                 "rating": rating,
                 "spread_bps": spread_bps,
                 "cost_of_debt": cost_of_debt,
@@ -159,7 +193,7 @@ def generate_yearly_ratings(results: dict, output_path: Path) -> None:
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(yearly_data, f, indent=2, ensure_ascii=False)
 
-    print(f"  Generated: {output_path.name} (dashboard approximation only)")
+    print(f"  Generated: {output_path.name} (full assess_credit_rating() per year)")
 
 
 def main():
@@ -205,8 +239,10 @@ def main():
     if ratings_csv.exists():
         csv_to_json(ratings_csv, dashboard_data_dir / "credit_ratings.json")
 
+    plant_params = runner._get_plant_params()
+
     # Generate yearly ratings data
-    generate_yearly_ratings(results, dashboard_data_dir / "yearly_ratings.json")
+    generate_yearly_ratings(results, dashboard_data_dir / "yearly_ratings.json", plant_params)
 
     # Cashflow files
     cashflows_dir = dashboard_data_dir / "cashflows"

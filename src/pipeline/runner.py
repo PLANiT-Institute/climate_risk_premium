@@ -326,7 +326,7 @@ class CRPModelRunner:
         elif scenario_name == "high_demand":
             return MarketScenario(name="high_demand", demand_growth_pct=2.0, price_sensitivity=0.5)
         else:
-            return MarketScenario(name="baseline", demand_growth_pct=1.0, price_sensitivity=0.5)
+            return MarketScenario(name="baseline", demand_growth_pct=0.0, price_sensitivity=0.5)
 
     def _compute_component(
         self,

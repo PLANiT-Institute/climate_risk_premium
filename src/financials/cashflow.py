@@ -47,13 +47,17 @@ class CashFlowTimeSeries:
     capex: np.ndarray
     free_cash_flow: np.ndarray
     capacity_factor: np.ndarray
+    final_cf: np.ndarray
     carbon_costs: np.ndarray = field(default=None)  # type: ignore[arg-type]
+    dscr: np.ndarray = field(default=None)  # type: ignore[arg-type]
     water_temp_disruption: np.ndarray = field(default=None)  # type: ignore[arg-type]
     lost_revenue_from_water_temp: np.ndarray = field(default=None)  # type: ignore[arg-type]
 
     def __post_init__(self) -> None:
         if self.carbon_costs is None:
             self.carbon_costs = np.zeros_like(self.years, dtype=float)
+        if self.dscr is None:
+            self.dscr = np.zeros_like(self.years, dtype=float)
         if self.water_temp_disruption is None:
             self.water_temp_disruption = np.zeros_like(self.years, dtype=float)
         if self.lost_revenue_from_water_temp is None:
@@ -78,7 +82,9 @@ class CashFlowTimeSeries:
             "capex": self.capex.tolist(),
             "free_cash_flow": self.free_cash_flow.tolist(),
             "capacity_factor": self.capacity_factor.tolist(),
+            "final_cf": self.final_cf.tolist(),
             "carbon_costs": self.carbon_costs.tolist(),
+            "dscr": self.dscr.tolist(),
             "water_temp_disruption": self.water_temp_disruption.tolist(),
             "lost_revenue_from_water_temp": self.lost_revenue_from_water_temp.tolist(),
         }
@@ -269,6 +275,7 @@ def compute_cashflows_timeseries(
     interest_expense = np.zeros(n_years)
     balance = debt_amount
 
+    annual_ds = 0.0
     if debt_interest > 0 and debt_tenor > 0:
         # Calculate level annual payment (Annuity)
         annual_ds = -npf.pmt(debt_interest, debt_tenor, debt_amount)
@@ -313,6 +320,15 @@ def compute_cashflows_timeseries(
 
     fcf = nopat + depreciation - capex
 
+    # DSCR (second pass, after tax_expense and capex are both defined)
+    cfads = ebitda - tax_expense - capex
+    dscr_series = np.zeros(n_years)
+    if annual_ds > 0:
+        n_debt = min(n_years, debt_tenor)
+        dscr_series[:n_debt] = cfads[:n_debt] / annual_ds
+
+    final_cf_series = cf_series * (1 - outage_rates)
+
     return CashFlowTimeSeries(
         years=years,
         revenue=revenue,
@@ -330,7 +346,9 @@ def compute_cashflows_timeseries(
         capex=capex,
         free_cash_flow=fcf,
         capacity_factor=cf_series,
+        final_cf=final_cf_series,
         carbon_costs=carbon_costs,
+        dscr=dscr_series,
         water_temp_disruption=water_temp_disruptions,
         lost_revenue_from_water_temp=lost_revenue_from_water_temp,
     )
