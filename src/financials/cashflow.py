@@ -147,17 +147,8 @@ def compute_cashflows_timeseries(
         outage_rates = np.array(
             [yearly_physical_adj.get_adjustment_for_year(int(y)).outage_rate for y in years]
         )
-        capacity_derates = np.array(
-            [yearly_physical_adj.get_adjustment_for_year(int(y)).capacity_derate for y in years]
-        )
         efficiency_losses = np.array(
             [yearly_physical_adj.get_adjustment_for_year(int(y)).efficiency_loss for y in years]
-        )
-        water_constraints = np.array(
-            [
-                yearly_physical_adj.get_adjustment_for_year(int(y)).water_constrained_capacity
-                for y in years
-            ]
         )
         water_temp_disruptions = np.array(
             [
@@ -168,11 +159,7 @@ def compute_cashflows_timeseries(
     else:
         # Static physical risks (same for all years)
         outage_rates = np.full(n_years, physical_adj.outage_rate)
-        capacity_derates = np.full(n_years, physical_adj.capacity_derate)
         efficiency_losses = np.full(n_years, physical_adj.efficiency_loss)
-        water_constraints = np.full(
-            n_years, getattr(physical_adj, "water_constrained_capacity", 1.0)
-        )
         water_temp_disruptions = np.full(
             n_years, getattr(physical_adj, "water_temp_disruption", 0.0)
         )
@@ -192,12 +179,7 @@ def compute_cashflows_timeseries(
         )
         base_cf_series = np.minimum(1.0, base_cf_series * demand_factors)
 
-    # Apply capacity derates (year-by-year)
-    cf_series = base_cf_series * (1 - capacity_derates)
-
-    # Apply water constraints (year-by-year hard cap)
-    cf_series = np.minimum(cf_series, water_constraints)
-    cf_series = np.maximum(cf_series, 0.0)
+    cf_series = np.maximum(base_cf_series, 0.0)
 
     # === GENERATION AND REVENUE ===
     # Potential generation (before outages)
@@ -378,7 +360,7 @@ def compute_cashflows(
     fuel_price = float(plant_params.get("fuel_price_per_mmbtu", 3.2))
     fixed_opex = float(plant_params.get("fixed_opex_per_kw_year", 42))
     variable_opex = float(plant_params.get("variable_opex_per_mwh", 4.5))
-    cf = max(0.0, transition.capacity_factor * (1 - physical.capacity_derate))
+    cf = max(0.0, transition.capacity_factor)
 
     annual_mwh = capacity_mw * 8760 * cf
     fuel_cost = annual_mwh * heat_rate * fuel_price

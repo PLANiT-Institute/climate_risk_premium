@@ -6,7 +6,6 @@ Updated to support new class-based risk models (src.models).
 from __future__ import annotations
 
 import logging
-import os
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, Any, List, Optional
@@ -32,8 +31,7 @@ from src.risk.financing import calculate_financing_with_counterfactual
 from src.risk.attribution import decompose_risk_shapley
 from src.financials import compute_cashflows_timeseries, calculate_metrics, CashFlowTimeSeries, FinancialMetrics
 from src.scenarios.korea_power_plan import load_korea_power_plan_scenarios
-from src.risk.physical import get_physical_risk_scenario, PhysicalAdjustments
-from src.planit import PLANiTRunner, PLANiTAdapter, PLANiTIntegrationConfig
+from src.risk.physical import PhysicalAdjustments
 from src.models.physical.wri_thermal import WaterTemperatureModel
 from src.models.physical.temperature import TemperatureModel, CoolingType
 from src.models.physical.wildfire import WildfireModel
@@ -121,122 +119,9 @@ class CRPModelRunner:
         self.base_dir = Path(base_dir)
         self.dataset = load_inputs(self.base_dir)
         self.power_plans = load_korea_power_plan_scenarios(self.base_dir / "data/raw/korea_power_plan.csv")
-        # Default behavior remains CSV-backed. Set CRP_PLANIT_MODE=live to run PLANiT at runtime.
-        self._planit_config = PLANiTIntegrationConfig()
-        self._planit_results = self._load_planit_results()
-        self._planit_adapter = PLANiTAdapter(self._planit_config)
         self._wt_model_by_scenario: Dict[str, WaterTemperatureModel] = {}
         self._temp_model_by_scenario: Dict[str, TemperatureModel] = {}
         self._wf_model_by_scenario: Dict[str, WildfireModel] = {}
-
-    def _load_planit_results(self) -> List[Any]:
-        """Load PLANiT hazard results.
-
-        Modes:
-        - csv  (default): read pre-computed CSV snapshots from Physicalrisk_PLANiT/data/results
-        - live          : call PLANiT runtime (CLIMADA/PhysRisk) and backfill gaps from csv snapshots
-        """
-        mode = os.getenv("CRP_PLANIT_MODE", "csv").strip().lower()
-        if mode == "live":
-            live_results = self._load_planit_results_live()
-            if live_results:
-                if self._is_dynamic_planit_location():
-                    logger.info(
-                        "Using live PLANiT runtime results for dynamic location (rows=%d, no CSV backfill)",
-                        len(live_results),
-                    )
-                    return live_results
-                csv_results = self._load_planit_results_csv()
-                merged = self._merge_planit_results(live_results, csv_results)
-                logger.info(
-                    "Using live PLANiT runtime results with CSV backfill (live=%d, csv=%d, merged=%d)",
-                    len(live_results), len(csv_results), len(merged),
-                )
-                return merged
-            if self._is_dynamic_planit_location():
-                logger.warning("Live PLANiT returned no results for dynamic location; returning empty set.")
-                return []
-            logger.warning("Live PLANiT returned no results; falling back to CSV snapshots.")
-        return self._load_planit_results_csv()
-
-    def _load_planit_results_csv(self) -> List[Any]:
-        """Load pre-computed PLANiT CSV snapshots."""
-        results_dir = str(self._planit_config.get_results_dir(str(self.base_dir)))
-        results = PLANiTRunner.load_results_from_csv(results_dir)
-        logger.info("Loaded PLANiT CSV results (%d rows) from %s", len(results), results_dir)
-        return results
-
-    def _load_planit_results_live(self) -> List[Any]:
-        """Run PLANiT and return flattened hazard results.
-
-        Optional environment variables:
-        - CRP_PLANIT_SCENARIOS: comma-separated SSP ids, e.g. "ssp126,ssp245,ssp585"
-        - CRP_PLANIT_YEARS: comma-separated years, e.g. "2030,2040,2050,2060"
-        """
-        scenarios = self._parse_planit_scenarios_env() or self._default_planit_scenarios()
-        years = self._parse_planit_years_env()
-
-        try:
-            runner = PLANiTRunner(self._planit_config, base_dir=str(self.base_dir))
-            by_hazard = runner.run_all_hazards(scenarios=scenarios, years=years)
-            flattened = [r for rows in by_hazard.values() for r in rows]
-            return flattened
-        except Exception as exc:
-            logger.warning("Live PLANiT run failed: %s", exc)
-            return []
-
-    @staticmethod
-    def _default_planit_scenarios() -> List[str]:
-        """Default live scenarios used by CRP physical pathways.
-
-        Derived from CRP physical scenario mapping to avoid running
-        unnecessary SSPs in live mode.
-        """
-        used = {ssp for ssp, _year in PHYSICAL_SCENARIO_SSP_MAP.values() if ssp != "historical"}
-        return sorted(used)
-
-    @staticmethod
-    def _is_dynamic_planit_location() -> bool:
-        return bool(os.getenv("CRP_PLANIT_LAT", "").strip() and os.getenv("CRP_PLANIT_LON", "").strip())
-
-    @staticmethod
-    def _merge_planit_results(live_results: List[Any], csv_results: List[Any]) -> List[Any]:
-        """Merge live and csv PLANiT rows with live rows taking priority.
-
-        Key fields are chosen so each hazard/scenario/year/asset has one row.
-        """
-        merged: Dict[tuple, Any] = {}
-        for row in csv_results:
-            key = (row.hazard_type, row.scenario, row.year, row.asset)
-            merged[key] = row
-        for row in live_results:
-            key = (row.hazard_type, row.scenario, row.year, row.asset)
-            merged[key] = row
-        return list(merged.values())
-
-    @staticmethod
-    def _parse_planit_scenarios_env() -> Optional[List[str]]:
-        raw = os.getenv("CRP_PLANIT_SCENARIOS", "").strip()
-        if not raw:
-            return None
-        items = [s.strip().lower() for s in raw.split(",") if s.strip()]
-        return items or None
-
-    @staticmethod
-    def _parse_planit_years_env() -> Optional[List[int]]:
-        raw = os.getenv("CRP_PLANIT_YEARS", "").strip()
-        if not raw:
-            return None
-        years: List[int] = []
-        for token in raw.split(","):
-            token = token.strip()
-            if not token:
-                continue
-            try:
-                years.append(int(token))
-            except ValueError:
-                logger.warning("Ignoring invalid CRP_PLANIT_YEARS token: %s", token)
-        return years or None
 
     def _get_plant_params(self) -> Dict[str, Any]:
         """Extract plant parameters as a flat dict."""
@@ -291,9 +176,9 @@ class CRPModelRunner:
             retirement_years=40,
         )
 
-    # Canonical mapping from SSP/CRP labels to TemperatureModel RCP keys.
+    # SSP/CRP labels → TemperatureModel RCP keys.
     # ALL_TEMPERATURE_PROJECTIONS only has "RCP4.5" and "RCP8.5".
-    # SSP1-2.6 is most comparable to RCP4.5 (both ~2.6 W/m²).
+    # SSP1-2.6 ≈ RCP4.5 (both ~2.6 W/m²).
     _CRP_TO_TEMP_RCP: Dict[str, str] = {
         "SSP1-2.6": "RCP4.5",
         "RCP4.5":   "RCP4.5",
@@ -301,33 +186,22 @@ class CRPModelRunner:
     }
 
     def _load_physical_scenario(self, scenario_name: str) -> PhysicalAdjustments:
-        """Load physical scenario, combining parametric models and PLANiT adapter.
+        """Build PhysicalAdjustments from three self-contained parametric models.
 
-        Pipeline (as of feat/wri-thermal-integration):
-          outage_rate              ← WildfireModel (KFS/CLIMADA baseline × climate factor)
-          efficiency_loss          ← TemperatureModel (air + SST → Rankine efficiency)
-          water_temp_disruption    ← WaterTemperatureModel (WRI seawater intake curves)
-          capacity_derate          ← PLANiT adapter (drought; 0 pending Commit 3 removal)
-          water_constrained_capacity ← PLANiT adapter (water_risk; 1.0 pending removal)
+          outage_rate           ← WildfireModel  (KFS/CLIMADA baseline × KFS climate factor)
+          efficiency_loss       ← TemperatureModel (air + SST → Rankine cycle efficiency)
+          water_temp_disruption ← WaterTemperatureModel (WRI seawater intake curves)
         """
-        ssp, target_year = PHYSICAL_SCENARIO_SSP_MAP.get(
-            scenario_name, ("ssp126", 2024)
-        )
-
-        # Map SSP back to CRP label for the adapter's scenario mapper
+        ssp, target_year = PHYSICAL_SCENARIO_SSP_MAP.get(scenario_name, ("ssp126", 2024))
         ssp_to_crp = {"ssp126": "SSP1-2.6", "ssp245": "RCP4.5", "ssp585": "RCP8.5"}
         crp_label = ssp_to_crp.get(ssp, "SSP1-2.6")
 
-        adj = self._planit_adapter.convert(
-            self._planit_results, target_year, crp_label
-        )
-
-        # WildfireModel: KFS/CLIMADA baseline × KFS climate scaling factor → outage_rate
+        # Wildfire outage: KFS/CLIMADA baseline × KFS RCP climate scaling factor
         if crp_label not in self._wf_model_by_scenario:
             self._wf_model_by_scenario[crp_label] = WildfireModel(scenario=crp_label)
         outage_rate = self._wf_model_by_scenario[crp_label].calculate_outage_rate(target_year)
 
-        # TemperatureModel: air temp + SST rise → Rankine cycle efficiency loss
+        # Temperature efficiency loss: air temp + SST rise → Rankine cycle
         temp_rcp = self._CRP_TO_TEMP_RCP.get(crp_label, "RCP4.5")
         if temp_rcp not in self._temp_model_by_scenario:
             self._temp_model_by_scenario[temp_rcp] = TemperatureModel(
@@ -335,18 +209,16 @@ class CRPModelRunner:
             )
         efficiency_loss = self._temp_model_by_scenario[temp_rcp].calculate_efficiency_loss(target_year).total_derate
 
-        # WRI water temperature disruption (intake seawater → forced curtailment)
+        # WRI water temperature disruption: seawater intake exceedance → curtailment
         if crp_label not in self._wt_model_by_scenario:
             self._wt_model_by_scenario[crp_label] = WaterTemperatureModel(scenario=crp_label)
         water_temp_disruption = self._wt_model_by_scenario[crp_label].calculate_disruption(target_year)
 
         return PhysicalAdjustments(
             outage_rate=outage_rate,
-            capacity_derate=adj["capacity_derate"],
             efficiency_loss=efficiency_loss,
-            water_constrained_capacity=adj["water_constrained_capacity"],
             water_temp_disruption=water_temp_disruption,
-            notes=adj["notes"],
+            notes=f"WF={outage_rate:.6f} TE={efficiency_loss:.4f} WT={water_temp_disruption:.6f} ({crp_label} y{target_year})",
         )
 
     def _load_market_scenario(self, scenario_name: str) -> MarketScenario:
@@ -413,9 +285,7 @@ class CRPModelRunner:
             "transition_cf": transition_adj.capacity_factor,
             "transition_years": transition_adj.operating_years,
             "physical_outage": physical_adj.outage_rate,
-            "physical_derate": physical_adj.capacity_derate,
             "physical_efficiency_loss": physical_adj.efficiency_loss,
-            "physical_water": physical_adj.water_constrained_capacity,
             "physical_water_temp": physical_adj.water_temp_disruption,
         }
 
@@ -531,9 +401,7 @@ class CRPModelRunner:
         )
         no_physical = PhysicalAdjustments(
             outage_rate=0.0,
-            capacity_derate=0.0,
             efficiency_loss=0.0,
-            water_constrained_capacity=1.0,
             water_temp_disruption=0.0,
             notes="No physical risk (baseline)",
         )

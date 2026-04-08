@@ -90,7 +90,7 @@ def aggressive_transition_scenario():
 def no_risk_adjustments():
     """Baseline adjustments with zero risk."""
     trans_adj = TransitionAdjustments(0.85, 40)
-    phys_adj = PhysicalAdjustments(0.0, 0.0, 0.0, 1.0)
+    phys_adj = PhysicalAdjustments(0.0, 0.0)
     return trans_adj, phys_adj
 
 
@@ -98,7 +98,7 @@ def no_risk_adjustments():
 def moderate_risk_adjustments():
     """Moderate risk adjustments."""
     trans_adj = TransitionAdjustments(0.65, 30)
-    phys_adj = PhysicalAdjustments(0.02, 0.01, 0.005, 0.98)
+    phys_adj = PhysicalAdjustments(0.02, 0.005)
     return trans_adj, phys_adj
 
 
@@ -106,7 +106,7 @@ def moderate_risk_adjustments():
 def high_risk_adjustments():
     """High risk adjustments."""
     trans_adj = TransitionAdjustments(0.45, 20)
-    phys_adj = PhysicalAdjustments(0.05, 0.03, 0.015, 0.92)
+    phys_adj = PhysicalAdjustments(0.05, 0.015)
     return trans_adj, phys_adj
 
 

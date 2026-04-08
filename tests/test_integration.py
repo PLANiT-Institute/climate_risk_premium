@@ -57,7 +57,7 @@ class TestEndToEndPipeline:
     def test_baseline_cashflows_positive_ebitda(self, samcheok_plant):
         trans = TransitionScenario("Baseline", 0.0, 40)
         trans_adj = TransitionAdjustments(0.85, 40)
-        phys_adj = PhysicalAdjustments(0.0, 0.0, 0.0, 1.0)
+        phys_adj = PhysicalAdjustments(0.0, 0.0)
 
         cf = compute_cashflows_timeseries(samcheok_plant, trans, trans_adj, phys_adj)
 
@@ -66,8 +66,8 @@ class TestEndToEndPipeline:
 
     def test_risk_scenario_lower_npv_than_baseline(self, samcheok_plant):
         trans = TransitionScenario("Baseline", 0.0, 40)
-        phys_no_risk = PhysicalAdjustments(0.0, 0.0, 0.0, 1.0)
-        phys_risky = PhysicalAdjustments(0.03, 0.02, 0.01, 0.95)
+        phys_no_risk = PhysicalAdjustments(0.0, 0.0)
+        phys_risky = PhysicalAdjustments(0.03, 0.01)
 
         trans_adj_base = TransitionAdjustments(0.85, 40)
         trans_adj_risk = TransitionAdjustments(0.65, 30)
@@ -86,13 +86,13 @@ class TestEndToEndPipeline:
 
         # Baseline
         base_adj = TransitionAdjustments(0.85, 40)
-        base_phys = PhysicalAdjustments(0.0, 0.0, 0.0, 1.0)
+        base_phys = PhysicalAdjustments(0.0, 0.0)
         cf_base = compute_cashflows_timeseries(samcheok_plant, trans, base_adj, base_phys)
         m_base = calculate_metrics(cf_base, samcheok_plant)
 
         # Risk scenario
         risk_adj = TransitionAdjustments(0.65, 30)
-        risk_phys = PhysicalAdjustments(0.03, 0.02, 0.01, 0.95)
+        risk_phys = PhysicalAdjustments(0.03, 0.01)
         cf_risk = compute_cashflows_timeseries(samcheok_plant, trans, risk_adj, risk_phys)
         m_risk = calculate_metrics(cf_risk, samcheok_plant)
 
@@ -119,7 +119,7 @@ class TestEndToEndPipeline:
 
         # Baseline (strong financials)
         base_adj = TransitionAdjustments(0.85, 40)
-        base_phys = PhysicalAdjustments(0.0, 0.0, 0.0, 1.0)
+        base_phys = PhysicalAdjustments(0.0, 0.0)
         cf_base = compute_cashflows_timeseries(samcheok_plant, trans, base_adj, base_phys)
 
         # Build rating metrics from baseline
@@ -176,9 +176,9 @@ class TestMultiScenarioComparison:
     def test_increasing_risk_decreases_npv(self, samcheok_plant):
         trans = TransitionScenario("Test", 0.0, 40)
         risk_levels = [
-            (0.85, 40, PhysicalAdjustments(0.0, 0.0, 0.0, 1.0)),
-            (0.70, 35, PhysicalAdjustments(0.01, 0.01, 0.005, 0.98)),
-            (0.55, 25, PhysicalAdjustments(0.03, 0.02, 0.01, 0.95)),
+            (0.85, 40, PhysicalAdjustments(0.0, 0.0)),
+            (0.70, 35, PhysicalAdjustments(0.01, 0.005)),
+            (0.55, 25, PhysicalAdjustments(0.03, 0.01)),
         ]
 
         npvs = []
