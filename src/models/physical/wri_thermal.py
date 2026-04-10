@@ -56,10 +56,10 @@ class WaterTemperatureModel:
     """WRI-based water temperature disruption model for once-through cooling.
 
     Estimates the annual fraction of time Samcheok Blue Power is forced to
-    curtail or shut down due to intake seawater temperature exceeding design
-    limits or regulatory discharge limits.
+    curtail or shut down due to intake seawater temperature exceeding the
+    plant's design limit.
 
-    Two curves are applied and the more restrictive result is returned:
+    The primary curve applied is:
 
     1. **WaterTemperature curve** (ΔT above design intake temp):
        Maps delta between projected summer peak SST and the plant's design
@@ -74,9 +74,13 @@ class WaterTemperatureModel:
        - ``WaterTemperatureModel`` → SST rise above *design limit* → forced
          curtailment on the **revenue** channel.
 
+    An optional second curve can be enabled via ``apply_regulatory_curve``:
+
     2. **RegulatoryDischargeWaterLimit curve** (absolute intake temp °C):
        Maps projected absolute summer peak SST to regulatory shutdown risk
-       (Korean environmental discharge temperature limits).
+       based on discharge temperature limits. **Disabled by default** because
+       Korea does not apply discharge water temperature regulations to thermal
+       power plants. Enable only for jurisdictions where such limits apply.
 
     Attributes:
         DESIGN_INTAKE_TEMP_C: Design intake temperature threshold (°C).
@@ -88,13 +92,18 @@ class WaterTemperatureModel:
     DESIGN_INTAKE_TEMP_C: float = 23.5
     SUMMER_WARMING_FACTOR: float = 1.2
 
-    def __init__(self, scenario: str = "RCP8.5") -> None:
+    def __init__(self, scenario: str = "RCP8.5", apply_regulatory_curve: bool = False) -> None:
         """Initialise the water temperature disruption model.
 
         Args:
             scenario: Climate scenario label passed to TemperatureModel.
                 Supported values: ``"RCP4.5"``, ``"RCP8.5"``.
                 Unknown values fall back to RCP8.5 (TemperatureModel default).
+            apply_regulatory_curve: Whether to apply the
+                RegulatoryDischargeWaterLimit curve as a second constraint.
+                Defaults to False — Korea does not apply discharge temperature
+                regulations to thermal power plants. Set to True only for
+                jurisdictions where such limits are enforced.
         """
         curves = _load_curves()["curves"]
 
@@ -106,6 +115,8 @@ class WaterTemperatureModel:
         self._reg_intensity: List[float] = reg["intensity"]
         self._reg_impact: List[float] = reg["impact_mean"]
 
+        self._apply_regulatory_curve = apply_regulatory_curve
+
         self._temp_model = TemperatureModel(
             rcp=scenario,
             cooling_type=CoolingType.ONCE_THROUGH,
@@ -114,8 +125,10 @@ class WaterTemperatureModel:
     def calculate_disruption(self, year: int) -> float:
         """Calculate annual water-temperature disruption fraction.
 
-        Combines thermal exceedance and regulatory limit curves and returns
-        the more restrictive result.
+        Returns the thermal exceedance disruption fraction. If
+        ``apply_regulatory_curve`` was set at init, the regulatory
+        discharge limit curve is also evaluated and the more restrictive
+        result is returned.
 
         Args:
             year: Projection year (e.g. 2030, 2050).
@@ -149,12 +162,15 @@ class WaterTemperatureModel:
             np.interp(delta_above_design, self._wt_intensity, self._wt_impact)
         ) / 365.0
 
+        if not self._apply_regulatory_curve:
+            return thermal_disruption
+
         # Step 5: Regulatory disruption from RegulatoryDischargeWaterLimit curve
+        # Only reached when apply_regulatory_curve=True (non-Korean jurisdictions)
         regulatory_disruption = float(
             np.interp(projected_summer_peak, self._reg_intensity, self._reg_impact)
         ) / 365.0
 
-        # Step 6: Return the binding (more restrictive) constraint
         return max(thermal_disruption, regulatory_disruption)
 
 
