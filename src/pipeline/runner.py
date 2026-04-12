@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 
+import numpy as np
 import pandas as pd
 
 logger = logging.getLogger(__name__)
@@ -31,7 +32,7 @@ from src.risk.financing import calculate_financing_with_counterfactual
 from src.risk.attribution import decompose_risk_shapley
 from src.financials import compute_cashflows_timeseries, calculate_metrics, CashFlowTimeSeries, FinancialMetrics
 from src.scenarios.korea_power_plan import load_korea_power_plan_scenarios
-from src.risk.physical import PhysicalAdjustments
+from src.risk.physical import PhysicalAdjustments, YearlyPhysicalAdjustments
 from src.models.physical.wri_thermal import WaterTemperatureModel
 from src.models.physical.temperature import TemperatureModel, CoolingType
 from src.models.physical.wildfire import WildfireModel
@@ -54,9 +55,9 @@ except ImportError:
     CombinedRiskResult = None
 
 
-# CRP physical scenario → PLANiT SSP + target year
+# CRP physical scenario → SSP + target year
+# Scenarios NOT in this map get zero physical risk (handled by _load_physical_scenario).
 PHYSICAL_SCENARIO_SSP_MAP: Dict[str, tuple] = {
-    "baseline": ("ssp126", 2024),
     "moderate_physical": ("ssp126", 2040),
     "high_physical": ("ssp585", 2040),
     "severe_drought": ("ssp585", 2050),
@@ -191,8 +192,18 @@ class CRPModelRunner:
           outage_rate           ← WildfireModel  (KFS/CLIMADA baseline × KFS climate factor)
           efficiency_loss       ← TemperatureModel (air + SST → Rankine cycle efficiency)
           water_temp_disruption ← WaterTemperatureModel (WRI seawater intake curves)
+
+        Scenarios not in PHYSICAL_SCENARIO_SSP_MAP return zero physical risk.
         """
-        ssp, target_year = PHYSICAL_SCENARIO_SSP_MAP.get(scenario_name, ("ssp126", 2024))
+        if scenario_name not in PHYSICAL_SCENARIO_SSP_MAP:
+            return PhysicalAdjustments(
+                outage_rate=0.0,
+                efficiency_loss=0.0,
+                water_temp_disruption=0.0,
+                notes=f"No physical risk ({scenario_name})",
+            )
+
+        ssp, target_year = PHYSICAL_SCENARIO_SSP_MAP[scenario_name]
         ssp_to_crp = {"ssp126": "SSP1-2.6", "ssp245": "RCP4.5", "ssp585": "RCP8.5"}
         crp_label = ssp_to_crp.get(ssp, "SSP1-2.6")
 
@@ -210,15 +221,70 @@ class CRPModelRunner:
         efficiency_loss = self._temp_model_by_scenario[temp_rcp].calculate_efficiency_loss(target_year).total_derate
 
         # WRI water temperature disruption: seawater intake exceedance → curtailment
-        if crp_label not in self._wt_model_by_scenario:
-            self._wt_model_by_scenario[crp_label] = WaterTemperatureModel(scenario=crp_label)
-        water_temp_disruption = self._wt_model_by_scenario[crp_label].calculate_disruption(target_year)
+        if temp_rcp not in self._wt_model_by_scenario:
+            self._wt_model_by_scenario[temp_rcp] = WaterTemperatureModel(scenario=temp_rcp)
+        water_temp_disruption = self._wt_model_by_scenario[temp_rcp].calculate_disruption(target_year)
 
         return PhysicalAdjustments(
             outage_rate=outage_rate,
             efficiency_loss=efficiency_loss,
             water_temp_disruption=water_temp_disruption,
             notes=f"WF={outage_rate:.6f} TE={efficiency_loss:.4f} WT={water_temp_disruption:.6f} ({crp_label} y{target_year})",
+        )
+
+    def _build_yearly_physical_adjustments(
+        self,
+        scenario_name: str,
+        start_year: int,
+        n_years: int,
+    ) -> Optional[YearlyPhysicalAdjustments]:
+        """Build year-by-year physical adjustments with linear interpolation.
+
+        Each model internally interpolates between its own anchor years
+        (KFS 2024/2030/2050/2100 for wildfire, KMA for temperature, etc.).
+        This method simply queries them for each operating year.
+
+        Returns None for scenarios not in PHYSICAL_SCENARIO_SSP_MAP
+        (i.e. no physical risk → cashflow engine uses static zeros).
+        """
+        if scenario_name not in PHYSICAL_SCENARIO_SSP_MAP:
+            return None
+
+        ssp, _target_year = PHYSICAL_SCENARIO_SSP_MAP[scenario_name]
+        ssp_to_crp = {"ssp126": "SSP1-2.6", "ssp245": "RCP4.5", "ssp585": "RCP8.5"}
+        crp_label = ssp_to_crp.get(ssp, "SSP1-2.6")
+        temp_rcp = self._CRP_TO_TEMP_RCP.get(crp_label, "RCP4.5")
+
+        # Reuse cached model instances (same as _load_physical_scenario)
+        if crp_label not in self._wf_model_by_scenario:
+            self._wf_model_by_scenario[crp_label] = WildfireModel(scenario=crp_label)
+        if temp_rcp not in self._temp_model_by_scenario:
+            self._temp_model_by_scenario[temp_rcp] = TemperatureModel(
+                rcp=temp_rcp, cooling_type=CoolingType.ONCE_THROUGH
+            )
+        if temp_rcp not in self._wt_model_by_scenario:
+            self._wt_model_by_scenario[temp_rcp] = WaterTemperatureModel(scenario=temp_rcp)
+
+        years = np.arange(start_year, start_year + n_years)
+        outage_rates = np.array([
+            self._wf_model_by_scenario[crp_label].calculate_outage_rate(int(y))
+            for y in years
+        ])
+        efficiency_losses = np.array([
+            self._temp_model_by_scenario[temp_rcp].calculate_efficiency_loss(int(y)).total_derate
+            for y in years
+        ])
+        water_temp_disruptions = np.array([
+            self._wt_model_by_scenario[temp_rcp].calculate_disruption(int(y))
+            for y in years
+        ])
+
+        return YearlyPhysicalAdjustments(
+            years=years,
+            outage_rates=outage_rates,
+            efficiency_losses=efficiency_losses,
+            water_temp_disruptions=water_temp_disruptions,
+            scenario_name=f"{crp_label} interpolated",
         )
 
     def _load_market_scenario(self, scenario_name: str) -> MarketScenario:
@@ -239,6 +305,7 @@ class CRPModelRunner:
         market_scenario: MarketScenario | None,
         risk_type: str,
         yearly_transition_adj=None,
+        yearly_physical_adj=None,
     ) -> RiskComponentResult:
         """Run cashflow → metrics → rating → CRP for a single risk configuration."""
         cashflow = compute_cashflows_timeseries(
@@ -248,6 +315,7 @@ class CRPModelRunner:
             physical_adj,
             market_scenario,
             yearly_transition_adj=yearly_transition_adj,
+            yearly_physical_adj=yearly_physical_adj,
         )
         metrics = calculate_metrics(cashflow, plant_params)
 
@@ -326,6 +394,8 @@ class CRPModelRunner:
         physical_adj = self._load_physical_scenario(physical_scenario_name)
         market_scenario = self._load_market_scenario(market_scenario_name)
 
+        start_year = int(plant_params.get("cod_year", 2025))
+
         # Load Korea Power Plan if specified
         korea_plan = None
         if power_plan_name and power_plan_name in self.power_plans:
@@ -348,19 +418,26 @@ class CRPModelRunner:
         yearly_transition_adj = None
         if enhanced_korea_scenario is not None:
             from src.risk.transition import create_yearly_transition_adjustments
-            start = int(plant_params.get("cod_year", 2025))
             yearly_transition_adj = create_yearly_transition_adjustments(
                 plant_params, enhanced_korea_scenario,
-                start_year=start,
-                end_year=start + transition_adj.operating_years - 1,
+                start_year=start_year,
+                end_year=start_year + transition_adj.operating_years - 1,
                 dispatch_priority_penalty=transition_scenario.dispatch_priority_penalty,
             )
+
+        # Build year-by-year physical adjustments (None for transition-only scenarios)
+        yearly_physical_adj = self._build_yearly_physical_adjustments(
+            physical_scenario_name,
+            start_year=start_year,
+            n_years=transition_adj.operating_years,
+        )
 
         # --- Combined run (always performed, same as before) ---
         combined = self._compute_component(
             plant_params, transition_scenario, transition_adj, physical_adj,
             market_scenario, "combined",
             yearly_transition_adj=yearly_transition_adj,
+            yearly_physical_adj=yearly_physical_adj,
         )
 
         # Build the primary ScenarioResult from the combined run
@@ -417,6 +494,7 @@ class CRPModelRunner:
         physical_only = self._compute_component(
             plant_params, transition_scenario, no_transition, physical_adj,
             market_scenario, "physical_only",
+            yearly_physical_adj=yearly_physical_adj,
         )
 
         # Shapley decomposition
@@ -458,6 +536,13 @@ class CRPModelRunner:
                       If None, runs default scenarios
         """
         if scenarios is None:
+            # === SCENARIO DESIGN ===
+            # Physical risk assignment:
+            #   - Transition-only scenarios: physical="baseline" → zero physical risk
+            #   - Physical scenarios: moderate_physical=SSP1-2.6, high_physical=SSP5-8.5
+            #   - Combined: physical SSP matches transition intensity direction
+            #   - enhanced_combined: SSP1-2.6 (policy-consistent with strong decarbonization)
+            #   - combined_aggressive: SSP5-8.5 (note: logical tension — flagged in reporting)
             scenarios = [
                 # Baseline scenario (no transition risk, no physical risk)
                 {"name": "baseline", "transition": "baseline", "physical": "baseline"},
