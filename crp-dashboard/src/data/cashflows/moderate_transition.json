@@ -18,7 +18,9 @@
     "capacity_factor": 0.5,
     "final_cf": 0.5,
     "carbon_costs": 0.0,
-    "dscr": 0.6860342532259203
+    "dscr": 0.6860342532259203,
+    "water_temp_disruption": 0.0,
+    "lost_revenue_from_water_temp": 0.0
   },
   {
     "year": 2026,
@@ -39,7 +41,9 @@
     "capacity_factor": 0.5,
     "final_cf": 0.5,
     "carbon_costs": 0.0,
-    "dscr": 0.6860342532259203
+    "dscr": 0.6860342532259203,
+    "water_temp_disruption": 0.0,
+    "lost_revenue_from_water_temp": 0.0
   },
   {
     "year": 2027,
@@ -60,7 +64,9 @@
     "capacity_factor": 0.5,
     "final_cf": 0.5,
     "carbon_costs": 0.0,
-    "dscr": 0.6860342532259203
+    "dscr": 0.6860342532259203,
+    "water_temp_disruption": 0.0,
+    "lost_revenue_from_water_temp": 0.0
   },
   {
     "year": 2028,
@@ -81,7 +87,9 @@
     "capacity_factor": 0.5,
     "final_cf": 0.5,
     "carbon_costs": 0.0,
-    "dscr": 0.6860342532259203
+    "dscr": 0.6860342532259203,
+    "water_temp_disruption": 0.0,
+    "lost_revenue_from_water_temp": 0.0
   },
   {
     "year": 2029,
@@ -102,7 +110,9 @@
     "capacity_factor": 0.5,
     "final_cf": 0.5,
     "carbon_costs": 0.0,
-    "dscr": 0.6860342532259203
+    "dscr": 0.6860342532259203,
+    "water_temp_disruption": 0.0,
+    "lost_revenue_from_water_temp": 0.0
   },
   {
     "year": 2030,
@@ -123,7 +133,9 @@
     "capacity_factor": 0.5,
     "final_cf": 0.5,
     "carbon_costs": 0.0,
-    "dscr": 0.6860342532259203
+    "dscr": 0.6860342532259203,
+    "water_temp_disruption": 0.0,
+    "lost_revenue_from_water_temp": 0.0
   },
   {
     "year": 2031,
@@ -144,7 +156,9 @@
     "capacity_factor": 0.5,
     "final_cf": 0.5,
     "carbon_costs": 0.0,
-    "dscr": 0.6860342532259203
+    "dscr": 0.6860342532259203,
+    "water_temp_disruption": 0.0,
+    "lost_revenue_from_water_temp": 0.0
   },
   {
     "year": 2032,
@@ -165,7 +179,9 @@
     "capacity_factor": 0.5,
     "final_cf": 0.5,
     "carbon_costs": 0.0,
-    "dscr": 0.6860342532259203
+    "dscr": 0.6860342532259203,
+    "water_temp_disruption": 0.0,
+    "lost_revenue_from_water_temp": 0.0
   },
   {
     "year": 2033,
@@ -186,7 +202,9 @@
     "capacity_factor": 0.5,
     "final_cf": 0.5,
     "carbon_costs": 0.0,
-    "dscr": 0.6860342532259203
+    "dscr": 0.6860342532259203,
+    "water_temp_disruption": 0.0,
+    "lost_revenue_from_water_temp": 0.0
   },
   {
     "year": 2034,
@@ -207,7 +225,9 @@
     "capacity_factor": 0.5,
     "final_cf": 0.5,
     "carbon_costs": 0.0,
-    "dscr": 0.6860342532259203
+    "dscr": 0.6860342532259203,
+    "water_temp_disruption": 0.0,
+    "lost_revenue_from_water_temp": 0.0
   },
   {
     "year": 2035,
@@ -228,7 +248,9 @@
     "capacity_factor": 0.5,
     "final_cf": 0.5,
     "carbon_costs": 0.0,
-    "dscr": 0.6860342532259203
+    "dscr": 0.6860342532259203,
+    "water_temp_disruption": 0.0,
+    "lost_revenue_from_water_temp": 0.0
   },
   {
     "year": 2036,
@@ -249,7 +271,9 @@
     "capacity_factor": 0.5,
     "final_cf": 0.5,
     "carbon_costs": 0.0,
-    "dscr": 0.6860342532259203
+    "dscr": 0.6860342532259203,
+    "water_temp_disruption": 0.0,
+    "lost_revenue_from_water_temp": 0.0
   },
   {
     "year": 2037,
@@ -270,7 +294,9 @@
     "capacity_factor": 0.5,
     "final_cf": 0.5,
     "carbon_costs": 0.0,
-    "dscr": 0.6860342532259203
+    "dscr": 0.6860342532259203,
+    "water_temp_disruption": 0.0,
+    "lost_revenue_from_water_temp": 0.0
   },
   {
     "year": 2038,
@@ -291,7 +317,9 @@
     "capacity_factor": 0.5,
     "final_cf": 0.5,
     "carbon_costs": 0.0,
-    "dscr": 0.6842163756880036
+    "dscr": 0.6842163756880036,
+    "water_temp_disruption": 0.0,
+    "lost_revenue_from_water_temp": 0.0
   },
   {
     "year": 2039,
@@ -312,7 +340,9 @@
     "capacity_factor": 0.5,
     "final_cf": 0.5,
     "carbon_costs": 0.0,
-    "dscr": 0.6753328590613771
+    "dscr": 0.6753328590613771,
+    "water_temp_disruption": 0.0,
+    "lost_revenue_from_water_temp": 0.0
   },
   {
     "year": 2040,
@@ -333,7 +363,9 @@
     "capacity_factor": 0.5,
     "final_cf": 0.5,
     "carbon_costs": 0.0,
-    "dscr": 0.6660051666034194
+    "dscr": 0.6660051666034194,
+    "water_temp_disruption": 0.0,
+    "lost_revenue_from_water_temp": 0.0
   },
   {
     "year": 2041,
@@ -354,7 +386,9 @@
     "capacity_factor": 0.5,
     "final_cf": 0.5,
     "carbon_costs": 0.0,
-    "dscr": 0.6562110895225636
+    "dscr": 0.6562110895225636,
+    "water_temp_disruption": 0.0,
+    "lost_revenue_from_water_temp": 0.0
   },
   {
     "year": 2042,
@@ -375,7 +409,9 @@
     "capacity_factor": 0.5,
     "final_cf": 0.5,
     "carbon_costs": 0.0,
-    "dscr": 0.645927308587665
+    "dscr": 0.645927308587665,
+    "water_temp_disruption": 0.0,
+    "lost_revenue_from_water_temp": 0.0
   },
   {
     "year": 2043,
@@ -396,7 +432,9 @@
     "capacity_factor": 0.5,
     "final_cf": 0.5,
     "carbon_costs": 0.0,
-    "dscr": 0.6351293386060216
+    "dscr": 0.6351293386060216,
+    "water_temp_disruption": 0.0,
+    "lost_revenue_from_water_temp": 0.0
   },
   {
     "year": 2044,
@@ -417,7 +455,9 @@
     "capacity_factor": 0.5,
     "final_cf": 0.5,
     "carbon_costs": 0.0,
-    "dscr": 0.623791470125296
+    "dscr": 0.623791470125296,
+    "water_temp_disruption": 0.0,
+    "lost_revenue_from_water_temp": 0.0
   },
   {
     "year": 2045,
@@ -438,7 +478,9 @@
     "capacity_factor": 0.5,
     "final_cf": 0.5,
     "carbon_costs": 0.0,
-    "dscr": 0.0
+    "dscr": 0.0,
+    "water_temp_disruption": 0.0,
+    "lost_revenue_from_water_temp": 0.0
   },
   {
     "year": 2046,
@@ -459,7 +501,9 @@
     "capacity_factor": 0.5,
     "final_cf": 0.5,
     "carbon_costs": 0.0,
-    "dscr": 0.0
+    "dscr": 0.0,
+    "water_temp_disruption": 0.0,
+    "lost_revenue_from_water_temp": 0.0
   },
   {
     "year": 2047,
@@ -480,7 +524,9 @@
     "capacity_factor": 0.5,
     "final_cf": 0.5,
     "carbon_costs": 0.0,
-    "dscr": 0.0
+    "dscr": 0.0,
+    "water_temp_disruption": 0.0,
+    "lost_revenue_from_water_temp": 0.0
   },
   {
     "year": 2048,
@@ -501,7 +547,9 @@
     "capacity_factor": 0.5,
     "final_cf": 0.5,
     "carbon_costs": 0.0,
-    "dscr": 0.0
+    "dscr": 0.0,
+    "water_temp_disruption": 0.0,
+    "lost_revenue_from_water_temp": 0.0
   },
   {
     "year": 2049,
@@ -522,7 +570,9 @@
     "capacity_factor": 0.5,
     "final_cf": 0.5,
     "carbon_costs": 0.0,
-    "dscr": 0.0
+    "dscr": 0.0,
+    "water_temp_disruption": 0.0,
+    "lost_revenue_from_water_temp": 0.0
   },
   {
     "year": 2050,
@@ -543,7 +593,9 @@
     "capacity_factor": 0.5,
     "final_cf": 0.5,
     "carbon_costs": 0.0,
-    "dscr": 0.0
+    "dscr": 0.0,
+    "water_temp_disruption": 0.0,
+    "lost_revenue_from_water_temp": 0.0
   },
   {
     "year": 2051,
@@ -564,7 +616,9 @@
     "capacity_factor": 0.5,
     "final_cf": 0.5,
     "carbon_costs": 0.0,
-    "dscr": 0.0
+    "dscr": 0.0,
+    "water_temp_disruption": 0.0,
+    "lost_revenue_from_water_temp": 0.0
   },
   {
     "year": 2052,
@@ -585,7 +639,9 @@
     "capacity_factor": 0.5,
     "final_cf": 0.5,
     "carbon_costs": 0.0,
-    "dscr": 0.0
+    "dscr": 0.0,
+    "water_temp_disruption": 0.0,
+    "lost_revenue_from_water_temp": 0.0
   },
   {
     "year": 2053,
@@ -606,7 +662,9 @@
     "capacity_factor": 0.5,
     "final_cf": 0.5,
     "carbon_costs": 0.0,
-    "dscr": 0.0
+    "dscr": 0.0,
+    "water_temp_disruption": 0.0,
+    "lost_revenue_from_water_temp": 0.0
   },
   {
     "year": 2054,
@@ -627,7 +685,9 @@
     "capacity_factor": 0.5,
     "final_cf": 0.5,
     "carbon_costs": 0.0,
-    "dscr": 0.0
+    "dscr": 0.0,
+    "water_temp_disruption": 0.0,
+    "lost_revenue_from_water_temp": 0.0
   },
   {
     "year": 2055,
@@ -648,7 +708,9 @@
     "capacity_factor": 0.5,
     "final_cf": 0.5,
     "carbon_costs": 0.0,
-    "dscr": 0.0
+    "dscr": 0.0,
+    "water_temp_disruption": 0.0,
+    "lost_revenue_from_water_temp": 0.0
   },
   {
     "year": 2056,
@@ -669,7 +731,9 @@
     "capacity_factor": 0.5,
     "final_cf": 0.5,
     "carbon_costs": 0.0,
-    "dscr": 0.0
+    "dscr": 0.0,
+    "water_temp_disruption": 0.0,
+    "lost_revenue_from_water_temp": 0.0
   },
   {
     "year": 2057,
@@ -690,7 +754,9 @@
     "capacity_factor": 0.5,
     "final_cf": 0.5,
     "carbon_costs": 0.0,
-    "dscr": 0.0
+    "dscr": 0.0,
+    "water_temp_disruption": 0.0,
+    "lost_revenue_from_water_temp": 0.0
   },
   {
     "year": 2058,
@@ -711,7 +777,9 @@
     "capacity_factor": 0.5,
     "final_cf": 0.5,
     "carbon_costs": 0.0,
-    "dscr": 0.0
+    "dscr": 0.0,
+    "water_temp_disruption": 0.0,
+    "lost_revenue_from_water_temp": 0.0
   },
   {
     "year": 2059,
@@ -732,6 +800,8 @@
     "capacity_factor": 0.5,
     "final_cf": 0.5,
     "carbon_costs": 0.0,
-    "dscr": 0.0
+    "dscr": 0.0,
+    "water_temp_disruption": 0.0,
+    "lost_revenue_from_water_temp": 0.0
   }
 ]

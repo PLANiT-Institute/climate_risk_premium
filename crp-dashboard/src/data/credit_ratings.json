@@ -86,14 +86,14 @@
     "equity_leverage_rating": "BBB",
     "asset_leverage_rating": "BBB",
     "capacity_mw": 2100.0,
-    "ebitda_to_fixed_assets": 5.698804191549294,
-    "ebitda_to_interest": 1.4247010478873237,
-    "dscr": 0.8518103215875152,
-    "net_debt_to_ebitda": 13.93803277161747,
+    "ebitda_to_fixed_assets": 5.611170612375747,
+    "ebitda_to_interest": 1.4027926530939367,
+    "dscr": 0.8440924455837685,
+    "net_debt_to_ebitda": 14.157274555786199,
     "debt_to_equity": 266.66666666666663,
     "debt_to_assets": 80.0,
     "is_ebitda_negative": false,
-    "rating_rationale": "Overall BBB: Weighted average downgraded 1 notch (DSCR=0.852 < 1.0)"
+    "rating_rationale": "Overall BBB: Weighted average downgraded 1 notch (DSCR=0.844 < 1.0)"
   },
   {
     "scenario": "high_physical",
@@ -110,14 +110,14 @@
     "equity_leverage_rating": "BBB",
     "asset_leverage_rating": "BBB",
     "capacity_mw": 2100.0,
-    "ebitda_to_fixed_assets": 5.698804191549294,
-    "ebitda_to_interest": 1.4247010478873237,
-    "dscr": 0.8518103215875152,
-    "net_debt_to_ebitda": 13.93803277161747,
+    "ebitda_to_fixed_assets": 5.573811610936925,
+    "ebitda_to_interest": 1.3934529027342313,
+    "dscr": 0.8417206396707326,
+    "net_debt_to_ebitda": 14.252835291925566,
     "debt_to_equity": 266.66666666666663,
     "debt_to_assets": 80.0,
     "is_ebitda_negative": false,
-    "rating_rationale": "Overall BBB: Weighted average downgraded 1 notch (DSCR=0.852 < 1.0)"
+    "rating_rationale": "Overall BBB: Weighted average downgraded 1 notch (DSCR=0.842 < 1.0)"
   },
   {
     "scenario": "combined_moderate",
@@ -134,14 +134,14 @@
     "equity_leverage_rating": "BBB",
     "asset_leverage_rating": "BBB",
     "capacity_mw": 2100.0,
-    "ebitda_to_fixed_assets": 4.403933070422536,
-    "ebitda_to_interest": 1.1009832676056337,
-    "dscr": 0.6752529450065655,
-    "net_debt_to_ebitda": 18.065580339377046,
+    "ebitda_to_fixed_assets": 4.335449980446774,
+    "ebitda_to_interest": 1.0838624951116935,
+    "dscr": 0.6681366097505897,
+    "net_debt_to_ebitda": 18.35252519595576,
     "debt_to_equity": 266.66666666666663,
     "debt_to_assets": 80.0,
     "is_ebitda_negative": false,
-    "rating_rationale": "Overall BBB: Weighted average downgraded 1 notch (DSCR=0.675 < 1.0)"
+    "rating_rationale": "Overall BBB: Weighted average downgraded 1 notch (DSCR=0.668 < 1.0)"
   },
   {
     "scenario": "combined_aggressive",
@@ -158,14 +158,14 @@
     "equity_leverage_rating": "BBB",
     "asset_leverage_rating": "BBB",
     "capacity_mw": 2100.0,
-    "ebitda_to_fixed_assets": 2.4616263887323937,
-    "ebitda_to_interest": 0.6154065971830983,
-    "dscr": 0.38346632301412753,
-    "net_debt_to_ebitda": 32.39883912773447,
+    "ebitda_to_fixed_assets": 2.407598049357758,
+    "ebitda_to_interest": 0.6018995123394395,
+    "dscr": 0.3760958386778417,
+    "net_debt_to_ebitda": 33.128137903393174,
     "debt_to_equity": 266.66666666666663,
     "debt_to_assets": 80.0,
     "is_ebitda_negative": false,
-    "rating_rationale": "Overall BB: Weighted average downgraded 1 notch (DSCR=0.383 < 1.0)"
+    "rating_rationale": "Overall BB: Weighted average downgraded 1 notch (DSCR=0.376 < 1.0)"
   },
   {
     "scenario": "low_demand",
@@ -206,14 +206,14 @@
     "equity_leverage_rating": "BBB",
     "asset_leverage_rating": "BBB",
     "capacity_mw": 2100.0,
-    "ebitda_to_fixed_assets": 5.698804191549294,
-    "ebitda_to_interest": 1.4247010478873237,
-    "dscr": 0.8518103215875152,
-    "net_debt_to_ebitda": 13.93803277161747,
+    "ebitda_to_fixed_assets": 5.573811610936925,
+    "ebitda_to_interest": 1.3934529027342313,
+    "dscr": 0.8417206396707326,
+    "net_debt_to_ebitda": 14.252835291925566,
     "debt_to_equity": 266.66666666666663,
     "debt_to_assets": 80.0,
     "is_ebitda_negative": false,
-    "rating_rationale": "Overall BBB: Weighted average downgraded 1 notch (DSCR=0.852 < 1.0)"
+    "rating_rationale": "Overall BBB: Weighted average downgraded 1 notch (DSCR=0.842 < 1.0)"
   },
   {
     "scenario": "enhanced_11th_plan",
@@ -254,13 +254,13 @@
     "equity_leverage_rating": "BBB",
     "asset_leverage_rating": "BBB",
     "capacity_mw": 2100.0,
-    "ebitda_to_fixed_assets": -1.3099688458102694,
-    "ebitda_to_interest": -0.32749221145256735,
-    "dscr": -0.20406384123327392,
+    "ebitda_to_fixed_assets": -1.3323964584237664,
+    "ebitda_to_interest": -0.3330991146059416,
+    "dscr": -0.20755756155665395,
     "net_debt_to_ebitda": 999.0,
     "debt_to_equity": 266.66666666666663,
     "debt_to_assets": 80.0,
     "is_ebitda_negative": true,
-    "rating_rationale": "Overall D: DSCR negative (-0.204)"
+    "rating_rationale": "Overall D: DSCR negative (-0.208)"
   }
 ]

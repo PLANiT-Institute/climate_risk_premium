@@ -52,41 +52,82 @@ class CashFlowTimeSeries:
     dscr: np.ndarray = field(default=None)  # type: ignore[arg-type]
     water_temp_disruption: np.ndarray = field(default=None)  # type: ignore[arg-type]
     lost_revenue_from_water_temp: np.ndarray = field(default=None)  # type: ignore[arg-type]
+    # --- New fields (appended; defaults preserve backward compatibility) ---
+    capacity_mw: float = 0.0
+    base_capacity_factor: np.ndarray = field(default=None)  # type: ignore[arg-type]
+    demand_factor: np.ndarray = field(default=None)  # type: ignore[arg-type]
+    outage_rate: np.ndarray = field(default=None)  # type: ignore[arg-type]
+    efficiency_loss: np.ndarray = field(default=None)  # type: ignore[arg-type]
+    potential_mwh: np.ndarray = field(default=None)  # type: ignore[arg-type]
+    actual_mwh: np.ndarray = field(default=None)  # type: ignore[arg-type]
+    power_price_per_mwh: np.ndarray = field(default=None)  # type: ignore[arg-type]
+    heat_rate_base: float = 0.0
+    effective_heat_rate: np.ndarray = field(default=None)  # type: ignore[arg-type]
+    taxable_income: np.ndarray = field(default=None)  # type: ignore[arg-type]
+    nopat: np.ndarray = field(default=None)  # type: ignore[arg-type]
+    cfads: np.ndarray = field(default=None)  # type: ignore[arg-type]
+    debt_service_annual: float = 0.0
 
     def __post_init__(self) -> None:
-        if self.carbon_costs is None:
-            self.carbon_costs = np.zeros_like(self.years, dtype=float)
-        if self.dscr is None:
-            self.dscr = np.zeros_like(self.years, dtype=float)
-        if self.water_temp_disruption is None:
-            self.water_temp_disruption = np.zeros_like(self.years, dtype=float)
-        if self.lost_revenue_from_water_temp is None:
-            self.lost_revenue_from_water_temp = np.zeros_like(self.years, dtype=float)
+        n = len(self.years) if self.years is not None else 0
+        for attr in [
+            'base_capacity_factor', 'demand_factor', 'capacity_factor',
+            'outage_rate', 'efficiency_loss', 'water_temp_disruption',
+            'final_cf', 'potential_mwh', 'actual_mwh',
+            'power_price_per_mwh', 'revenue', 'lost_revenue_from_outages',
+            'lost_revenue_from_water_temp', 'effective_heat_rate',
+            'fuel_costs', 'variable_opex', 'fixed_opex', 'carbon_costs',
+            'total_costs', 'ebitda', 'depreciation', 'ebit',
+            'interest_expense', 'taxable_income', 'tax_expense',
+            'net_income', 'nopat', 'capex', 'free_cash_flow',
+            'cfads', 'dscr',
+        ]:
+            if getattr(self, attr) is None:
+                setattr(self, attr, np.zeros(n, dtype=float))
 
     def to_dict(self) -> Dict[str, List[float]]:
         """Convert to dict for CSV export."""
         return {
             "year": self.years.tolist(),
+            # --- Capacity & Physical Risk ---
+            "capacity_mw": [self.capacity_mw] * len(self.years),
+            "base_capacity_factor": self.base_capacity_factor.tolist(),
+            "demand_factor": self.demand_factor.tolist(),
+            "capacity_factor": self.capacity_factor.tolist(),
+            "outage_rate": self.outage_rate.tolist(),
+            "efficiency_loss": self.efficiency_loss.tolist(),
+            "water_temp_disruption": self.water_temp_disruption.tolist(),
+            "final_cf": self.final_cf.tolist(),
+            "potential_mwh": self.potential_mwh.tolist(),
+            "actual_mwh": self.actual_mwh.tolist(),
+            # --- Price & Revenue ---
+            "power_price_per_mwh": self.power_price_per_mwh.tolist(),
             "revenue": self.revenue.tolist(),
+            "lost_revenue_from_outages": self.lost_revenue_from_outages.tolist(),
+            "lost_revenue_from_water_temp": self.lost_revenue_from_water_temp.tolist(),
+            # --- Costs ---
+            "heat_rate_base": [self.heat_rate_base] * len(self.years),
+            "effective_heat_rate": self.effective_heat_rate.tolist(),
             "fuel_costs": self.fuel_costs.tolist(),
             "variable_opex": self.variable_opex.tolist(),
             "fixed_opex": self.fixed_opex.tolist(),
-            "lost_revenue_from_outages": self.lost_revenue_from_outages.tolist(),
+            "carbon_costs": self.carbon_costs.tolist(),
             "total_costs": self.total_costs.tolist(),
+            # --- Profitability ---
             "ebitda": self.ebitda.tolist(),
             "depreciation": self.depreciation.tolist(),
             "ebit": self.ebit.tolist(),
             "interest_expense": self.interest_expense.tolist(),
+            "taxable_income": self.taxable_income.tolist(),
             "tax_expense": self.tax_expense.tolist(),
             "net_income": self.net_income.tolist(),
+            # --- Cash Flow ---
+            "nopat": self.nopat.tolist(),
             "capex": self.capex.tolist(),
             "free_cash_flow": self.free_cash_flow.tolist(),
-            "capacity_factor": self.capacity_factor.tolist(),
-            "final_cf": self.final_cf.tolist(),
-            "carbon_costs": self.carbon_costs.tolist(),
+            "cfads": self.cfads.tolist(),
+            "debt_service_annual": [self.debt_service_annual] * len(self.years),
             "dscr": self.dscr.tolist(),
-            "water_temp_disruption": self.water_temp_disruption.tolist(),
-            "lost_revenue_from_water_temp": self.lost_revenue_from_water_temp.tolist(),
         }
 
 
@@ -172,12 +213,17 @@ def compute_cashflows_timeseries(
         base_cf = transition_adj.capacity_factor
         base_cf_series = np.full(n_years, base_cf)
 
+    # Capture pre-demand CF before any clipping
+    pre_demand_cf = base_cf_series.copy()
+
     # Apply Market Demand factor if market scenario exists
     if market_scenario:
         demand_factors = np.array(
             [market_scenario.get_demand_factor(int(year), start_year) for year in years]
         )
         base_cf_series = np.minimum(1.0, base_cf_series * demand_factors)
+    else:
+        demand_factors = np.ones(n_years)
 
     cf_series = np.maximum(base_cf_series, 0.0)
 
@@ -333,6 +379,21 @@ def compute_cashflows_timeseries(
         dscr=dscr_series,
         water_temp_disruption=water_temp_disruptions,
         lost_revenue_from_water_temp=lost_revenue_from_water_temp,
+        # New fields
+        capacity_mw=capacity_mw,
+        base_capacity_factor=pre_demand_cf,
+        demand_factor=demand_factors,
+        outage_rate=outage_rates,
+        efficiency_loss=efficiency_losses,
+        potential_mwh=potential_mwh,
+        actual_mwh=actual_mwh,
+        power_price_per_mwh=prices,
+        heat_rate_base=heat_rate,
+        effective_heat_rate=effective_heat_rates,
+        taxable_income=taxable_income,
+        nopat=nopat,
+        cfads=cfads,
+        debt_service_annual=annual_ds,
     )
 
 
