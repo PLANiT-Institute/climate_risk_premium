@@ -1,0 +1,367 @@
+﻿hazard_type,indicator_id,path,display_name,description_short
+ChronicHeat,mean_degree_days/above/32c,chronic_heat/osc/v2/mean_degree_days_v2_above_32c_ACCESS-CM2_{scenario}_{year},Mean degree days above 32°C/ACCESS-CM2,"Degree days indicators are calculated by integrating over time the absolute difference in temperature
+of the medium over a reference temperature. The exact method of calculation may vary;
+here the dai"
+ChronicHeat,mean_degree_days/above/32c,chronic_heat/osc/v2/mean_degree_days_v2_above_32c_CMCC-ESM2_{scenario}_{year},Mean degree days above 32°C/CMCC-ESM2,"Degree days indicators are calculated by integrating over time the absolute difference in temperature
+of the medium over a reference temperature. The exact method of calculation may vary;
+here the dai"
+ChronicHeat,mean_degree_days/above/32c,chronic_heat/osc/v2/mean_degree_days_v2_above_32c_CNRM-CM6-1_{scenario}_{year},Mean degree days above 32°C/CNRM-CM6-1,"Degree days indicators are calculated by integrating over time the absolute difference in temperature
+of the medium over a reference temperature. The exact method of calculation may vary;
+here the dai"
+ChronicHeat,mean_degree_days/above/32c,chronic_heat/osc/v2/mean_degree_days_v2_above_32c_MIROC6_{scenario}_{year},Mean degree days above 32°C/MIROC6,"Degree days indicators are calculated by integrating over time the absolute difference in temperature
+of the medium over a reference temperature. The exact method of calculation may vary;
+here the dai"
+ChronicHeat,mean_degree_days/above/32c,chronic_heat/osc/v2/mean_degree_days_v2_above_32c_MPI-ESM1-2-LR_{scenario}_{year},Mean degree days above 32°C/MPI-ESM1-2-LR,"Degree days indicators are calculated by integrating over time the absolute difference in temperature
+of the medium over a reference temperature. The exact method of calculation may vary;
+here the dai"
+ChronicHeat,mean_degree_days/above/32c,chronic_heat/osc/v2/mean_degree_days_v2_above_32c_NorESM2-MM_{scenario}_{year},Mean degree days above 32°C/NorESM2-MM,"Degree days indicators are calculated by integrating over time the absolute difference in temperature
+of the medium over a reference temperature. The exact method of calculation may vary;
+here the dai"
+ChronicHeat,days/above/35c,chronic_heat/jupiter/v1/days_above_35c_{scenario}_{year},Days per year above 35°C (Jupiter),"
+These data should not be used in any manner relating to emergency management or planning, public safety,
+physical safety or property endangerment. For higher-resolution data based on up-to-date metho"
+ChronicHeat,mean_work_loss/low,chronic_heat/osc/v2/mean_work_loss_low_ACCESS-CM2_{scenario}_{year},"Mean work loss, low intensity/ACCESS-CM2","The mean work loss indicator is calculated from the 'Wet Bulb Globe Temperature' (WBGT) indicator:
+
+$$
+I^\text{WBGT}_i = 0.567 \times T^\text{avg}_i + 0.393 \times p^\text{vapour}_i + 3.94
+$$
+
+$I^\tex"
+ChronicHeat,mean_work_loss/low,chronic_heat/osc/v2/mean_work_loss_low_CMCC-ESM2_{scenario}_{year},"Mean work loss, low intensity/CMCC-ESM2","The mean work loss indicator is calculated from the 'Wet Bulb Globe Temperature' (WBGT) indicator:
+
+$$
+I^\text{WBGT}_i = 0.567 \times T^\text{avg}_i + 0.393 \times p^\text{vapour}_i + 3.94
+$$
+
+$I^\tex"
+ChronicHeat,mean_work_loss/low,chronic_heat/osc/v2/mean_work_loss_low_CNRM-CM6-1_{scenario}_{year},"Mean work loss, low intensity/CNRM-CM6-1","The mean work loss indicator is calculated from the 'Wet Bulb Globe Temperature' (WBGT) indicator:
+
+$$
+I^\text{WBGT}_i = 0.567 \times T^\text{avg}_i + 0.393 \times p^\text{vapour}_i + 3.94
+$$
+
+$I^\tex"
+ChronicHeat,mean_work_loss/low,chronic_heat/osc/v2/mean_work_loss_low_MPI-ESM1-2-LR_{scenario}_{year},"Mean work loss, low intensity/MPI-ESM1-2-LR","The mean work loss indicator is calculated from the 'Wet Bulb Globe Temperature' (WBGT) indicator:
+
+$$
+I^\text{WBGT}_i = 0.567 \times T^\text{avg}_i + 0.393 \times p^\text{vapour}_i + 3.94
+$$
+
+$I^\tex"
+ChronicHeat,mean_work_loss/low,chronic_heat/osc/v2/mean_work_loss_low_MIROC6_{scenario}_{year},"Mean work loss, low intensity/MIROC6","The mean work loss indicator is calculated from the 'Wet Bulb Globe Temperature' (WBGT) indicator:
+
+$$
+I^\text{WBGT}_i = 0.567 \times T^\text{avg}_i + 0.393 \times p^\text{vapour}_i + 3.94
+$$
+
+$I^\tex"
+ChronicHeat,mean_work_loss/low,chronic_heat/osc/v2/mean_work_loss_low_NorESM2-MM_{scenario}_{year},"Mean work loss, low intensity/NorESM2-MM","The mean work loss indicator is calculated from the 'Wet Bulb Globe Temperature' (WBGT) indicator:
+
+$$
+I^\text{WBGT}_i = 0.567 \times T^\text{avg}_i + 0.393 \times p^\text{vapour}_i + 3.94
+$$
+
+$I^\tex"
+ChronicHeat,mean_work_loss/medium,chronic_heat/osc/v2/mean_work_loss_medium_ACCESS-CM2_{scenario}_{year},"Mean work loss, medium intensity/ACCESS-CM2","The mean work loss indicator is calculated from the 'Wet Bulb Globe Temperature' (WBGT) indicator:
+
+$$
+I^\text{WBGT}_i = 0.567 \times T^\text{avg}_i + 0.393 \times p^\text{vapour}_i + 3.94
+$$
+
+$I^\tex"
+ChronicHeat,mean_work_loss/medium,chronic_heat/osc/v2/mean_work_loss_medium_CMCC-ESM2_{scenario}_{year},"Mean work loss, medium intensity/CMCC-ESM2","The mean work loss indicator is calculated from the 'Wet Bulb Globe Temperature' (WBGT) indicator:
+
+$$
+I^\text{WBGT}_i = 0.567 \times T^\text{avg}_i + 0.393 \times p^\text{vapour}_i + 3.94
+$$
+
+$I^\tex"
+ChronicHeat,mean_work_loss/medium,chronic_heat/osc/v2/mean_work_loss_medium_CNRM-CM6-1_{scenario}_{year},"Mean work loss, medium intensity/CNRM-CM6-1","The mean work loss indicator is calculated from the 'Wet Bulb Globe Temperature' (WBGT) indicator:
+
+$$
+I^\text{WBGT}_i = 0.567 \times T^\text{avg}_i + 0.393 \times p^\text{vapour}_i + 3.94
+$$
+
+$I^\tex"
+ChronicHeat,mean_work_loss/medium,chronic_heat/osc/v2/mean_work_loss_medium_MPI-ESM1-2-LR_{scenario}_{year},"Mean work loss, medium intensity/MPI-ESM1-2-LR","The mean work loss indicator is calculated from the 'Wet Bulb Globe Temperature' (WBGT) indicator:
+
+$$
+I^\text{WBGT}_i = 0.567 \times T^\text{avg}_i + 0.393 \times p^\text{vapour}_i + 3.94
+$$
+
+$I^\tex"
+ChronicHeat,mean_work_loss/medium,chronic_heat/osc/v2/mean_work_loss_medium_MIROC6_{scenario}_{year},"Mean work loss, medium intensity/MIROC6","The mean work loss indicator is calculated from the 'Wet Bulb Globe Temperature' (WBGT) indicator:
+
+$$
+I^\text{WBGT}_i = 0.567 \times T^\text{avg}_i + 0.393 \times p^\text{vapour}_i + 3.94
+$$
+
+$I^\tex"
+ChronicHeat,mean_work_loss/medium,chronic_heat/osc/v2/mean_work_loss_medium_NorESM2-MM_{scenario}_{year},"Mean work loss, medium intensity/NorESM2-MM","The mean work loss indicator is calculated from the 'Wet Bulb Globe Temperature' (WBGT) indicator:
+
+$$
+I^\text{WBGT}_i = 0.567 \times T^\text{avg}_i + 0.393 \times p^\text{vapour}_i + 3.94
+$$
+
+$I^\tex"
+ChronicHeat,mean_work_loss/high,chronic_heat/osc/v2/mean_work_loss_high_ACCESS-CM2_{scenario}_{year},"Mean work loss, high intensity/ACCESS-CM2","The mean work loss indicator is calculated from the 'Wet Bulb Globe Temperature' (WBGT) indicator:
+
+$$
+I^\text{WBGT}_i = 0.567 \times T^\text{avg}_i + 0.393 \times p^\text{vapour}_i + 3.94
+$$
+
+$I^\tex"
+ChronicHeat,mean_work_loss/high,chronic_heat/osc/v2/mean_work_loss_high_CMCC-ESM2_{scenario}_{year},"Mean work loss, high intensity/CMCC-ESM2","The mean work loss indicator is calculated from the 'Wet Bulb Globe Temperature' (WBGT) indicator:
+
+$$
+I^\text{WBGT}_i = 0.567 \times T^\text{avg}_i + 0.393 \times p^\text{vapour}_i + 3.94
+$$
+
+$I^\tex"
+ChronicHeat,mean_work_loss/high,chronic_heat/osc/v2/mean_work_loss_high_CNRM-CM6-1_{scenario}_{year},"Mean work loss, high intensity/CNRM-CM6-1","The mean work loss indicator is calculated from the 'Wet Bulb Globe Temperature' (WBGT) indicator:
+
+$$
+I^\text{WBGT}_i = 0.567 \times T^\text{avg}_i + 0.393 \times p^\text{vapour}_i + 3.94
+$$
+
+$I^\tex"
+ChronicHeat,mean_work_loss/high,chronic_heat/osc/v2/mean_work_loss_high_MPI-ESM1-2-LR_{scenario}_{year},"Mean work loss, high intensity/MPI-ESM1-2-LR","The mean work loss indicator is calculated from the 'Wet Bulb Globe Temperature' (WBGT) indicator:
+
+$$
+I^\text{WBGT}_i = 0.567 \times T^\text{avg}_i + 0.393 \times p^\text{vapour}_i + 3.94
+$$
+
+$I^\tex"
+ChronicHeat,mean_work_loss/high,chronic_heat/osc/v2/mean_work_loss_high_MIROC6_{scenario}_{year},"Mean work loss, high intensity/MIROC6","The mean work loss indicator is calculated from the 'Wet Bulb Globe Temperature' (WBGT) indicator:
+
+$$
+I^\text{WBGT}_i = 0.567 \times T^\text{avg}_i + 0.393 \times p^\text{vapour}_i + 3.94
+$$
+
+$I^\tex"
+ChronicHeat,mean_work_loss/high,chronic_heat/osc/v2/mean_work_loss_high_NorESM2-MM_{scenario}_{year},"Mean work loss, high intensity/NorESM2-MM","The mean work loss indicator is calculated from the 'Wet Bulb Globe Temperature' (WBGT) indicator:
+
+$$
+I^\text{WBGT}_i = 0.567 \times T^\text{avg}_i + 0.393 \times p^\text{vapour}_i + 3.94
+$$
+
+$I^\tex"
+ChronicHeat,days_tas/above/25c,chronic_heat/osc/v2/days_tas_above_25c_ACCESS-CM2_{scenario}_{year},Days with average temperature above 25°C/ACCESS-CM2,"Days per year for which the average near-surface temperature 'tas' is above a threshold specified in °C.
+
+$$
+I =  \frac{365}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^{avg}_i > T^\text{"
+ChronicHeat,days_tas/above/25c,chronic_heat/osc/v2/days_tas_above_25c_CMCC-ESM2_{scenario}_{year},Days with average temperature above 25°C/CMCC-ESM2,"Days per year for which the average near-surface temperature 'tas' is above a threshold specified in °C.
+
+$$
+I =  \frac{365}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^{avg}_i > T^\text{"
+ChronicHeat,days_tas/above/25c,chronic_heat/osc/v2/days_tas_above_25c_CNRM-CM6-1_{scenario}_{year},Days with average temperature above 25°C/CNRM-CM6-1,"Days per year for which the average near-surface temperature 'tas' is above a threshold specified in °C.
+
+$$
+I =  \frac{365}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^{avg}_i > T^\text{"
+ChronicHeat,days_tas/above/25c,chronic_heat/osc/v2/days_tas_above_25c_MPI-ESM1-2-LR_{scenario}_{year},Days with average temperature above 25°C/MPI-ESM1-2-LR,"Days per year for which the average near-surface temperature 'tas' is above a threshold specified in °C.
+
+$$
+I =  \frac{365}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^{avg}_i > T^\text{"
+ChronicHeat,days_tas/above/25c,chronic_heat/osc/v2/days_tas_above_25c_MIROC6_{scenario}_{year},Days with average temperature above 25°C/MIROC6,"Days per year for which the average near-surface temperature 'tas' is above a threshold specified in °C.
+
+$$
+I =  \frac{365}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^{avg}_i > T^\text{"
+ChronicHeat,days_tas/above/25c,chronic_heat/osc/v2/days_tas_above_25c_NorESM2-MM_{scenario}_{year},Days with average temperature above 25°C/NorESM2-MM,"Days per year for which the average near-surface temperature 'tas' is above a threshold specified in °C.
+
+$$
+I =  \frac{365}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^{avg}_i > T^\text{"
+ChronicHeat,days_tas/above/30c,chronic_heat/osc/v2/days_tas_above_30c_ACCESS-CM2_{scenario}_{year},Days with average temperature above 30°C/ACCESS-CM2,"Days per year for which the average near-surface temperature 'tas' is above a threshold specified in °C.
+
+$$
+I =  \frac{365}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^{avg}_i > T^\text{"
+ChronicHeat,days_tas/above/30c,chronic_heat/osc/v2/days_tas_above_30c_CMCC-ESM2_{scenario}_{year},Days with average temperature above 30°C/CMCC-ESM2,"Days per year for which the average near-surface temperature 'tas' is above a threshold specified in °C.
+
+$$
+I =  \frac{365}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^{avg}_i > T^\text{"
+ChronicHeat,days_tas/above/30c,chronic_heat/osc/v2/days_tas_above_30c_CNRM-CM6-1_{scenario}_{year},Days with average temperature above 30°C/CNRM-CM6-1,"Days per year for which the average near-surface temperature 'tas' is above a threshold specified in °C.
+
+$$
+I =  \frac{365}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^{avg}_i > T^\text{"
+ChronicHeat,days_tas/above/30c,chronic_heat/osc/v2/days_tas_above_30c_MPI-ESM1-2-LR_{scenario}_{year},Days with average temperature above 30°C/MPI-ESM1-2-LR,"Days per year for which the average near-surface temperature 'tas' is above a threshold specified in °C.
+
+$$
+I =  \frac{365}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^{avg}_i > T^\text{"
+ChronicHeat,days_tas/above/30c,chronic_heat/osc/v2/days_tas_above_30c_MIROC6_{scenario}_{year},Days with average temperature above 30°C/MIROC6,"Days per year for which the average near-surface temperature 'tas' is above a threshold specified in °C.
+
+$$
+I =  \frac{365}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^{avg}_i > T^\text{"
+ChronicHeat,days_tas/above/30c,chronic_heat/osc/v2/days_tas_above_30c_NorESM2-MM_{scenario}_{year},Days with average temperature above 30°C/NorESM2-MM,"Days per year for which the average near-surface temperature 'tas' is above a threshold specified in °C.
+
+$$
+I =  \frac{365}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^{avg}_i > T^\text{"
+ChronicHeat,days_tas/above/35c,chronic_heat/osc/v2/days_tas_above_35c_ACCESS-CM2_{scenario}_{year},Days with average temperature above 35°C/ACCESS-CM2,"Days per year for which the average near-surface temperature 'tas' is above a threshold specified in °C.
+
+$$
+I =  \frac{365}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^{avg}_i > T^\text{"
+ChronicHeat,days_tas/above/35c,chronic_heat/osc/v2/days_tas_above_35c_CMCC-ESM2_{scenario}_{year},Days with average temperature above 35°C/CMCC-ESM2,"Days per year for which the average near-surface temperature 'tas' is above a threshold specified in °C.
+
+$$
+I =  \frac{365}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^{avg}_i > T^\text{"
+ChronicHeat,days_tas/above/35c,chronic_heat/osc/v2/days_tas_above_35c_CNRM-CM6-1_{scenario}_{year},Days with average temperature above 35°C/CNRM-CM6-1,"Days per year for which the average near-surface temperature 'tas' is above a threshold specified in °C.
+
+$$
+I =  \frac{365}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^{avg}_i > T^\text{"
+ChronicHeat,days_tas/above/35c,chronic_heat/osc/v2/days_tas_above_35c_MPI-ESM1-2-LR_{scenario}_{year},Days with average temperature above 35°C/MPI-ESM1-2-LR,"Days per year for which the average near-surface temperature 'tas' is above a threshold specified in °C.
+
+$$
+I =  \frac{365}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^{avg}_i > T^\text{"
+ChronicHeat,days_tas/above/35c,chronic_heat/osc/v2/days_tas_above_35c_MIROC6_{scenario}_{year},Days with average temperature above 35°C/MIROC6,"Days per year for which the average near-surface temperature 'tas' is above a threshold specified in °C.
+
+$$
+I =  \frac{365}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^{avg}_i > T^\text{"
+ChronicHeat,days_tas/above/35c,chronic_heat/osc/v2/days_tas_above_35c_NorESM2-MM_{scenario}_{year},Days with average temperature above 35°C/NorESM2-MM,"Days per year for which the average near-surface temperature 'tas' is above a threshold specified in °C.
+
+$$
+I =  \frac{365}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^{avg}_i > T^\text{"
+ChronicHeat,days_tas/above/40c,chronic_heat/osc/v2/days_tas_above_40c_ACCESS-CM2_{scenario}_{year},Days with average temperature above 40°C/ACCESS-CM2,"Days per year for which the average near-surface temperature 'tas' is above a threshold specified in °C.
+
+$$
+I =  \frac{365}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^{avg}_i > T^\text{"
+ChronicHeat,days_tas/above/40c,chronic_heat/osc/v2/days_tas_above_40c_CMCC-ESM2_{scenario}_{year},Days with average temperature above 40°C/CMCC-ESM2,"Days per year for which the average near-surface temperature 'tas' is above a threshold specified in °C.
+
+$$
+I =  \frac{365}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^{avg}_i > T^\text{"
+ChronicHeat,days_tas/above/40c,chronic_heat/osc/v2/days_tas_above_40c_CNRM-CM6-1_{scenario}_{year},Days with average temperature above 40°C/CNRM-CM6-1,"Days per year for which the average near-surface temperature 'tas' is above a threshold specified in °C.
+
+$$
+I =  \frac{365}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^{avg}_i > T^\text{"
+ChronicHeat,days_tas/above/40c,chronic_heat/osc/v2/days_tas_above_40c_MPI-ESM1-2-LR_{scenario}_{year},Days with average temperature above 40°C/MPI-ESM1-2-LR,"Days per year for which the average near-surface temperature 'tas' is above a threshold specified in °C.
+
+$$
+I =  \frac{365}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^{avg}_i > T^\text{"
+ChronicHeat,days_tas/above/40c,chronic_heat/osc/v2/days_tas_above_40c_MIROC6_{scenario}_{year},Days with average temperature above 40°C/MIROC6,"Days per year for which the average near-surface temperature 'tas' is above a threshold specified in °C.
+
+$$
+I =  \frac{365}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^{avg}_i > T^\text{"
+ChronicHeat,days_tas/above/40c,chronic_heat/osc/v2/days_tas_above_40c_NorESM2-MM_{scenario}_{year},Days with average temperature above 40°C/NorESM2-MM,"Days per year for which the average near-surface temperature 'tas' is above a threshold specified in °C.
+
+$$
+I =  \frac{365}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^{avg}_i > T^\text{"
+ChronicHeat,days_tas/above/45c,chronic_heat/osc/v2/days_tas_above_45c_ACCESS-CM2_{scenario}_{year},Days with average temperature above 45°C/ACCESS-CM2,"Days per year for which the average near-surface temperature 'tas' is above a threshold specified in °C.
+
+$$
+I =  \frac{365}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^{avg}_i > T^\text{"
+ChronicHeat,days_tas/above/45c,chronic_heat/osc/v2/days_tas_above_45c_CMCC-ESM2_{scenario}_{year},Days with average temperature above 45°C/CMCC-ESM2,"Days per year for which the average near-surface temperature 'tas' is above a threshold specified in °C.
+
+$$
+I =  \frac{365}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^{avg}_i > T^\text{"
+ChronicHeat,days_tas/above/45c,chronic_heat/osc/v2/days_tas_above_45c_CNRM-CM6-1_{scenario}_{year},Days with average temperature above 45°C/CNRM-CM6-1,"Days per year for which the average near-surface temperature 'tas' is above a threshold specified in °C.
+
+$$
+I =  \frac{365}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^{avg}_i > T^\text{"
+ChronicHeat,days_tas/above/45c,chronic_heat/osc/v2/days_tas_above_45c_MPI-ESM1-2-LR_{scenario}_{year},Days with average temperature above 45°C/MPI-ESM1-2-LR,"Days per year for which the average near-surface temperature 'tas' is above a threshold specified in °C.
+
+$$
+I =  \frac{365}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^{avg}_i > T^\text{"
+ChronicHeat,days_tas/above/45c,chronic_heat/osc/v2/days_tas_above_45c_MIROC6_{scenario}_{year},Days with average temperature above 45°C/MIROC6,"Days per year for which the average near-surface temperature 'tas' is above a threshold specified in °C.
+
+$$
+I =  \frac{365}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^{avg}_i > T^\text{"
+ChronicHeat,days_tas/above/45c,chronic_heat/osc/v2/days_tas_above_45c_NorESM2-MM_{scenario}_{year},Days with average temperature above 45°C/NorESM2-MM,"Days per year for which the average near-surface temperature 'tas' is above a threshold specified in °C.
+
+$$
+I =  \frac{365}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^{avg}_i > T^\text{"
+ChronicHeat,days_tas/above/50c,chronic_heat/osc/v2/days_tas_above_50c_ACCESS-CM2_{scenario}_{year},Days with average temperature above 50°C/ACCESS-CM2,"Days per year for which the average near-surface temperature 'tas' is above a threshold specified in °C.
+
+$$
+I =  \frac{365}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^{avg}_i > T^\text{"
+ChronicHeat,days_tas/above/50c,chronic_heat/osc/v2/days_tas_above_50c_CMCC-ESM2_{scenario}_{year},Days with average temperature above 50°C/CMCC-ESM2,"Days per year for which the average near-surface temperature 'tas' is above a threshold specified in °C.
+
+$$
+I =  \frac{365}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^{avg}_i > T^\text{"
+ChronicHeat,days_tas/above/50c,chronic_heat/osc/v2/days_tas_above_50c_CNRM-CM6-1_{scenario}_{year},Days with average temperature above 50°C/CNRM-CM6-1,"Days per year for which the average near-surface temperature 'tas' is above a threshold specified in °C.
+
+$$
+I =  \frac{365}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^{avg}_i > T^\text{"
+ChronicHeat,days_tas/above/50c,chronic_heat/osc/v2/days_tas_above_50c_MPI-ESM1-2-LR_{scenario}_{year},Days with average temperature above 50°C/MPI-ESM1-2-LR,"Days per year for which the average near-surface temperature 'tas' is above a threshold specified in °C.
+
+$$
+I =  \frac{365}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^{avg}_i > T^\text{"
+ChronicHeat,days_tas/above/50c,chronic_heat/osc/v2/days_tas_above_50c_MIROC6_{scenario}_{year},Days with average temperature above 50°C/MIROC6,"Days per year for which the average near-surface temperature 'tas' is above a threshold specified in °C.
+
+$$
+I =  \frac{365}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^{avg}_i > T^\text{"
+ChronicHeat,days_tas/above/50c,chronic_heat/osc/v2/days_tas_above_50c_NorESM2-MM_{scenario}_{year},Days with average temperature above 50°C/NorESM2-MM,"Days per year for which the average near-surface temperature 'tas' is above a threshold specified in °C.
+
+$$
+I =  \frac{365}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^{avg}_i > T^\text{"
+ChronicHeat,days_tas/above/55c,chronic_heat/osc/v2/days_tas_above_55c_ACCESS-CM2_{scenario}_{year},Days with average temperature above 55°C/ACCESS-CM2,"Days per year for which the average near-surface temperature 'tas' is above a threshold specified in °C.
+
+$$
+I =  \frac{365}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^{avg}_i > T^\text{"
+ChronicHeat,days_tas/above/55c,chronic_heat/osc/v2/days_tas_above_55c_CMCC-ESM2_{scenario}_{year},Days with average temperature above 55°C/CMCC-ESM2,"Days per year for which the average near-surface temperature 'tas' is above a threshold specified in °C.
+
+$$
+I =  \frac{365}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^{avg}_i > T^\text{"
+ChronicHeat,days_tas/above/55c,chronic_heat/osc/v2/days_tas_above_55c_CNRM-CM6-1_{scenario}_{year},Days with average temperature above 55°C/CNRM-CM6-1,"Days per year for which the average near-surface temperature 'tas' is above a threshold specified in °C.
+
+$$
+I =  \frac{365}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^{avg}_i > T^\text{"
+ChronicHeat,days_tas/above/55c,chronic_heat/osc/v2/days_tas_above_55c_MPI-ESM1-2-LR_{scenario}_{year},Days with average temperature above 55°C/MPI-ESM1-2-LR,"Days per year for which the average near-surface temperature 'tas' is above a threshold specified in °C.
+
+$$
+I =  \frac{365}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^{avg}_i > T^\text{"
+ChronicHeat,days_tas/above/55c,chronic_heat/osc/v2/days_tas_above_55c_MIROC6_{scenario}_{year},Days with average temperature above 55°C/MIROC6,"Days per year for which the average near-surface temperature 'tas' is above a threshold specified in °C.
+
+$$
+I =  \frac{365}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^{avg}_i > T^\text{"
+ChronicHeat,days_tas/above/55c,chronic_heat/osc/v2/days_tas_above_55c_NorESM2-MM_{scenario}_{year},Days with average temperature above 55°C/NorESM2-MM,"Days per year for which the average near-surface temperature 'tas' is above a threshold specified in °C.
+
+$$
+I =  \frac{365}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^{avg}_i > T^\text{"
+ChronicHeat,mean_degree_days/above/index,chronic_heat/osc/v2/mean_degree_days_above_index_ACCESS-CM2_{scenario}_{year},Mean degree days above index value/ACCESS-CM2,"Degree days indicators are calculated by integrating over time the absolute difference in temperature
+of the medium over a reference temperature. The exact method of calculation may vary;
+here the dai"
+ChronicHeat,weeks_water_temp_above,chronic_heat/nluu/v2/weeks_water_temp_above_GFDL_{scenario}_{year},Weeks with average water temperature above threshold in °C/GFDL,"Weeks per year for which the average water temperature is above a threshold specified in °C:
+
+$$
+I =  \frac{52}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^{avg}_i > T^\text{ref}} \nonumb"
+ChronicHeat,weeks_water_temp_above,chronic_heat/nluu/v2/weeks_water_temp_above_HadGEM_{scenario}_{year},Weeks with average water temperature above threshold in °C/HadGEM,"Weeks per year for which the average water temperature is above a threshold specified in °C:
+
+$$
+I =  \frac{52}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^{avg}_i > T^\text{ref}} \nonumb"
+ChronicHeat,weeks_water_temp_above,chronic_heat/nluu/v2/weeks_water_temp_above_IPSL_{scenario}_{year},Weeks with average water temperature above threshold in °C/IPSL,"Weeks per year for which the average water temperature is above a threshold specified in °C:
+
+$$
+I =  \frac{52}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^{avg}_i > T^\text{ref}} \nonumb"
+ChronicHeat,weeks_water_temp_above,chronic_heat/nluu/v2/weeks_water_temp_above_MIROC_{scenario}_{year},Weeks with average water temperature above threshold in °C/MIROC,"Weeks per year for which the average water temperature is above a threshold specified in °C:
+
+$$
+I =  \frac{52}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^{avg}_i > T^\text{ref}} \nonumb"
+ChronicHeat,weeks_water_temp_above,chronic_heat/nluu/v2/weeks_water_temp_above_NorESM_{scenario}_{year},Weeks with average water temperature above threshold in °C/NorESM,"Weeks per year for which the average water temperature is above a threshold specified in °C:
+
+$$
+I =  \frac{52}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^{avg}_i > T^\text{ref}} \nonumb"
+ChronicHeat,weeks_water_temp_above,chronic_heat/nluu/v2/weeks_water_temp_above_E2O_{scenario}_{year},Weeks with average water temperature above threshold in °C/E2O,"Weeks per year for which the average water temperature is above a threshold specified in °C:
+
+$$
+I =  \frac{52}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^{avg}_i > T^\text{ref}} \nonumb"
+ChronicHeat,days_wbgt_above,chronic_heat/osc/v2/days_wbgt_above_ACCESS-CM2_{scenario}_{year},Days with wet-bulb globe temperature above threshold in °C/ACCESS-CM2,"Days per year for which the 'Wet Bulb Globe Temperature' indicator is above a threshold specified in °C:
+
+$$
+I =  \frac{365}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^\text{WBGT}_i > T^"
+ChronicHeat,days_wbgt_above,chronic_heat/osc/v2/days_wbgt_above_CMCC-ESM2_{scenario}_{year},Days with wet-bulb globe temperature above threshold in °C/CMCC-ESM2,"Days per year for which the 'Wet Bulb Globe Temperature' indicator is above a threshold specified in °C:
+
+$$
+I =  \frac{365}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^\text{WBGT}_i > T^"
+ChronicHeat,days_wbgt_above,chronic_heat/osc/v2/days_wbgt_above_CNRM-CM6-1_{scenario}_{year},Days with wet-bulb globe temperature above threshold in °C/CNRM-CM6-1,"Days per year for which the 'Wet Bulb Globe Temperature' indicator is above a threshold specified in °C:
+
+$$
+I =  \frac{365}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^\text{WBGT}_i > T^"
+ChronicHeat,days_wbgt_above,chronic_heat/osc/v2/days_wbgt_above_MPI-ESM1-2-LR_{scenario}_{year},Days with wet-bulb globe temperature above threshold in °C/MPI-ESM1-2-LR,"Days per year for which the 'Wet Bulb Globe Temperature' indicator is above a threshold specified in °C:
+
+$$
+I =  \frac{365}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^\text{WBGT}_i > T^"
+ChronicHeat,days_wbgt_above,chronic_heat/osc/v2/days_wbgt_above_MIROC6_{scenario}_{year},Days with wet-bulb globe temperature above threshold in °C/MIROC6,"Days per year for which the 'Wet Bulb Globe Temperature' indicator is above a threshold specified in °C:
+
+$$
+I =  \frac{365}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^\text{WBGT}_i > T^"
+ChronicHeat,days_wbgt_above,chronic_heat/osc/v2/days_wbgt_above_NorESM2-MM_{scenario}_{year},Days with wet-bulb globe temperature above threshold in °C/NorESM2-MM,"Days per year for which the 'Wet Bulb Globe Temperature' indicator is above a threshold specified in °C:
+
+$$
+I =  \frac{365}{n_y} \sum_{i = 1}^{n_y} \boldsymbol{\mathbb{1}}_{\; \, T^\text{WBGT}_i > T^"
