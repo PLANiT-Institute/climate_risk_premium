@@ -32,7 +32,7 @@ from src.risk.financing import calculate_financing_with_counterfactual
 from src.risk.attribution import decompose_risk_shapley
 from src.financials import compute_cashflows_timeseries, calculate_metrics, CashFlowTimeSeries, FinancialMetrics
 from src.scenarios.korea_power_plan import load_korea_power_plan_scenarios
-from src.risk.physical import get_physical_risk_scenario, PhysicalAdjustments
+from src.risk.physical import get_physical_risk_scenario, PhysicalAdjustments, load_yearly_from_output_csv
 from src.planit import PLANiTRunner, PLANiTAdapter, PLANiTIntegrationConfig
 
 # Conditional import for enhanced 11th Basic Plan
@@ -328,6 +328,7 @@ class CRPModelRunner:
         market_scenario: MarketScenario | None,
         risk_type: str,
         yearly_transition_adj=None,
+        yearly_physical_adj=None,
     ) -> RiskComponentResult:
         """Run cashflow → metrics → rating → CRP for a single risk configuration."""
         cashflow = compute_cashflows_timeseries(
@@ -337,6 +338,7 @@ class CRPModelRunner:
             physical_adj,
             market_scenario,
             yearly_transition_adj=yearly_transition_adj,
+            yearly_physical_adj=yearly_physical_adj,
         )
         metrics = calculate_metrics(cashflow, plant_params)
 
@@ -446,11 +448,20 @@ class CRPModelRunner:
                 dispatch_priority_penalty=transition_scenario.dispatch_priority_penalty,
             )
 
+        # Build yearly physical adjustments from physical_risk_output.csv
+        _phys_start = int(plant_params.get("cod_year", 2025))
+        _phys_end = _phys_start + transition_adj.operating_years - 1
+        yearly_physical_adj = load_yearly_from_output_csv(
+            start_year=_phys_start,
+            end_year=_phys_end,
+        )
+
         # --- Combined run (always performed, same as before) ---
         combined = self._compute_component(
             plant_params, transition_scenario, transition_adj, physical_adj,
             market_scenario, "combined",
             yearly_transition_adj=yearly_transition_adj,
+            yearly_physical_adj=yearly_physical_adj,
         )
 
         # Build the primary ScenarioResult from the combined run
@@ -508,6 +519,7 @@ class CRPModelRunner:
         physical_only = self._compute_component(
             plant_params, transition_scenario, no_transition, physical_adj,
             market_scenario, "physical_only",
+            yearly_physical_adj=yearly_physical_adj,
         )
 
         # Shapley decomposition
