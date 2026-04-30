@@ -1,0 +1,2992 @@
+{
+  "asset_impacts": [
+    {
+      "asset_id": "",
+      "impacts": [
+        {
+          "key": {
+            "hazard_type": "AirTemperature",
+            "scenario_id": "historical",
+            "year": "None"
+          },
+          "impact_type": "disruption",
+          "hazard_indicator_id": "days_tas/above/{temp_c}c",
+          "impact_distribution": {
+            "bin_edges": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "probabilities": [
+              0.02108,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "impact_exceedance": {
+            "values": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "exceed_probabilities": [
+              0.02108,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "impact_mean": 0.0,
+          "impact_std_deviation": 0.0,
+          "impact_semi_std_deviation": 0.0,
+          "calc_details": {
+            "hazard_path": [
+              "chronic_heat/osc/v2/days_tas_above_25c_ACCESS-CM2_{scenario}_{year}",
+              "chronic_heat/osc/v2/days_tas_above_30c_ACCESS-CM2_{scenario}_{year}",
+              "chronic_heat/osc/v2/days_tas_above_35c_ACCESS-CM2_{scenario}_{year}",
+              "chronic_heat/osc/v2/days_tas_above_40c_ACCESS-CM2_{scenario}_{year}",
+              "chronic_heat/osc/v2/days_tas_above_45c_ACCESS-CM2_{scenario}_{year}",
+              "chronic_heat/osc/v2/days_tas_above_50c_ACCESS-CM2_{scenario}_{year}",
+              "chronic_heat/osc/v2/days_tas_above_55c_ACCESS-CM2_{scenario}_{year}",
+              "chronic_heat/osc/v2/days_tas_above_25c_ACCESS-CM2_{scenario}_{year}",
+              "chronic_heat/osc/v2/days_tas_above_30c_ACCESS-CM2_{scenario}_{year}",
+              "chronic_heat/osc/v2/days_tas_above_35c_ACCESS-CM2_{scenario}_{year}",
+              "chronic_heat/osc/v2/days_tas_above_40c_ACCESS-CM2_{scenario}_{year}",
+              "chronic_heat/osc/v2/days_tas_above_45c_ACCESS-CM2_{scenario}_{year}",
+              "chronic_heat/osc/v2/days_tas_above_50c_ACCESS-CM2_{scenario}_{year}",
+              "chronic_heat/osc/v2/days_tas_above_55c_ACCESS-CM2_{scenario}_{year}"
+            ]
+          }
+        },
+        {
+          "key": {
+            "hazard_type": "AirTemperature",
+            "scenario_id": "ssp585",
+            "year": "2050"
+          },
+          "impact_type": "disruption",
+          "hazard_indicator_id": "days_tas/above/{temp_c}c",
+          "impact_distribution": {
+            "bin_edges": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "probabilities": [
+              0.1328,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "impact_exceedance": {
+            "values": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "exceed_probabilities": [
+              0.1328,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "impact_mean": 0.0,
+          "impact_std_deviation": 0.0,
+          "impact_semi_std_deviation": 0.0,
+          "calc_details": {
+            "hazard_path": [
+              "chronic_heat/osc/v2/days_tas_above_25c_ACCESS-CM2_{scenario}_{year}",
+              "chronic_heat/osc/v2/days_tas_above_30c_ACCESS-CM2_{scenario}_{year}",
+              "chronic_heat/osc/v2/days_tas_above_35c_ACCESS-CM2_{scenario}_{year}",
+              "chronic_heat/osc/v2/days_tas_above_40c_ACCESS-CM2_{scenario}_{year}",
+              "chronic_heat/osc/v2/days_tas_above_45c_ACCESS-CM2_{scenario}_{year}",
+              "chronic_heat/osc/v2/days_tas_above_50c_ACCESS-CM2_{scenario}_{year}",
+              "chronic_heat/osc/v2/days_tas_above_55c_ACCESS-CM2_{scenario}_{year}",
+              "chronic_heat/osc/v2/days_tas_above_25c_ACCESS-CM2_{scenario}_{year}",
+              "chronic_heat/osc/v2/days_tas_above_30c_ACCESS-CM2_{scenario}_{year}",
+              "chronic_heat/osc/v2/days_tas_above_35c_ACCESS-CM2_{scenario}_{year}",
+              "chronic_heat/osc/v2/days_tas_above_40c_ACCESS-CM2_{scenario}_{year}",
+              "chronic_heat/osc/v2/days_tas_above_45c_ACCESS-CM2_{scenario}_{year}",
+              "chronic_heat/osc/v2/days_tas_above_50c_ACCESS-CM2_{scenario}_{year}",
+              "chronic_heat/osc/v2/days_tas_above_55c_ACCESS-CM2_{scenario}_{year}"
+            ]
+          }
+        },
+        {
+          "key": {
+            "hazard_type": "CoastalInundation",
+            "scenario_id": "historical",
+            "year": "None"
+          },
+          "impact_type": "disruption",
+          "hazard_indicator_id": "flood_depth",
+          "impact_distribution": {
+            "bin_edges": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "probabilities": [
+              0.3,
+              0.1,
+              0.06,
+              0.02,
+              0.01,
+              0.006,
+              0.002,
+              0.001,
+              0.001
+            ]
+          },
+          "impact_exceedance": {
+            "values": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "exceed_probabilities": [
+              0.5,
+              0.2,
+              0.1,
+              0.04,
+              0.02,
+              0.01,
+              0.004,
+              0.002,
+              0.001,
+              0.0
+            ]
+          },
+          "impact_mean": 0.0,
+          "impact_std_deviation": 0.0,
+          "impact_semi_std_deviation": 0.0,
+          "calc_details": {
+            "hazard_exceedance": {
+              "values": [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "exceed_probabilities": [
+                0.5,
+                0.2,
+                0.1,
+                0.04,
+                0.02,
+                0.01,
+                0.004,
+                0.002,
+                0.001,
+                0.0
+              ]
+            },
+            "hazard_distribution": {
+              "bin_edges": [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "probabilities": [
+                0.3,
+                0.1,
+                0.06,
+                0.02,
+                0.01,
+                0.006,
+                0.002,
+                0.001,
+                0.001
+              ]
+            },
+            "vulnerability_distribution": {
+              "intensity_bin_edges": [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "impact_bin_edges": [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "prob_matrix": [
+                [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ]
+              ]
+            },
+            "hazard_path": [
+              "inundation/wri/v2/inuncoast_{scenario}_wtsub_{year}_0"
+            ]
+          }
+        },
+        {
+          "key": {
+            "hazard_type": "CoastalInundation",
+            "scenario_id": "ssp585",
+            "year": "2050"
+          },
+          "impact_type": "disruption",
+          "hazard_indicator_id": "flood_depth",
+          "impact_distribution": {
+            "bin_edges": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "probabilities": [
+              0.3,
+              0.1,
+              0.06,
+              0.02,
+              0.01,
+              0.006,
+              0.002,
+              0.001,
+              0.001
+            ]
+          },
+          "impact_exceedance": {
+            "values": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "exceed_probabilities": [
+              0.5,
+              0.2,
+              0.1,
+              0.04,
+              0.02,
+              0.01,
+              0.004,
+              0.002,
+              0.001,
+              0.0
+            ]
+          },
+          "impact_mean": 0.0,
+          "impact_std_deviation": 0.0,
+          "impact_semi_std_deviation": 0.0,
+          "calc_details": {
+            "hazard_exceedance": {
+              "values": [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "exceed_probabilities": [
+                0.5,
+                0.2,
+                0.1,
+                0.04,
+                0.02,
+                0.01,
+                0.004,
+                0.002,
+                0.001,
+                0.0
+              ]
+            },
+            "hazard_distribution": {
+              "bin_edges": [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "probabilities": [
+                0.3,
+                0.1,
+                0.06,
+                0.02,
+                0.01,
+                0.006,
+                0.002,
+                0.001,
+                0.001
+              ]
+            },
+            "vulnerability_distribution": {
+              "intensity_bin_edges": [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "impact_bin_edges": [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "prob_matrix": [
+                [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ]
+              ]
+            },
+            "hazard_path": [
+              "inundation/wri/v2/inuncoast_{scenario}_wtsub_{year}_0"
+            ]
+          }
+        },
+        {
+          "key": {
+            "hazard_type": "Drought",
+            "scenario_id": "historical",
+            "year": "None"
+          },
+          "impact_type": "disruption",
+          "hazard_indicator_id": "months/spei12m/below/threshold",
+          "impact_distribution": {
+            "bin_edges": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.1,
+              0.2,
+              1.0,
+              1.0
+            ],
+            "probabilities": [
+              0.3438,
+              0.09097,
+              0.04444,
+              0.0125,
+              0.002083,
+              0.0,
+              0.0
+            ]
+          },
+          "impact_exceedance": {
+            "values": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.1,
+              0.2,
+              1.0,
+              1.0
+            ],
+            "exceed_probabilities": [
+              0.4938,
+              0.15,
+              0.05903,
+              0.01458,
+              0.002083,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "impact_mean": 0.0009375,
+          "impact_std_deviation": 0.009455,
+          "impact_semi_std_deviation": 0.009409,
+          "calc_details": {
+            "hazard_path": [
+              "drought/osc/v2/months_spei12m_below_threshold_multi_model_0_{scenario}_{year}"
+            ]
+          }
+        },
+        {
+          "key": {
+            "hazard_type": "Drought",
+            "scenario_id": "ssp585",
+            "year": "2050"
+          },
+          "impact_type": "disruption",
+          "hazard_indicator_id": "months/spei12m/below/threshold",
+          "impact_distribution": {
+            "bin_edges": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.1,
+              0.2,
+              1.0,
+              1.0
+            ],
+            "probabilities": [
+              0.2271,
+              0.05417,
+              0.02292,
+              0.01597,
+              0.001389,
+              0.0,
+              0.0
+            ]
+          },
+          "impact_exceedance": {
+            "values": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.1,
+              0.2,
+              1.0,
+              1.0
+            ],
+            "exceed_probabilities": [
+              0.3215,
+              0.09444,
+              0.04028,
+              0.01736,
+              0.001389,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "impact_mean": 0.001007,
+          "impact_std_deviation": 0.0092,
+          "impact_semi_std_deviation": 0.009145,
+          "calc_details": {
+            "hazard_path": [
+              "drought/osc/v2/months_spei12m_below_threshold_multi_model_0_{scenario}_{year}"
+            ]
+          }
+        },
+        {
+          "key": {
+            "hazard_type": "Fire",
+            "scenario_id": "historical",
+            "year": "None"
+          },
+          "impact_type": "damage",
+          "hazard_indicator_id": "fire_probability",
+          "impact_distribution": {
+            "bin_edges": [
+              0.7,
+              0.7
+            ],
+            "probabilities": [
+              8.94e-05
+            ]
+          },
+          "impact_exceedance": {
+            "values": [
+              0.7,
+              0.7
+            ],
+            "exceed_probabilities": [
+              8.94e-05,
+              0.0
+            ]
+          },
+          "impact_mean": 6.258e-05,
+          "impact_std_deviation": 0.006618,
+          "impact_semi_std_deviation": 0.006618,
+          "calc_details": {
+            "hazard_path": [
+              "fire/jupiter/v1/fire_probability_{scenario}_{year}"
+            ]
+          }
+        },
+        {
+          "key": {
+            "hazard_type": "Fire",
+            "scenario_id": "ssp585",
+            "year": "2050"
+          },
+          "impact_type": "damage",
+          "hazard_indicator_id": "fire_probability",
+          "impact_distribution": {
+            "bin_edges": [
+              0.7,
+              0.7
+            ],
+            "probabilities": [
+              9.838e-05
+            ]
+          },
+          "impact_exceedance": {
+            "values": [
+              0.7,
+              0.7
+            ],
+            "exceed_probabilities": [
+              9.838e-05,
+              0.0
+            ]
+          },
+          "impact_mean": 6.887e-05,
+          "impact_std_deviation": 0.006943,
+          "impact_semi_std_deviation": 0.006943,
+          "calc_details": {
+            "hazard_path": [
+              "fire/jupiter/v1/fire_probability_{scenario}_{year}"
+            ]
+          }
+        },
+        {
+          "key": {
+            "hazard_type": "Hail",
+            "scenario_id": "historical",
+            "year": "None"
+          },
+          "impact_type": "damage",
+          "hazard_indicator_id": "days/above/5cm",
+          "impact_distribution": {
+            "bin_edges": [
+              0.001,
+              0.001
+            ],
+            "probabilities": [
+              0.0
+            ]
+          },
+          "impact_exceedance": {
+            "values": [
+              0.001,
+              0.001
+            ],
+            "exceed_probabilities": [
+              0.0,
+              0.0
+            ]
+          },
+          "impact_mean": 0.0,
+          "impact_std_deviation": 0.0,
+          "impact_semi_std_deviation": 0.0,
+          "calc_details": {
+            "hazard_path": [
+              "hail/jupiter/v1/days_above_5cm_{scenario}_{year}"
+            ]
+          }
+        },
+        {
+          "key": {
+            "hazard_type": "Hail",
+            "scenario_id": "ssp585",
+            "year": "2050"
+          },
+          "impact_type": "damage",
+          "hazard_indicator_id": "days/above/5cm",
+          "impact_distribution": {
+            "bin_edges": [
+              0.001,
+              0.001
+            ],
+            "probabilities": [
+              1.7e-05
+            ]
+          },
+          "impact_exceedance": {
+            "values": [
+              0.001,
+              0.001
+            ],
+            "exceed_probabilities": [
+              1.7e-05,
+              0.0
+            ]
+          },
+          "impact_mean": 1.7e-08,
+          "impact_std_deviation": 4.123e-06,
+          "impact_semi_std_deviation": 4.123e-06,
+          "calc_details": {
+            "hazard_path": [
+              "hail/jupiter/v1/days_above_5cm_{scenario}_{year}"
+            ]
+          }
+        },
+        {
+          "key": {
+            "hazard_type": "RiverineInundation",
+            "scenario_id": "historical",
+            "year": "None"
+          },
+          "impact_type": "disruption",
+          "hazard_indicator_id": "flood_depth",
+          "impact_distribution": {
+            "bin_edges": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.1188,
+              0.1991,
+              0.1991
+            ],
+            "probabilities": [
+              0.3,
+              0.1,
+              0.06,
+              0.02,
+              0.01,
+              0.006,
+              0.002,
+              0.001,
+              0.001
+            ]
+          },
+          "impact_exceedance": {
+            "values": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.1188,
+              0.1991,
+              0.1991
+            ],
+            "exceed_probabilities": [
+              0.5,
+              0.2,
+              0.1,
+              0.04,
+              0.02,
+              0.01,
+              0.004,
+              0.002,
+              0.001,
+              0.0
+            ]
+          },
+          "impact_mean": 0.0004768,
+          "impact_std_deviation": 0.008638,
+          "impact_semi_std_deviation": 0.008625,
+          "calc_details": {
+            "hazard_exceedance": {
+              "values": [
+                0.01257,
+                0.09344,
+                0.1655,
+                0.2564,
+                0.3238,
+                0.3905,
+                0.4784,
+                0.5445,
+                0.6106,
+                0.6106
+              ],
+              "exceed_probabilities": [
+                0.5,
+                0.2,
+                0.1,
+                0.04,
+                0.02,
+                0.01,
+                0.004,
+                0.002,
+                0.001,
+                0.0
+              ]
+            },
+            "hazard_distribution": {
+              "bin_edges": [
+                0.01257,
+                0.09344,
+                0.1655,
+                0.2564,
+                0.3238,
+                0.3905,
+                0.4784,
+                0.5445,
+                0.6106,
+                0.6106
+              ],
+              "probabilities": [
+                0.3,
+                0.1,
+                0.06,
+                0.02,
+                0.01,
+                0.006,
+                0.002,
+                0.001,
+                0.001
+              ]
+            },
+            "vulnerability_distribution": {
+              "intensity_bin_edges": [
+                0.01257,
+                0.09344,
+                0.1655,
+                0.2564,
+                0.3238,
+                0.3905,
+                0.4784,
+                0.5445,
+                0.6106,
+                0.6106
+              ],
+              "impact_bin_edges": [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.1188,
+                0.1991,
+                0.1991
+              ],
+              "prob_matrix": [
+                [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ]
+              ]
+            },
+            "hazard_path": [
+              "inundation/wri/v2/inunriver_{scenario}_MIROC-ESM-CHEM_{year}"
+            ]
+          }
+        },
+        {
+          "key": {
+            "hazard_type": "RiverineInundation",
+            "scenario_id": "ssp585",
+            "year": "2050"
+          },
+          "impact_type": "disruption",
+          "hazard_indicator_id": "flood_depth",
+          "impact_distribution": {
+            "bin_edges": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.07782,
+              0.2073,
+              0.5524,
+              0.8237,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "probabilities": [
+              0.3,
+              0.1,
+              0.05579,
+              0.004211,
+              0.02,
+              0.01,
+              0.006,
+              0.002,
+              0.001,
+              0.001
+            ]
+          },
+          "impact_exceedance": {
+            "values": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.07782,
+              0.2073,
+              0.5524,
+              0.8237,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "exceed_probabilities": [
+              0.5,
+              0.2,
+              0.1,
+              0.04421,
+              0.04,
+              0.02,
+              0.01,
+              0.004,
+              0.002,
+              0.001,
+              0.0
+            ]
+          },
+          "impact_mean": 0.01477,
+          "impact_std_deviation": 0.09117,
+          "impact_semi_std_deviation": 0.09002,
+          "calc_details": {
+            "hazard_exceedance": {
+              "values": [
+                0.02652,
+                0.1915,
+                0.3236,
+                0.4784,
+                0.49,
+                0.6131,
+                0.7351,
+                0.8957,
+                1.017,
+                1.138,
+                1.138
+              ],
+              "exceed_probabilities": [
+                0.5,
+                0.2,
+                0.1,
+                0.04421,
+                0.04,
+                0.02,
+                0.01,
+                0.004,
+                0.002,
+                0.001,
+                0.0
+              ]
+            },
+            "hazard_distribution": {
+              "bin_edges": [
+                0.02652,
+                0.1915,
+                0.3236,
+                0.4784,
+                0.49,
+                0.6131,
+                0.7351,
+                0.8957,
+                1.017,
+                1.138,
+                1.138
+              ],
+              "probabilities": [
+                0.3,
+                0.1,
+                0.05579,
+                0.004211,
+                0.02,
+                0.01,
+                0.006,
+                0.002,
+                0.001,
+                0.001
+              ]
+            },
+            "vulnerability_distribution": {
+              "intensity_bin_edges": [
+                0.02652,
+                0.1915,
+                0.3236,
+                0.4784,
+                0.49,
+                0.6131,
+                0.7351,
+                0.8957,
+                1.017,
+                1.138,
+                1.138
+              ],
+              "impact_bin_edges": [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.07782,
+                0.2073,
+                0.5524,
+                0.8237,
+                1.0,
+                1.0,
+                1.0
+              ],
+              "prob_matrix": [
+                [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ]
+              ]
+            },
+            "hazard_path": [
+              "inundation/wri/v2/inunriver_{scenario}_MIROC-ESM-CHEM_{year}"
+            ]
+          }
+        },
+        {
+          "key": {
+            "hazard_type": "WaterRisk",
+            "scenario_id": "historical",
+            "year": "None"
+          },
+          "impact_type": "disruption",
+          "hazard_indicator_id": "water_stress",
+          "impact_distribution": {
+            "bin_edges": [
+              0.0,
+              0.0
+            ],
+            "probabilities": [
+              0.335
+            ]
+          },
+          "impact_exceedance": {
+            "values": [
+              0.0,
+              0.0
+            ],
+            "exceed_probabilities": [
+              0.335,
+              0.0
+            ]
+          },
+          "impact_mean": 0.0,
+          "impact_std_deviation": 0.0,
+          "impact_semi_std_deviation": 0.0,
+          "calc_details": {
+            "hazard_path": [
+              "water_risk/wri/v2/water_stress_{scenario}_{year}",
+              "water_risk/wri/v2/water_supply_{scenario}_{year}",
+              "water_risk/wri/v2/water_supply_{scenario}_{year}"
+            ]
+          }
+        },
+        {
+          "key": {
+            "hazard_type": "WaterRisk",
+            "scenario_id": "ssp585",
+            "year": "2050"
+          },
+          "impact_type": "disruption",
+          "hazard_indicator_id": "water_stress",
+          "impact_distribution": {
+            "bin_edges": [
+              0.01684,
+              0.01684
+            ],
+            "probabilities": [
+              0.324
+            ]
+          },
+          "impact_exceedance": {
+            "values": [
+              0.01684,
+              0.01684
+            ],
+            "exceed_probabilities": [
+              0.324,
+              0.0
+            ]
+          },
+          "impact_mean": 0.005457,
+          "impact_std_deviation": 0.007882,
+          "impact_semi_std_deviation": 0.00648,
+          "calc_details": {
+            "hazard_path": [
+              "water_risk/wri/v2/water_stress_{scenario}_{year}",
+              "water_risk/wri/v2/water_supply_{scenario}_{year}",
+              "water_risk/wri/v2/water_supply_{scenario}_{year}"
+            ]
+          }
+        },
+        {
+          "key": {
+            "hazard_type": "WaterTemperature",
+            "scenario_id": "historical",
+            "year": "None"
+          },
+          "impact_type": "disruption",
+          "hazard_indicator_id": "weeks_water_temp_above",
+          "impact_distribution": {
+            "bin_edges": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.01043,
+              0.0365,
+              0.09418,
+              0.4,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "probabilities": [
+              0.1314,
+              0.1897,
+              0.1436,
+              0.1436,
+              0.1429,
+              0.1333,
+              0.08974,
+              0.02115,
+              0.000641,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "impact_exceedance": {
+            "values": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.01043,
+              0.0365,
+              0.09418,
+              0.4,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "exceed_probabilities": [
+              0.9962,
+              0.8647,
+              0.675,
+              0.5314,
+              0.3878,
+              0.2449,
+              0.1115,
+              0.02179,
+              0.000641,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "impact_mean": 0.001006,
+          "impact_std_deviation": 0.004243,
+          "impact_semi_std_deviation": 0.004135,
+          "calc_details": {
+            "hazard_path": [
+              "chronic_heat/nluu/v2/weeks_water_temp_above_GFDL_{scenario}_{year}",
+              "chronic_heat/nluu/v2/weeks_water_temp_above_GFDL_{scenario}_{year}",
+              "chronic_heat/osc/v2/days_wbgt_above_ACCESS-CM2_{scenario}_{year}",
+              "chronic_heat/osc/v2/days_wbgt_above_ACCESS-CM2_{scenario}_{year}"
+            ]
+          }
+        },
+        {
+          "key": {
+            "hazard_type": "WaterTemperature",
+            "scenario_id": "ssp585",
+            "year": "2050"
+          },
+          "impact_type": "disruption",
+          "hazard_indicator_id": "weeks_water_temp_above",
+          "impact_distribution": {
+            "bin_edges": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.01043,
+              0.0365,
+              0.09418,
+              0.4,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "probabilities": [
+              0.03558,
+              0.1413,
+              0.1894,
+              0.1404,
+              0.1279,
+              0.1288,
+              0.1462,
+              0.08173,
+              0.008654,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "impact_exceedance": {
+            "values": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.01043,
+              0.0365,
+              0.09418,
+              0.4,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "exceed_probabilities": [
+              1.0,
+              0.9644,
+              0.8231,
+              0.6337,
+              0.4933,
+              0.3654,
+              0.2365,
+              0.09038,
+              0.008654,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "impact_mean": 0.003245,
+          "impact_std_deviation": 0.009151,
+          "impact_semi_std_deviation": 0.008691,
+          "calc_details": {
+            "hazard_path": [
+              "chronic_heat/nluu/v2/weeks_water_temp_above_GFDL_{scenario}_{year}",
+              "chronic_heat/nluu/v2/weeks_water_temp_above_GFDL_{scenario}_{year}",
+              "chronic_heat/osc/v2/days_wbgt_above_ACCESS-CM2_{scenario}_{year}",
+              "chronic_heat/osc/v2/days_wbgt_above_ACCESS-CM2_{scenario}_{year}"
+            ]
+          }
+        },
+        {
+          "key": {
+            "hazard_type": "Wind",
+            "scenario_id": "historical",
+            "year": "None"
+          },
+          "impact_type": "damage",
+          "hazard_indicator_id": "max_speed",
+          "impact_distribution": {
+            "bin_edges": [
+              0.0,
+              0.0003455,
+              0.0008007,
+              0.001717,
+              0.003167,
+              0.004348,
+              0.005291,
+              0.006469,
+              0.008228,
+              0.01029,
+              0.02339,
+              0.03774,
+              0.04629,
+              0.05305,
+              0.05892,
+              0.06284,
+              0.07208,
+              0.07525,
+              0.07957,
+              0.07957
+            ],
+            "probabilities": [
+              0.05,
+              0.01667,
+              0.008333,
+              0.005,
+              0.003333,
+              0.002381,
+              0.001786,
+              0.001389,
+              0.001111,
+              0.005,
+              0.001667,
+              0.0008333,
+              0.0005,
+              0.0003333,
+              0.0002381,
+              0.0001786,
+              0.0001389,
+              0.0001111,
+              0.001
+            ]
+          },
+          "impact_exceedance": {
+            "values": [
+              0.0,
+              0.0003455,
+              0.0008007,
+              0.001717,
+              0.003167,
+              0.004348,
+              0.005291,
+              0.006469,
+              0.008228,
+              0.01029,
+              0.02339,
+              0.03774,
+              0.04629,
+              0.05305,
+              0.05892,
+              0.06284,
+              0.07208,
+              0.07525,
+              0.07957,
+              0.07957
+            ],
+            "exceed_probabilities": [
+              0.1,
+              0.05,
+              0.03333,
+              0.025,
+              0.02,
+              0.01667,
+              0.01429,
+              0.0125,
+              0.01111,
+              0.01,
+              0.005,
+              0.003333,
+              0.0025,
+              0.002,
+              0.001667,
+              0.001429,
+              0.00125,
+              0.001111,
+              0.001,
+              0.0
+            ]
+          },
+          "impact_mean": 0.0004345,
+          "impact_std_deviation": 0.004059,
+          "impact_semi_std_deviation": 0.004038,
+          "calc_details": {
+            "hazard_exceedance": {
+              "values": [
+                22.35,
+                26.73,
+                29.0,
+                30.6,
+                31.81,
+                32.79,
+                33.58,
+                34.56,
+                35.36,
+                35.97,
+                39.82,
+                42.02,
+                43.28,
+                44.27,
+                45.09,
+                45.47,
+                46.38,
+                46.69,
+                47.12,
+                47.12
+              ],
+              "exceed_probabilities": [
+                0.1,
+                0.05,
+                0.03333,
+                0.025,
+                0.02,
+                0.01667,
+                0.01429,
+                0.0125,
+                0.01111,
+                0.01,
+                0.005,
+                0.003333,
+                0.0025,
+                0.002,
+                0.001667,
+                0.001429,
+                0.00125,
+                0.001111,
+                0.001,
+                0.0
+              ]
+            },
+            "hazard_distribution": {
+              "bin_edges": [
+                22.35,
+                26.73,
+                29.0,
+                30.6,
+                31.81,
+                32.79,
+                33.58,
+                34.56,
+                35.36,
+                35.97,
+                39.82,
+                42.02,
+                43.28,
+                44.27,
+                45.09,
+                45.47,
+                46.38,
+                46.69,
+                47.12,
+                47.12
+              ],
+              "probabilities": [
+                0.05,
+                0.01667,
+                0.008333,
+                0.005,
+                0.003333,
+                0.002381,
+                0.001786,
+                0.001389,
+                0.001111,
+                0.005,
+                0.001667,
+                0.0008333,
+                0.0005,
+                0.0003333,
+                0.0002381,
+                0.0001786,
+                0.0001389,
+                0.0001111,
+                0.001
+              ]
+            },
+            "vulnerability_distribution": {
+              "intensity_bin_edges": [
+                22.35,
+                26.73,
+                29.0,
+                30.6,
+                31.81,
+                32.79,
+                33.58,
+                34.56,
+                35.36,
+                35.97,
+                39.82,
+                42.02,
+                43.28,
+                44.27,
+                45.09,
+                45.47,
+                46.38,
+                46.69,
+                47.12,
+                47.12
+              ],
+              "impact_bin_edges": [
+                0.0,
+                0.0003455,
+                0.0008007,
+                0.001717,
+                0.003167,
+                0.004348,
+                0.005291,
+                0.006469,
+                0.008228,
+                0.01029,
+                0.02339,
+                0.03774,
+                0.04629,
+                0.05305,
+                0.05892,
+                0.06284,
+                0.07208,
+                0.07525,
+                0.07957,
+                0.07957
+              ],
+              "prob_matrix": [
+                [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ]
+              ]
+            },
+            "hazard_path": [
+              "wind/iris/v1/max_speed_{scenario}_{year}"
+            ]
+          }
+        },
+        {
+          "key": {
+            "hazard_type": "Wind",
+            "scenario_id": "ssp585",
+            "year": "2050"
+          },
+          "impact_type": "damage",
+          "hazard_indicator_id": "max_speed",
+          "impact_distribution": {
+            "bin_edges": [
+              0.0001546,
+              0.001076,
+              0.004117,
+              0.006442,
+              0.01074,
+              0.01484,
+              0.01748,
+              0.02017,
+              0.02256,
+              0.02643,
+              0.05546,
+              0.07789,
+              0.08764,
+              0.09795,
+              0.1054,
+              0.1173,
+              0.1317,
+              0.1457,
+              0.1531,
+              0.1531
+            ],
+            "probabilities": [
+              0.05,
+              0.01667,
+              0.008333,
+              0.005,
+              0.003333,
+              0.002381,
+              0.001786,
+              0.001389,
+              0.001111,
+              0.005,
+              0.001667,
+              0.0008333,
+              0.0005,
+              0.0003333,
+              0.0002381,
+              0.0001786,
+              0.0001389,
+              0.0001111,
+              0.001
+            ]
+          },
+          "impact_exceedance": {
+            "values": [
+              0.0001546,
+              0.001076,
+              0.004117,
+              0.006442,
+              0.01074,
+              0.01484,
+              0.01748,
+              0.02017,
+              0.02256,
+              0.02643,
+              0.05546,
+              0.07789,
+              0.08764,
+              0.09795,
+              0.1054,
+              0.1173,
+              0.1317,
+              0.1457,
+              0.1531,
+              0.1531
+            ],
+            "exceed_probabilities": [
+              0.1,
+              0.05,
+              0.03333,
+              0.025,
+              0.02,
+              0.01667,
+              0.01429,
+              0.0125,
+              0.01111,
+              0.01,
+              0.005,
+              0.003333,
+              0.0025,
+              0.002,
+              0.001667,
+              0.001429,
+              0.00125,
+              0.001111,
+              0.001,
+              0.0
+            ]
+          },
+          "impact_mean": 0.001036,
+          "impact_std_deviation": 0.008174,
+          "impact_semi_std_deviation": 0.008114,
+          "calc_details": {
+            "hazard_exceedance": {
+              "values": [
+                25.77,
+                30.06,
+                32.6,
+                34.53,
+                36.1,
+                37.31,
+                38.08,
+                38.87,
+                39.58,
+                40.36,
+                44.63,
+                46.95,
+                47.91,
+                48.92,
+                49.65,
+                50.57,
+                51.56,
+                52.51,
+                53.02,
+                53.02
+              ],
+              "exceed_probabilities": [
+                0.1,
+                0.05,
+                0.03333,
+                0.025,
+                0.02,
+                0.01667,
+                0.01429,
+                0.0125,
+                0.01111,
+                0.01,
+                0.005,
+                0.003333,
+                0.0025,
+                0.002,
+                0.001667,
+                0.001429,
+                0.00125,
+                0.001111,
+                0.001,
+                0.0
+              ]
+            },
+            "hazard_distribution": {
+              "bin_edges": [
+                25.77,
+                30.06,
+                32.6,
+                34.53,
+                36.1,
+                37.31,
+                38.08,
+                38.87,
+                39.58,
+                40.36,
+                44.63,
+                46.95,
+                47.91,
+                48.92,
+                49.65,
+                50.57,
+                51.56,
+                52.51,
+                53.02,
+                53.02
+              ],
+              "probabilities": [
+                0.05,
+                0.01667,
+                0.008333,
+                0.005,
+                0.003333,
+                0.002381,
+                0.001786,
+                0.001389,
+                0.001111,
+                0.005,
+                0.001667,
+                0.0008333,
+                0.0005,
+                0.0003333,
+                0.0002381,
+                0.0001786,
+                0.0001389,
+                0.0001111,
+                0.001
+              ]
+            },
+            "vulnerability_distribution": {
+              "intensity_bin_edges": [
+                25.77,
+                30.06,
+                32.6,
+                34.53,
+                36.1,
+                37.31,
+                38.08,
+                38.87,
+                39.58,
+                40.36,
+                44.63,
+                46.95,
+                47.91,
+                48.92,
+                49.65,
+                50.57,
+                51.56,
+                52.51,
+                53.02,
+                53.02
+              ],
+              "impact_bin_edges": [
+                0.0001546,
+                0.001076,
+                0.004117,
+                0.006442,
+                0.01074,
+                0.01484,
+                0.01748,
+                0.02017,
+                0.02256,
+                0.02643,
+                0.05546,
+                0.07789,
+                0.08764,
+                0.09795,
+                0.1054,
+                0.1173,
+                0.1317,
+                0.1457,
+                0.1531,
+                0.1531
+              ],
+              "prob_matrix": [
+                [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ]
+              ]
+            },
+            "hazard_path": [
+              "wind/iris/v1/max_speed_{scenario}_{year}"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

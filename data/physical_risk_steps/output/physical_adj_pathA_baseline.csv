@@ -1,0 +1,6 @@
+field,value
+outage_rate,0.0
+capacity_derate,0.0
+efficiency_loss,0.0
+water_constrained_capacity,1.0
+notes,PLANiT (ssp126 y2024): wildfire_frequency_missing
