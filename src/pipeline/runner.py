@@ -310,6 +310,48 @@ class CRPModelRunner:
             notes=adj["notes"],
         )
 
+    def _save_physical_adjustments(
+        self,
+        physical_adj,
+        yearly_physical_adj,
+        scenario_name: str,
+    ) -> None:
+        """Save Path A (PhysicalAdjustments) and Path B (YearlyPhysicalAdjustments) to CSV."""
+        import csv as _csv
+        out_dir = self.base_dir / "data" / "physical_risk_steps" / "output"
+        out_dir.mkdir(parents=True, exist_ok=True)
+        safe_scenario = scenario_name.replace("/", "_").replace(" ", "_")
+
+        # Path A: single-row CSV
+        path_a_file = out_dir / f"physical_adj_pathA_{safe_scenario}.csv"
+        with open(path_a_file, "w", newline="", encoding="utf-8") as f:
+            writer = _csv.writer(f)
+            writer.writerow(["field", "value"])
+            writer.writerow(["outage_rate", physical_adj.outage_rate])
+            writer.writerow(["capacity_derate", physical_adj.capacity_derate])
+            writer.writerow(["efficiency_loss", physical_adj.efficiency_loss])
+            writer.writerow(["water_constrained_capacity", physical_adj.water_constrained_capacity])
+            writer.writerow(["notes", physical_adj.notes])
+        logger.info("Saved Path A PhysicalAdjustments → %s", path_a_file)
+
+        # Path B: year-by-year CSV
+        path_b_file = out_dir / f"physical_adj_pathB_{safe_scenario}.csv"
+        with open(path_b_file, "w", newline="", encoding="utf-8") as f:
+            writer = _csv.writer(f)
+            writer.writerow([
+                "year", "outage_rate", "capacity_derate",
+                "efficiency_loss", "water_constrained_capacity",
+            ])
+            for i, yr in enumerate(yearly_physical_adj.years):
+                writer.writerow([
+                    int(yr),
+                    yearly_physical_adj.outage_rates[i],
+                    yearly_physical_adj.capacity_derates[i],
+                    yearly_physical_adj.efficiency_losses[i],
+                    yearly_physical_adj.water_constraints[i],
+                ])
+        logger.info("Saved Path B YearlyPhysicalAdjustments → %s", path_b_file)
+
     def _load_market_scenario(self, scenario_name: str) -> MarketScenario:
         """Load market scenario (demand/price)."""
         if scenario_name == "low_demand":
@@ -454,6 +496,10 @@ class CRPModelRunner:
         yearly_physical_adj = load_yearly_from_output_csv(
             start_year=_phys_start,
             end_year=_phys_end,
+        )
+
+        self._save_physical_adjustments(
+            physical_adj, yearly_physical_adj, scenario_name
         )
 
         # --- Combined run (always performed, same as before) ---
