@@ -32,7 +32,7 @@ from src.risk.financing import calculate_financing_with_counterfactual
 from src.risk.attribution import decompose_risk_shapley
 from src.financials import compute_cashflows_timeseries, calculate_metrics, CashFlowTimeSeries, FinancialMetrics
 from src.scenarios.korea_power_plan import load_korea_power_plan_scenarios
-from src.risk.physical import get_physical_risk_scenario, PhysicalAdjustments, load_yearly_from_output_csv
+from src.risk.physical import get_physical_risk_scenario, PhysicalAdjustments, load_yearly_from_output_csv, YearlyPhysicalAdjustments
 from src.planit import PLANiTRunner, PLANiTAdapter, PLANiTIntegrationConfig
 
 # Conditional import for enhanced 11th Basic Plan
@@ -56,7 +56,7 @@ except ImportError:
 # CRP physical scenario → PLANiT SSP + target year
 PHYSICAL_SCENARIO_SSP_MAP: Dict[str, tuple] = {
     "baseline": ("ssp126", 2024),
-    "moderate_physical": ("ssp126", 2040),
+    "moderate_physical": ("ssp245", 2040),
     "high_physical": ("ssp585", 2040),
     "severe_drought": ("ssp585", 2050),
 }
@@ -130,7 +130,7 @@ class CRPModelRunner:
         - csv  (default): read pre-computed CSV snapshots from Physicalrisk_PLANiT/data/results
         - live          : call PLANiT runtime (CLIMADA/PhysRisk) and backfill gaps from csv snapshots
         """
-        mode = os.getenv("CRP_PLANIT_MODE", "csv").strip().lower()
+        mode = os.getenv("CRP_PLANIT_MODE", "live").strip().lower()
         if mode == "live":
             live_results = self._load_planit_results_live()
             if live_results:
@@ -310,6 +310,61 @@ class CRPModelRunner:
             notes=adj["notes"],
         )
 
+    def _build_yearly_physical_from_planit(
+        self, scenario_name: str, start_year: int, end_year: int
+    ) -> Optional[YearlyPhysicalAdjustments]:
+        """Build year-by-year physical adjustments from PLANiT adapter.
+
+        Uses the PLANiT adapter to compute scenario-specific adjustments for
+        each year, ensuring physical risk varies across scenarios (baseline,
+        moderate_physical, high_physical, severe_drought).
+
+        Falls back to load_yearly_from_output_csv() if PLANiT results are empty.
+        """
+        if not self._planit_results:
+            logger.warning("No PLANiT results; falling back to static CSV physical adjustments.")
+            return load_yearly_from_output_csv(start_year=start_year, end_year=end_year)
+
+        import numpy as np
+
+        ssp, _target_year = PHYSICAL_SCENARIO_SSP_MAP.get(
+            scenario_name, ("ssp126", 2024)
+        )
+        ssp_to_crp = {"ssp126": "SSP1-2.6", "ssp245": "RCP4.5", "ssp585": "RCP8.5"}
+        crp_label = ssp_to_crp.get(ssp, "SSP1-2.6")
+
+        all_years = np.arange(start_year, end_year + 1)
+        outage_rates = np.zeros(len(all_years))
+        capacity_derates = np.zeros(len(all_years))
+        efficiency_losses = np.zeros(len(all_years))
+        water_constraints = np.ones(len(all_years))
+
+        for i, year in enumerate(all_years):
+            adj = self._planit_adapter.convert(
+                self._planit_results, int(year), crp_label
+            )
+            outage_rates[i] = adj["outage_rate"]
+            capacity_derates[i] = adj["capacity_derate"]
+            efficiency_losses[i] = adj["efficiency_loss"]
+            water_constraints[i] = adj["water_constrained_capacity"]
+
+        label = f"PLANiT {crp_label} ({scenario_name})"
+        logger.info(
+            "Built yearly physical adjustments from PLANiT: scenario=%s, years=%d-%d, "
+            "avg_outage=%.6f, avg_derate=%.6f, avg_eff_loss=%.6f",
+            label, start_year, end_year,
+            outage_rates.mean(), capacity_derates.mean(), efficiency_losses.mean(),
+        )
+
+        return YearlyPhysicalAdjustments(
+            years=all_years,
+            outage_rates=outage_rates,
+            capacity_derates=capacity_derates,
+            efficiency_losses=efficiency_losses,
+            water_constraints=water_constraints,
+            scenario_name=label,
+        )
+
     def _load_market_scenario(self, scenario_name: str) -> MarketScenario:
         """Load market scenario (demand/price)."""
         if scenario_name == "low_demand":
@@ -448,12 +503,11 @@ class CRPModelRunner:
                 dispatch_priority_penalty=transition_scenario.dispatch_priority_penalty,
             )
 
-        # Build yearly physical adjustments from physical_risk_output.csv
+        # Build yearly physical adjustments from PLANiT (scenario-aware)
         _phys_start = int(plant_params.get("cod_year", 2025))
         _phys_end = _phys_start + transition_adj.operating_years - 1
-        yearly_physical_adj = load_yearly_from_output_csv(
-            start_year=_phys_start,
-            end_year=_phys_end,
+        yearly_physical_adj = self._build_yearly_physical_from_planit(
+            physical_scenario_name, _phys_start, _phys_end
         )
 
         # --- Combined run (always performed, same as before) ---
