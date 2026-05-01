@@ -8,6 +8,7 @@ import numpy as np
 
 from .config import PLANiTIntegrationConfig
 from .runner import PLANiTHazardResult
+from ..data.loaders import get_climate_factor
 
 logger = logging.getLogger(__name__)
 
@@ -72,6 +73,11 @@ class PLANiTAdapter:
 
     def __init__(self, config: Optional[PLANiTIntegrationConfig] = None):
         self._config = config or PLANiTIntegrationConfig()
+
+    @staticmethod
+    def _normalize_scenario(crp_scenario: str) -> str:
+        """Normalize scenario string to lower case, no spaces."""
+        return crp_scenario.lower().replace(" ", "")
 
     # ------------------------------------------------------------------
     # Public API
@@ -170,7 +176,11 @@ class PLANiTAdapter:
                 )
                 break
 
-        wf_outage_rate, wf_method = self._compute_wildfire_outage_rate(wf_val, wf_freq)
+        logger.debug(f"[WILDFIRE] Computing outage rate: freq={wf_freq}, scenario={crp_scenario}, year={target_year}")
+        wf_outage_rate, wf_method = self._compute_wildfire_outage_rate(
+            wf_val, wf_freq, target_year=target_year, crp_scenario=crp_scenario
+        )
+        logger.debug(f"[WILDFIRE] Computed outage_rate={wf_outage_rate}")
         if wf_outage_rate is not None:
             outage_rate = wf_outage_rate
             if wf_method == "event_probability":
@@ -185,9 +195,26 @@ class PLANiTAdapter:
                     notes_parts.append(f"wildfire_freq_source={wf_freq_source}")
             if wf_source_scenario != ssp:
                 notes_parts.append(f"wildfire_source_scenario={wf_source_scenario}")
+            # Add climate factor note
+            try:
+                climate_factor = get_climate_factor("wildfire", target_year, crp_scenario)
+                if abs(climate_factor - 1.0) > 0.001:  # Only note if significantly different from 1.0
+                    notes_parts.append(f"wildfire_climate_factor={climate_factor:.3f}")
+            except Exception:
+                pass
         elif "outage_rate" in baseline:
+            # Apply climate factor to baseline fallback value
             outage_rate = baseline["outage_rate"]
-            notes_parts.append("wildfire=csv_fallback")
+            logger.debug(f"[WILDFIRE] CSV fallback: baseline={outage_rate}, scenario={crp_scenario}, year={target_year}")
+            try:
+                climate_factor = get_climate_factor("wildfire", target_year, crp_scenario)
+                outage_rate_before = outage_rate
+                outage_rate = outage_rate * climate_factor
+                logger.debug(f"[WILDFIRE] Applied climate_factor={climate_factor}: {outage_rate_before} → {outage_rate}")
+                notes_parts.append(f"wildfire=csv_fallback_with_climate_factor={climate_factor:.3f}")
+            except Exception as e:
+                logger.debug(f"[WILDFIRE] Climate factor lookup failed: {e}")
+                notes_parts.append("wildfire=csv_fallback")
         else:
             notes_parts.append("wildfire_frequency_missing")
 
@@ -273,8 +300,13 @@ class PLANiTAdapter:
         self,
         _wildfire_legacy_value: Optional[float],
         event_frequency_per_year: Optional[float],
+        target_year: Optional[int] = None,
+        crp_scenario: Optional[str] = None,
     ) -> Tuple[Optional[float], Optional[str]]:
-        """Compute wildfire outage_rate using event-frequency probability method."""
+        """Compute wildfire outage_rate using event-frequency probability method.
+
+        Applies climate factor multiplier from climate_factors.csv if year and scenario provided.
+        """
         method = str(self._config.wildfire_outage_method).strip().lower()
 
         if method == "event_probability" and event_frequency_per_year is not None:
@@ -282,6 +314,18 @@ class PLANiTAdapter:
             outage_hours = max(0.0, float(self._config.wildfire_outage_duration_hours))
             hours_per_year = max(1.0, float(self._config.hours_per_year))
             outage_rate = event_frequency_per_year * outage_prob * (outage_hours / hours_per_year)
+
+            # Apply climate factor multiplier if year and scenario provided
+            if target_year is not None and crp_scenario is not None:
+                try:
+                    # crp_scenario is already in climate_factors.csv format (RCP4.5, SSP1-2.6, etc.)
+                    climate_factor = get_climate_factor("wildfire", target_year, crp_scenario)
+                    outage_rate = outage_rate * climate_factor
+                except Exception as e:
+                    logger.warning(
+                        "Failed to apply climate factor for wildfire: %s. Using unadjusted rate.", e
+                    )
+
             return min(1.0, max(0.0, outage_rate)), "event_probability"
 
         return None, None

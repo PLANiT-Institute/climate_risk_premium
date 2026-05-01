@@ -1,6 +1,6 @@
 field,value
-outage_rate,0.00013698630136986303
-capacity_derate,0.005
+outage_rate,0.0
+capacity_derate,0.0
 efficiency_loss,0.0
 water_constrained_capacity,1.0
-notes,"PLANiT (ssp245 y2040): wildfire_event_freq=0.500000/yr, wildfire_outage_prob=0.100, wildfire_outage_duration_h=24.0, wildfire_freq_source=event_count/20y, drought_metric=impact_mean, drought_impact=0.005000"
+notes,PLANiT (ssp245 y2040): wildfire_frequency_missing
