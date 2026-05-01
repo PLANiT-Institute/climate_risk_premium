@@ -308,44 +308,8 @@ class CRPModelRunner:
         Falls back to load_yearly_from_output_csv() if PLANiT results are empty.
         """
         if not self._planit_results:
-            logger.warning("No PLANiT results; falling back to static CSV physical adjustments with climate factors.")
-            # Load baseline CSV and apply climate factors for scenario variation
-            from ..data.loaders import get_climate_factor
-            from pathlib import Path as _Path
-            import csv as _csv
-
-            # Anchor on 2024 RCP8.5 baseline values (factor=1.0), then scale by
-            # climate_factors.csv for the requested scenario. This avoids relying on
-            # physical_risk_output.csv's RCP8.5 trajectory (which is flat 2030→2050).
-            csv_adj = load_yearly_from_output_csv(start_year=start_year, end_year=end_year)
-
-            ssp, _target_year = PHYSICAL_SCENARIO_SSP_MAP.get(scenario_name, ("ssp126", 2024))
-            ssp_to_crp = {"ssp126": "SSP1-2.6", "ssp245": "RCP4.5", "ssp585": "RCP8.5"}
-            crp_label = ssp_to_crp.get(ssp, "SSP1-2.6")
-
-            # Pull 2024 RCP8.5 baseline (climate factor = 1.0 by definition)
-            base_outage_2024 = float(csv_adj.outage_rates[0]) / max(
-                get_climate_factor("wildfire", int(csv_adj.years[0]), "RCP8.5"), 1e-9
-            )
-            base_efficiency_2024 = float(csv_adj.efficiency_losses[0]) / max(
-                get_climate_factor("wildfire", int(csv_adj.years[0]), "RCP8.5"), 1e-9
-            )
-
-            scaled_outage = []
-            scaled_efficiency = []
-            for year in csv_adj.years:
-                f = get_climate_factor("wildfire", int(year), crp_label)
-                scaled_outage.append(base_outage_2024 * f)
-                scaled_efficiency.append(base_efficiency_2024 * f)
-            csv_adj.outage_rates = np.array(scaled_outage)
-            csv_adj.efficiency_losses = np.array(scaled_efficiency)
-            csv_adj.scenario_name = f"baseline × climate_factor[{crp_label}]"
-            logger.info(
-                "Physical adjustments for %s (%s): base_outage=%.6f, avg_outage=%.6f",
-                scenario_name, crp_label, base_outage_2024,
-                csv_adj.outage_rates.mean(),
-            )
-            return csv_adj
+            logger.warning("No PLANiT results; building physical adjustments from hazard_baselines.csv × climate_factors.csv.")
+            return self._build_yearly_from_baselines_csv(scenario_name, start_year, end_year)
 
         ssp, _target_year = PHYSICAL_SCENARIO_SSP_MAP.get(
             scenario_name, ("ssp126", 2024)
@@ -385,6 +349,123 @@ class CRPModelRunner:
             scenario_name=label,
         )
 
+    def _build_yearly_from_baselines_csv(
+        self, scenario_name: str, start_year: int, end_year: int
+    ) -> YearlyPhysicalAdjustments:
+        """Build year-by-year adjustments from hazard_baselines.csv × climate_factors.csv.
+
+        Channels populated for every scenario × year:
+            outage_rate              = wildfire(plant) + tropical_cyclone(plant)
+            capacity_derate          = drought.capacity_derate × cf("drought")
+            efficiency_loss          = drought.eff_loss × cf("drought") + heat_stress.eff_loss × cf("heat_stress")
+            water_constrained_capacity = 1.0 (only set when severe drought distribution available)
+            transmission_outage_rate = wildfire(line) + typhoon(line) + heat_sag(line) + flood(substation)
+            asset_capex_loss_rate    = annual replacement-value fraction (line corridor + plant damage_ratio)
+        """
+        from ..data.loaders import (
+            get_climate_factor,
+            load_hazard_baselines as _load_baselines,
+        )
+        from ..planit.vulnerability import (
+            event_frequency_to_outage_rate,
+            transmission_outage_rate as _trans_outage,
+            substation_outage_rate as _sub_outage,
+        )
+
+        baselines = _load_baselines()
+        line_params = (
+            self.dataset.get('transmission') if isinstance(self.dataset, dict) else {}
+        ) or {}
+
+        ssp, _target_year = PHYSICAL_SCENARIO_SSP_MAP.get(scenario_name, ("ssp126", 2024))
+        ssp_to_crp = {"ssp126": "SSP1-2.6", "ssp245": "RCP4.5", "ssp585": "RCP8.5"}
+        crp_label = ssp_to_crp.get(ssp, "SSP1-2.6")
+
+        years = np.arange(start_year, end_year + 1)
+        n = len(years)
+        plant_outage = np.zeros(n)
+        capacity_derate = np.zeros(n)
+        efficiency_loss = np.zeros(n)
+        water_constraint = np.ones(n)
+        line_outage = np.zeros(n)
+        capex_loss = np.zeros(n)
+
+        # Defaults for plant-level wildfire conversion (only used if PLANiT inputs missing)
+        plant_wf_p = 0.10
+        plant_wf_dur = 24.0
+
+        wf = baselines.get("wildfire")
+        tc = baselines.get("tropical_cyclone")
+        dr = baselines.get("drought")
+        hs = baselines.get("heat_stress")
+        cf = baselines.get("coastal_flood")
+
+        for i, yr in enumerate(years):
+            yi = int(yr)
+            # --- Plant-level outage: wildfire + tropical cyclone direct hits ---
+            if wf is not None:
+                wf_freq = wf.base_frequency * get_climate_factor("wildfire", yi, crp_label)
+                plant_outage[i] += event_frequency_to_outage_rate(
+                    wf_freq, plant_wf_p, plant_wf_dur
+                )
+            if tc is not None:
+                # tropical_cyclone in hazard_baselines stores outage_rate directly; scale by cf
+                tc_factor = get_climate_factor("tropical_cyclone", yi, crp_label)
+                plant_outage[i] += tc.outage_rate * tc_factor
+
+            # --- Capacity derate (drought) ---
+            if dr is not None:
+                dr_factor = get_climate_factor("drought", yi, crp_label)
+                capacity_derate[i] = dr.capacity_derate * dr_factor
+
+            # --- Efficiency loss (drought + heat stress) ---
+            if dr is not None:
+                efficiency_loss[i] += dr.efficiency_loss * get_climate_factor("drought", yi, crp_label)
+            if hs is not None:
+                efficiency_loss[i] += hs.efficiency_loss * get_climate_factor("heat_stress", yi, crp_label)
+
+            # --- Transmission outage: wildfire + typhoon + heat-sag on line + substation flood ---
+            wf_freq_line = wf.base_frequency * get_climate_factor("wildfire", yi, crp_label) if wf else 0.0
+            tc_freq_line = tc.base_frequency * get_climate_factor("tropical_cyclone", yi, crp_label) if tc else 0.0
+            heat_freq_line = hs.base_frequency * get_climate_factor("heat_stress", yi, crp_label) if hs else 0.0
+            flood_freq = cf.base_frequency * get_climate_factor("coastal_flood", yi, crp_label) if cf else 0.0
+
+            line_outage[i] = _trans_outage(wf_freq_line, tc_freq_line, heat_freq_line, line_params)
+            line_outage[i] += _sub_outage(flood_freq, line_params)
+            line_outage[i] = min(1.0, line_outage[i])
+
+            # --- Asset capex loss (annual fraction destroyed) ---
+            # Plant: damage_ratio per event × event_frequency, summed across hazards
+            plant_loss = 0.0
+            for h, name in [(wf, "wildfire"), (tc, "tropical_cyclone")]:
+                if h is None:
+                    continue
+                f = get_climate_factor(name, yi, crp_label)
+                plant_loss += h.damage_ratio * h.base_frequency * f
+            # Line/substation: prebuilt fraction in transmission.csv
+            line_loss = float(line_params.get("line_annual_damage_fraction", 0.0))
+            # Scale line losses by an aggregate climate factor (use wildfire as bellwether)
+            line_loss *= get_climate_factor("wildfire", yi, crp_label)
+            capex_loss[i] = plant_loss + line_loss
+
+        adj = YearlyPhysicalAdjustments(
+            years=years,
+            outage_rates=plant_outage,
+            capacity_derates=capacity_derate,
+            efficiency_losses=efficiency_loss,
+            water_constraints=water_constraint,
+            transmission_outage_rates=line_outage,
+            asset_capex_loss_rates=capex_loss,
+            scenario_name=f"hazard_baselines × climate_factor[{crp_label}]",
+        )
+        logger.info(
+            "Physical adj %s (%s): plant_outage=%.6f line_outage=%.6f derate=%.6f eff_loss=%.6f capex_loss=%.6f",
+            scenario_name, crp_label,
+            plant_outage.mean(), line_outage.mean(), capacity_derate.mean(),
+            efficiency_loss.mean(), capex_loss.mean(),
+        )
+        return adj
+
     def _save_physical_adjustments(
         self,
         physical_adj,
@@ -406,16 +487,19 @@ class CRPModelRunner:
             writer.writerow(["capacity_derate", physical_adj.capacity_derate])
             writer.writerow(["efficiency_loss", physical_adj.efficiency_loss])
             writer.writerow(["water_constrained_capacity", physical_adj.water_constrained_capacity])
+            writer.writerow(["transmission_outage_rate", physical_adj.transmission_outage_rate])
+            writer.writerow(["asset_capex_loss_rate", physical_adj.asset_capex_loss_rate])
             writer.writerow(["notes", physical_adj.notes])
         logger.info("Saved Path A PhysicalAdjustments → %s", path_a_file)
 
-        # Path B: year-by-year CSV
+        # Path B: year-by-year CSV (includes transmission + capex channels)
         path_b_file = out_dir / f"physical_adj_pathB_{safe_scenario}.csv"
         with open(path_b_file, "w", newline="", encoding="utf-8") as f:
             writer = _csv.writer(f)
             writer.writerow([
-                "year", "outage_rate", "capacity_derate",
-                "efficiency_loss", "water_constrained_capacity",
+                "year", "plant_outage_rate", "capacity_derate", "efficiency_loss",
+                "water_constrained_capacity", "transmission_outage_rate",
+                "asset_capex_loss_rate",
             ])
             for i, yr in enumerate(yearly_physical_adj.years):
                 writer.writerow([
@@ -424,6 +508,8 @@ class CRPModelRunner:
                     yearly_physical_adj.capacity_derates[i],
                     yearly_physical_adj.efficiency_losses[i],
                     yearly_physical_adj.water_constraints[i],
+                    yearly_physical_adj.transmission_outage_rates[i],
+                    yearly_physical_adj.asset_capex_loss_rates[i],
                 ])
         logger.info("Saved Path B YearlyPhysicalAdjustments → %s", path_b_file)
 

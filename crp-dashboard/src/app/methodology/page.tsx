@@ -9,9 +9,9 @@ const INPUT_TABLE = [
   { group: "Plant", item: "CAPEX", value: `${PLANT.total_capex_million.toLocaleString()}M USD`, source: "data/raw/plant_parameters.csv" },
   { group: "Transition", item: "Policy scenarios", value: "baseline/moderate/aggressive", source: "data/raw/policy.csv" },
   { group: "Transition", item: "Enhanced plan", value: "11th plan trajectory", source: "data/raw/enhanced_korea_power_plan.csv" },
-  { group: "Physical", item: "Wildfire event frequency", value: "CLIMADA output", source: "Physicalrisk_PLANiT/data/results/*.csv" },
-  { group: "Physical", item: "Drought impact distribution", value: "PhysRisk output", source: "Physicalrisk_PLANiT/data/results/*.csv" },
-  { group: "Physical", item: "Water risk impact distribution", value: "PhysRisk output", source: "Physicalrisk_PLANiT/data/results/*.csv" },
+  { group: "Physical", item: "Hazard baselines (7 hazards)", value: "freq, outage, derate, eff_loss, damage_ratio", source: "data/physical/hazard_baselines.csv" },
+  { group: "Physical", item: "Climate factors", value: "5 scenarios × 4 anchor years", source: "data/physical/climate_factors.csv" },
+  { group: "Physical", item: "Transmission line params", value: "30km line, 345kV, $2M/km, fragility", source: "data/raw/transmission.csv" },
 ];
 
 export default function MethodologyPage() {
@@ -27,12 +27,18 @@ export default function MethodologyPage() {
       <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
         <h2 className="text-lg font-semibold text-slate-800 mb-3">Current Pipeline Scope</h2>
         <div className="bg-slate-50 rounded-lg p-4 font-mono text-xs leading-6 overflow-x-auto">
-          <pre>{`Inputs (Plant + Policy + PLANiT hazards)
+          <pre>{`Inputs (Plant + Transmission + Policy + PLANiT/CLIMADA hazards)
     ↓
-Transition Adjustments (capacity_factor, operating_years)
-Physical Adjustments (outage_rate, capacity_derate, water_cap)
+Transition Adjustments (capacity_factor, operating_years, carbon price)
+Physical Adjustments (6 channels):
+  • plant_outage         (wildfire + tropical cyclone)
+  • capacity_derate      (drought reduces cooling water)
+  • efficiency_loss      (drought + heat stress raise heat rate)
+  • transmission_outage  (line damage from wildfire/typhoon/heat + substation flood)
+  • asset_capex_loss     (annual fraction of plant + line replacement value destroyed)
+  • combined_unavail     = 1 − (1 − plant)(1 − line)
     ↓
-Cashflow Engine (Revenue, EBITDA, FCF)
+Cashflow Engine (Revenue, EBITDA, FCF, with capex destruction)
     ↓
 Financial Metrics (NPV, IRR, DSCR, LLCR)
     ↓
@@ -43,21 +49,42 @@ Counterfactual Financing Impact (CRP in bps)`}</pre>
       </div>
 
       <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-        <h2 className="text-lg font-semibold text-slate-800 mb-4">Physical Risk Conversion Equations</h2>
+        <h2 className="text-lg font-semibold text-slate-800 mb-4">Physical Risk Channels</h2>
+        <p className="text-xs text-slate-600 mb-4">
+          The pipeline composes six independent hazard channels per scenario × year. All
+          values come from <code className="bg-slate-100 px-1 rounded">data/physical/hazard_baselines.csv</code>{" "}
+          × <code className="bg-slate-100 px-1 rounded">climate_factors.csv</code>{" "}
+          (and <code className="bg-slate-100 px-1 rounded">data/raw/transmission.csv</code> for grid).
+        </p>
         <EquationBlock
-          label="Wildfire (CLIMADA event frequency → outage_rate)"
-          latex="\text{outage\_rate} = f_{\text{event/yr}} \times p_{\text{outage|event}} \times \frac{h_{\text{outage}}}{8760}"
+          label="1. Plant outage (wildfire + tropical cyclone direct hits)"
+          latex="\text{plant\_outage} = f_{\text{wf}}\,p_{\text{wf}}\frac{h_{\text{wf}}}{8760} + r_{\text{TC}}^{\text{base}}\,c_{\text{TC}}"
         />
         <EquationBlock
-          label="Drought (PhysRisk expected impact → derate)"
-          latex="\text{capacity\_derate} = \mathbb{E}[\text{impact}] \times \text{drought\_severity\_scale}"
+          label="2. Capacity derate (drought reduces cooling water availability)"
+          latex="\text{capacity\_derate} = d_{\text{drought}}^{\text{base}} \times c_{\text{drought}}(y)"
         />
         <EquationBlock
-          label="Water Risk (PhysRisk expected impact → hard cap)"
-          latex="\text{water\_constrained\_capacity} = \max(0,\;1-\mathbb{E}[\text{impact}])"
+          label="3. Efficiency loss (drought + heat stress raise heat rate)"
+          latex="\text{eff\_loss} = e_{\text{dr}}^{\text{base}}c_{\text{dr}}(y) + e_{\text{hs}}^{\text{base}}c_{\text{hs}}(y)"
+        />
+        <EquationBlock
+          label="4. Transmission outage (line + substation, composes with plant outage)"
+          latex="\text{line\_outage} = \sum_{h\in\{wf,tc,heat\}} f_h p_h^{\text{line}} \frac{h_h^{\text{line}}}{8760} + f_{\text{flood}} p_{\text{sub}}\frac{h_{\text{sub}}}{8760}"
+        />
+        <EquationBlock
+          label="5. Combined unavailability (plant + line independent failure)"
+          latex="\text{outage} = 1 - (1-\text{plant\_outage})(1-\text{line\_outage})"
+        />
+        <EquationBlock
+          label="6. Asset capex loss (annual replacement-value destruction)"
+          latex="\text{capex\_loss\_rate} = \sum_h \text{damage}_h\,f_h\,c_h(y) + L^{\text{line}}_{\text{annual}}\,c_{\text{wf}}(y)"
         />
         <p className="text-xs text-slate-500 mt-3">
-          Note: interpolation between anchor years is linear; pre-anchor years blend from baseline.
+          Where <em>f<sub>h</sub></em> is hazard frequency, <em>p<sub>h</sub></em> is conditional
+          outage probability, <em>h<sub>h</sub></em> is mean outage duration, and{" "}
+          <em>c<sub>h</sub>(y)</em> is the scenario-specific climate factor in year y. Annual
+          interpolation is linear between IPCC anchor years (2024/2030/2050/2100).
         </p>
       </div>
 

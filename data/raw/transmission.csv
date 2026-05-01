@@ -1,0 +1,14 @@
+param_name,value,unit,description
+line_length_km,30,km,Transmission corridor length plant → grid interconnect (Samcheok → Donghae substation)
+line_voltage_kv,345,kV,Korean grid backbone voltage class
+line_replacement_cost_per_km_million,2.0,USD M/km,345 kV double-circuit line typical replacement (KEPCO 2023)
+substation_replacement_cost_million,50.0,USD M,345 kV substation transformer + bays replacement
+line_wildfire_outage_probability,0.20,decimal,P(line outage | wildfire reaches corridor); higher than plant due to exposure
+line_wildfire_outage_duration_hours,12,hours,Mean restoration time for wildfire-damaged line section
+line_typhoon_outage_probability,0.30,decimal,P(line outage | sustained wind > 50 m/s near corridor)
+line_typhoon_outage_duration_hours,8,hours,Mean restoration time after typhoon damage
+line_heat_sag_probability,0.05,decimal,P(thermal trip | heat-event day with high load)
+line_heat_sag_duration_hours,2,hours,Auto-reclose duration on thermal trip
+line_annual_damage_fraction,0.001,decimal,Average asset value destroyed per year from cumulative climate events
+substation_flood_outage_probability,0.40,decimal,P(substation outage | flood reaches transformer pad)
+substation_flood_outage_duration_hours,72,hours,Restoration after substation flooding

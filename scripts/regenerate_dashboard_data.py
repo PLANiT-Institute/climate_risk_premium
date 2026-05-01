@@ -61,26 +61,44 @@ HAZARD_MAP = {
 def load_climate_factors(project_root: Path) -> dict:
     """Load climate_factors.csv as {(scenario, year): {hazard: factor}}."""
     path = project_root / "data" / "physical" / "climate_factors.csv"
+    cols = ["wildfire", "tropical_cyclone", "river_flood", "coastal_flood", "drought", "heat_stress"]
     factors = {}
     with open(path, newline="") as f:
         for row in csv.DictReader(f):
             key = (row["scenario"], int(row["year"]))
-            factors[key] = {
-                "wildfire": float(row["wildfire"]),
-                "drought": float(row["drought"]),
-                "coastal_flood": float(row["coastal_flood"]),
-            }
+            factors[key] = {c: float(row.get(c, 1.0)) for c in cols}
     return factors
 
 
 def load_hazard_baselines(project_root: Path) -> dict:
-    """Load hazard_baselines.csv as {hazard_type: outage_rate}."""
+    """Load hazard_baselines.csv as {hazard_type: {col: float, ...}}."""
     path = project_root / "data" / "physical" / "hazard_baselines.csv"
     baselines = {}
     with open(path, newline="") as f:
         for row in csv.DictReader(f):
-            baselines[row["hazard_type"]] = float(row["outage_rate"])
+            baselines[row["hazard_type"]] = {
+                "base_frequency": float(row["base_frequency"]),
+                "outage_rate":    float(row["outage_rate"]),
+                "capacity_derate": float(row["capacity_derate"]),
+                "efficiency_loss": float(row["efficiency_loss"]),
+                "damage_ratio":   float(row["damage_ratio"]),
+            }
     return baselines
+
+
+def load_transmission_params(project_root: Path) -> dict:
+    """Load transmission.csv {param: value}."""
+    path = project_root / "data" / "raw" / "transmission.csv"
+    if not path.exists():
+        return {}
+    out = {}
+    with open(path, newline="") as f:
+        for row in csv.DictReader(f):
+            try:
+                out[row["param_name"]] = float(row["value"])
+            except (ValueError, KeyError):
+                pass
+    return out
 
 
 def interpolate_factor(factors: dict, scenario: str, year: int, hazard_col: str) -> float:
@@ -106,33 +124,89 @@ def interpolate_factor(factors: dict, scenario: str, year: int, hazard_col: str)
 
 
 def calculate_scenario_risks(project_root: Path) -> dict:
-    """
-    Calculate SCENARIO_RISKS from climate_factors.csv and hazard_baselines.csv.
-    No hardcoded values — all derived from source data files.
+    """Compute the SCENARIO_RISKS summary surfaced on the physical-risk page.
+
+    Six channels, each in fraction-of-year units (or fraction-of-CF for derate):
+        wildfire     — plant outage from direct fire damage
+        drought      — capacity derate from cooling water shortage
+        heat         — efficiency loss from heat stress
+        transmission — line outage (wildfire + typhoon + heat-sag + sub flood)
+        capex_loss   — annual fraction of total replacement value destroyed
+        total        — sum (rough magnitude indicator)
+
+    All channels derived from data/physical/hazard_baselines.csv,
+    data/physical/climate_factors.csv, and data/raw/transmission.csv.
     """
     factors = load_climate_factors(project_root)
     baselines = load_hazard_baselines(project_root)
+    line_params = load_transmission_params(project_root)
+
+    wf = baselines.get("wildfire", {})
+    tc = baselines.get("tropical_cyclone", {})
+    dr = baselines.get("drought", {})
+    hs = baselines.get("heat_stress", {})
+    cfd = baselines.get("coastal_flood", {})
+
+    plant_wf_p = 0.10
+    plant_wf_dur = 24.0
+
+    def _outage(freq, p, dur):
+        return max(0.0, freq) * max(0.0, min(1.0, p)) * max(0.0, dur) / 8760.0
 
     result = {}
     for display_key, (cf_scenario, year) in DISPLAY_SCENARIO_MAP.items():
-        wildfire_base  = baselines.get("wildfire", 0.0)
-        drought_base   = baselines.get("drought", 0.0)
-        water_base     = baselines.get("coastal_flood", 0.0)
+        f_wf   = interpolate_factor(factors, cf_scenario, year, "wildfire")
+        f_tc   = interpolate_factor(factors, cf_scenario, year, "tropical_cyclone") if "tropical_cyclone" in next(iter(factors.values()), {}) else f_wf
+        f_dr   = interpolate_factor(factors, cf_scenario, year, "drought")
+        f_hs   = interpolate_factor(factors, cf_scenario, year, "heat_stress")
+        f_flood = interpolate_factor(factors, cf_scenario, year, "coastal_flood")
 
-        wildfire_f  = interpolate_factor(factors, cf_scenario, year, "wildfire")
-        drought_f   = interpolate_factor(factors, cf_scenario, year, "drought")
-        water_f     = interpolate_factor(factors, cf_scenario, year, "coastal_flood")
+        # Plant outage: wildfire + tropical cyclone direct hits
+        plant = _outage(wf.get("base_frequency", 0) * f_wf, plant_wf_p, plant_wf_dur)
+        plant += tc.get("outage_rate", 0) * f_tc
 
-        wildfire  = round(wildfire_base * wildfire_f, 6)
-        drought   = round(drought_base * drought_f, 6)
-        water     = round(water_base * water_f, 6)
-        total     = round(wildfire + drought + water, 6)
+        # Drought capacity derate, heat stress efficiency loss
+        drought = dr.get("capacity_derate", 0) * f_dr
+        heat = hs.get("efficiency_loss", 0) * f_hs
+
+        # Transmission outage: wildfire/typhoon/heat on line + flood on substation
+        wf_freq_line = wf.get("base_frequency", 0) * f_wf
+        tc_freq_line = tc.get("base_frequency", 0) * f_tc
+        heat_freq    = hs.get("base_frequency", 0) * f_hs
+        flood_freq   = cfd.get("base_frequency", 0) * f_flood
+        transmission = (
+            _outage(wf_freq_line, line_params.get("line_wildfire_outage_probability", 0.20),
+                    line_params.get("line_wildfire_outage_duration_hours", 12))
+            + _outage(tc_freq_line, line_params.get("line_typhoon_outage_probability", 0.30),
+                      line_params.get("line_typhoon_outage_duration_hours", 8))
+            + _outage(heat_freq, line_params.get("line_heat_sag_probability", 0.05),
+                      line_params.get("line_heat_sag_duration_hours", 2))
+            + _outage(flood_freq, line_params.get("substation_flood_outage_probability", 0.40),
+                      line_params.get("substation_flood_outage_duration_hours", 72))
+        )
+
+        # Annual capex destruction (plant damage_ratio + line annual fraction)
+        capex_loss = (
+            wf.get("damage_ratio", 0) * wf.get("base_frequency", 0) * f_wf
+            + tc.get("damage_ratio", 0) * tc.get("base_frequency", 0) * f_tc
+            + line_params.get("line_annual_damage_fraction", 0) * f_wf
+        )
+
+        plant = round(plant, 6)
+        drought = round(drought, 6)
+        heat = round(heat, 6)
+        transmission = round(transmission, 6)
+        capex_loss = round(capex_loss, 6)
+        total = round(plant + drought + heat + transmission + capex_loss, 6)
 
         result[display_key] = {
-            "wildfire":  wildfire,
-            "drought":   drought,
-            "waterRisk": water,
-            "total":     total,
+            "wildfire":     plant,
+            "drought":      drought,
+            "heat":         heat,
+            "transmission": transmission,
+            "capexLoss":    capex_loss,
+            "waterRisk":    0.0,  # legacy field for backward compat with frontend
+            "total":        total,
         }
     return result
 
@@ -364,14 +438,20 @@ def generate_typescript(
     lines.append("};")
     lines.append("")
 
-    # SCENARIO_RISKS
+    # SCENARIO_RISKS — six channels per scenario
     lines.append("export const SCENARIO_RISKS: Record<RiskScenario, HazardRisk> = {")
     for key, vals in scenario_risks.items():
-        wf = vals["wildfire"]
-        dr = vals["drought"]
-        wr = vals["waterRisk"]
-        tot = vals["total"]
-        lines.append(f'  {key}: {{ wildfire: {wf}, drought: {dr}, waterRisk: {wr}, total: {tot} }},')
+        lines.append(
+            f"  {key}: {{ "
+            f"wildfire: {vals['wildfire']}, "
+            f"drought: {vals['drought']}, "
+            f"heat: {vals['heat']}, "
+            f"transmission: {vals['transmission']}, "
+            f"capexLoss: {vals['capexLoss']}, "
+            f"waterRisk: {vals['waterRisk']}, "
+            f"total: {vals['total']} "
+            f"}},"
+        )
     lines.append("};")
     lines.append("")
 

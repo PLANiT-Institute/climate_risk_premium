@@ -1,6 +1,14 @@
 """Physical risk data structures and CSV fallback loader.
 
 Hazard computation is done via the PLANiT integration layer (src/planit/).
+
+Channels:
+- Plant outage     : wildfire/typhoon damage to plant equipment
+- Capacity derate  : drought reduces available cooling water → lower CF
+- Efficiency loss  : drought + heat stress raise effective heat rate
+- Water constraint : extreme drought caps max CF
+- Transmission     : grid-side outage (line/substation) — composes with plant outage
+- Asset capex loss : annual fraction of plant + line replacement value destroyed
 """
 from typing import Optional
 from dataclasses import dataclass
@@ -19,10 +27,12 @@ _planit_logger = _logging.getLogger(__name__)
 @dataclass
 class PhysicalAdjustments:
     """Physical risk adjustments for a single year/scenario."""
-    outage_rate: float              # Fraction of time plant unavailable (wildfire/CLIMADA)
-    capacity_derate: float          # Asset damage rate → O&M cost increase (drought/PhysRisk)
-    efficiency_loss: float          # Heat rate increase fraction (temperature)
-    water_constrained_capacity: float = 1.0  # Max CF from water availability (PhysRisk)
+    outage_rate: float                       # Fraction of time PLANT is unavailable
+    capacity_derate: float                   # Drought-driven capacity factor reduction
+    efficiency_loss: float                   # Heat-rate increase from drought + heat stress
+    water_constrained_capacity: float = 1.0  # Max CF from water availability
+    transmission_outage_rate: float = 0.0    # Fraction of time GRID (line/substation) is unavailable
+    asset_capex_loss_rate: float = 0.0       # Annual fraction of plant+line replacement value destroyed
     notes: str = ""
 
 
@@ -34,7 +44,16 @@ class YearlyPhysicalAdjustments:
     capacity_derates: np.ndarray
     efficiency_losses: np.ndarray
     water_constraints: np.ndarray
+    transmission_outage_rates: Optional[np.ndarray] = None
+    asset_capex_loss_rates: Optional[np.ndarray] = None
     scenario_name: str = ""
+
+    def __post_init__(self):
+        n = len(self.years)
+        if self.transmission_outage_rates is None:
+            self.transmission_outage_rates = np.zeros(n)
+        if self.asset_capex_loss_rates is None:
+            self.asset_capex_loss_rates = np.zeros(n)
 
     def get_adjustment_for_year(self, year: int) -> PhysicalAdjustments:
         if year in self.years:
@@ -44,9 +63,11 @@ class YearlyPhysicalAdjustments:
                 capacity_derate=self.capacity_derates[idx],
                 efficiency_loss=self.efficiency_losses[idx],
                 water_constrained_capacity=self.water_constraints[idx],
+                transmission_outage_rate=self.transmission_outage_rates[idx],
+                asset_capex_loss_rate=self.asset_capex_loss_rates[idx],
                 notes=f"{self.scenario_name} year {year}"
             )
-        return PhysicalAdjustments(0, 0, 0, 1.0, "Out of range")
+        return PhysicalAdjustments(0, 0, 0, 1.0, 0.0, 0.0, "Out of range")
 
 
 
