@@ -68,6 +68,9 @@ FRONTEND_PID=$!
 cd ..
 echo -e "${GREEN}✓ Frontend started (PID: $FRONTEND_PID)${NC}"
 
+# Wait a moment for frontend to be ready
+sleep 3
+
 echo ""
 echo -e "${GREEN}======================================================================${NC}"
 echo -e "${GREEN}Both services are running!${NC}"
@@ -77,6 +80,20 @@ echo -e "${YELLOW}Access the services:${NC}"
 echo -e "  • Frontend (Next.js):    ${BLUE}http://localhost:3000${NC}"
 echo -e "  • Backend (Streamlit):   ${BLUE}http://localhost:8501${NC}"
 echo ""
+
+# Open browser automatically
+echo -e "${YELLOW}Opening browser...${NC}"
+if command -v open &> /dev/null; then
+    # macOS
+    open http://localhost:3000
+elif command -v xdg-open &> /dev/null; then
+    # Linux
+    xdg-open http://localhost:3000 &
+elif command -v start &> /dev/null; then
+    # Windows
+    start http://localhost:3000
+fi
+
 echo -e "${YELLOW}Press Ctrl+C to stop both services${NC}"
 echo ""
 
