@@ -62,8 +62,9 @@ def load_yearly_from_output_csv(
     Falls back to zero adjustments if the file is missing.
     """
     if csv_path is None:
+        # __file__ = <repo>/src/risk/physical.py → 3 parents to repo root
         csv_path = str(
-            _Path(__file__).parent.parent.parent.parent
+            _Path(__file__).parent.parent.parent
             / "data" / "physical_risk_steps" / "output" / "physical_risk_output.csv"
         )
 
@@ -73,7 +74,12 @@ def load_yearly_from_output_csv(
 
     try:
         with open(csv_path, newline="") as f:
-            for row in _csv.DictReader(f):
+            # Skip leading comment lines so DictReader picks up the real header
+            data_lines = [line for line in f if not line.startswith("#")]
+            for row in _csv.DictReader(data_lines):
+                # RCP8.5 baseline series — physical_risk_output.csv has multiple scenarios
+                if row.get("scenario") and row["scenario"] != "RCP8.5":
+                    continue
                 anchor_years.append(int(row["year"]))
                 anchor_outage.append(float(row["total_acute_pct"]))
                 anchor_efficiency.append(float(row["temp_total_pct"]))
