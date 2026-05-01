@@ -101,16 +101,28 @@ class PLANiTRunner:
         self._planit_main = True
 
     def _ensure_local_venv_site_packages(self) -> None:
-        """Add local .venv site-packages to sys.path for live PLANiT imports."""
-        venv = Path(self._base_dir) / ".venv"
-        pyver = f"python{sys.version_info.major}.{sys.version_info.minor}"
-        candidates = [
-            venv / "lib" / pyver / "site-packages",
-            venv / "Lib" / "site-packages",
-        ]
-        for path in candidates:
-            if path.exists() and str(path) not in sys.path:
-                sys.path.insert(0, str(path))
+        """Add local venv site-packages to sys.path for live PLANiT imports.
+
+        Searches .venv-climada (Python 3.12 with CLIMADA) and .venv.
+        """
+        for venv_name in (".venv-climada", ".venv"):
+            venv = Path(self._base_dir) / venv_name
+            if not venv.exists():
+                continue
+            lib_dir = venv / "lib"
+            if not lib_dir.exists():
+                lib_dir = venv / "Lib"
+            if not lib_dir.exists():
+                continue
+            for pydir in sorted(lib_dir.glob("python3.*"), reverse=True):
+                sp = pydir / "site-packages"
+                if sp.exists() and str(sp) not in sys.path:
+                    sys.path.insert(0, str(sp))
+                    logger.info("Added venv site-packages: %s", sp)
+                    return
+            sp = venv / "Lib" / "site-packages"
+            if sp.exists() and str(sp) not in sys.path:
+                sys.path.insert(0, str(sp))
 
     @staticmethod
     def _ensure_distutils_compat():
@@ -468,7 +480,11 @@ class PLANiTRunner:
         Returns:
             List of PLANiTHazardResult
         """
-        planit_cfg = self._load_planit_config()
+        try:
+            planit_cfg = self._load_planit_config()
+        except Exception as e:
+            logger.warning(f"In-process config load failed: {e}")
+            planit_cfg = {}
 
         if scenarios is None:
             scenarios = [s for s in planit_cfg.get("scenarios", ["ssp585"]) if s != "historical"]
@@ -504,8 +520,12 @@ class PLANiTRunner:
         try:
             raw = self._planit_run(planit_cfg, hazard, plot=False)
         except Exception as e:
-            logger.error(f"PLANiT run failed for {hazard}: {e}")
-            return results  # Return whatever was cached
+            logger.warning(f"In-process PLANiT failed for {hazard}: {e}")
+            logger.info("Attempting subprocess PLANiT run via .venv-climada...")
+            raw = self._run_planit_subprocess(hazard, planit_cfg)
+            if raw is None:
+                logger.error(f"PLANiT subprocess also failed for {hazard}")
+                return results
 
         # Parse results
         new_results = self._parse_results(raw, hazard)
@@ -533,6 +553,111 @@ class PLANiTRunner:
             # silently mix incompatible outputs. Allow opt-in cache usage.
             return os.getenv("CRP_PLANIT_WILDFIRE_CACHE", "0").strip() == "1"
         return True
+
+    def _run_planit_subprocess(
+        self, hazard: str, planit_cfg: Dict[str, Any]
+    ) -> Optional[Dict[str, Any]]:
+        """Run PLANiT in a subprocess using .venv-climada Python.
+
+        Falls back to subprocess when in-process import fails due to
+        Python version mismatch (e.g., main is 3.14 but CLIMADA needs 3.12).
+        """
+        import subprocess
+        import json as _json
+        import tempfile
+
+        base = Path(self._base_dir).resolve()
+        venv_python = base / ".venv-climada" / "bin" / "python3"
+        if not venv_python.exists():
+            logger.warning("No .venv-climada/bin/python3 found at %s", venv_python)
+            return None
+
+        planit_root = base / "Physicalrisk_PLANiT"
+        config_yaml = str(planit_root / "config" / "unified_config.yaml")
+
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as tmp:
+            _json.dump(planit_cfg, tmp)
+            config_tmp = tmp.name
+
+        script = f"""
+import sys, os, json, warnings, logging
+warnings.filterwarnings("ignore")
+logging.basicConfig(level=logging.WARNING)
+os.chdir({str(planit_root)!r})
+sys.path.insert(0, {str(planit_root / 'src')!r})
+
+import yaml
+with open({config_yaml!r}) as f:
+    cfg = yaml.safe_load(f)
+cfg["_base_path"] = {str(planit_root)!r}
+
+with open({config_tmp!r}) as f:
+    overrides = json.load(f)
+cfg["scenarios"] = overrides.get("scenarios", cfg.get("scenarios", []))
+cfg["years"] = overrides.get("years", cfg.get("years", []))
+
+import os as _os
+max_prob = _os.environ.get("CRP_PLANIT_WILDFIRE_MAX_PROB_SEASONS")
+if max_prob is not None:
+    cfg.setdefault("climada", {{}}).setdefault("hazard", {{}})["wildfire_max_probabilistic_seasons"] = int(max_prob)
+
+from core.hazard import get_hazard
+from core.exposure import load_assets_from_geojson, get_exposure
+from core.vulnerability import calculate_impact
+
+hazard_type = {hazard!r}
+ht = hazard_type.lower()
+
+hazards = get_hazard(cfg, hazard_type)
+
+if ht in ("wildfire", "fire"):
+    assets, bounds = load_assets_from_geojson(cfg)
+    exposure = get_exposure(cfg, hazard_type, bounds)
+    results = {{"hazard_type": hazard_type, "scenarios": {{}}}}
+    for scenario, haz in hazards.items():
+        imp = calculate_impact(cfg, hazard_type, haz, exposure)
+        results["scenarios"][scenario] = {{
+            "n_events": len(getattr(haz, "event_name", [])),
+            "legacy_impact_krw": float(getattr(imp, "aai_agg", 0)),
+        }}
+else:
+    results = {{"hazard_type": hazard_type, "raw_response": hazards if isinstance(hazards, str) else str(hazards)}}
+
+print("__PLANIT_RESULT_START__")
+print(json.dumps(results, default=str))
+print("__PLANIT_RESULT_END__")
+"""
+        try:
+            proc = subprocess.run(
+                [str(venv_python), "-c", script],
+                capture_output=True, text=True, timeout=600,
+                cwd=str(planit_root),
+                env={**os.environ, "CRP_PLANIT_WILDFIRE_MAX_PROB_SEASONS": "0"},
+            )
+            if proc.returncode != 0:
+                logger.warning("PLANiT subprocess stderr: %s", proc.stderr[-500:] if proc.stderr else "(empty)")
+                return None
+
+            out = proc.stdout
+            start = out.find("__PLANIT_RESULT_START__")
+            end = out.find("__PLANIT_RESULT_END__")
+            if start < 0 or end < 0:
+                logger.warning("PLANiT subprocess output missing result markers")
+                return None
+
+            result_json = out[start + len("__PLANIT_RESULT_START__"):end].strip()
+            result = _json.loads(result_json)
+            logger.info("PLANiT subprocess succeeded for %s", hazard)
+            return result
+
+        except subprocess.TimeoutExpired:
+            logger.warning("PLANiT subprocess timed out for %s", hazard)
+            return None
+        except Exception as e:
+            logger.warning("PLANiT subprocess failed: %s", e)
+            return None
+        finally:
+            Path(config_tmp).unlink(missing_ok=True)
 
     def run_all_hazards(
         self,
@@ -617,7 +742,7 @@ class PLANiTRunner:
             return out
 
         # --- Wildfire (CLIMADA): hazard_type, scenario, annual_frequency_per_year, n_events ---
-        for p in sorted(rdir.glob("wildfire_results_*.csv")):
+        for p in sorted(rdir.glob("wildfire_results_*.csv"), reverse=True):
             with open(p, encoding="utf-8") as f:
                 for row in csv.DictReader(f):
                     scenario_raw = row.get("scenario", "").strip()
@@ -645,7 +770,7 @@ class PLANiTRunner:
 
         # --- PhysRisk CSVs (drought, water_risk): scenario, year, asset, impact_mean ---
         for hazard_name in ("drought", "water_risk"):
-            for p in sorted(rdir.glob(f"{hazard_name}_results_*.csv")):
+            for p in sorted(rdir.glob(f"{hazard_name}_results_*.csv"), reverse=True):
                 with open(p, encoding="utf-8") as f:
                     for row in csv.DictReader(f):
                         asset = row.get("asset", "").strip()

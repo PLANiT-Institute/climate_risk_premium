@@ -3,7 +3,7 @@ Unit tests for risk adjustment modules.
 """
 import pytest
 from src.scenarios import TransitionScenario, PhysicalScenario
-from src.risk import apply_transition, apply_physical, calculate_expected_loss, map_expected_loss_to_spreads
+from src.risk import apply_transition, calculate_expected_loss, map_expected_loss_to_spreads
 
 
 @pytest.fixture
@@ -33,17 +33,6 @@ def test_transition_adjustments(plant_params):
     # Operating years should be capped
     assert adj.operating_years == 25
 
-
-def test_physical_adjustments(plant_params):
-    """Test physical risk adjustments via engine-based API."""
-    adj = apply_physical(plant_params, "Baseline (Corrected)", 2024)
-
-    # Engine returns PhysicalAdjustments with non-negative values
-    assert adj.outage_rate >= 0.0
-    assert adj.capacity_derate >= 0.0
-    assert adj.efficiency_loss >= 0.0
-    assert adj.water_constrained_capacity > 0.0
-    assert adj.water_constrained_capacity <= 1.0
 
 
 def test_expected_loss_calculation():

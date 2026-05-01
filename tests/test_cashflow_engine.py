@@ -98,10 +98,11 @@ class TestRevenueCalculation:
 
     def test_revenue_reduced_by_capacity_derate(self, zero_cost_plant, baseline_scenario):
         trans, trans_adj, _ = baseline_scenario
+        # Chronic hazard (Drought) reduces capacity factor
         phys_adj = PhysicalAdjustments(0.0, 0.20, 0.0, 1.0)
         cf = compute_cashflows_timeseries(zero_cost_plant, trans, trans_adj, phys_adj)
 
-        # CF reduced from 0.5 to 0.4 (20% derate)
+        # CF reduced from 0.5 to 0.4 (20% derate from drought)
         expected_revenue = 1000 * 8760 * 0.4 * 100
         assert np.allclose(cf.revenue, expected_revenue)
 
