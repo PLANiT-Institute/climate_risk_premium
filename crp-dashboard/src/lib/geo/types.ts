@@ -50,7 +50,13 @@ export interface HazardRisk {
 }
 
 export const SCENARIO_RISKS: Record<RiskScenario, HazardRisk> = {
-  baseline: { wildfire: 0.000274, drought: 0.000938, waterRisk: 0.0, total: 0.00121 },
-  ssp126_2040: { wildfire: 0.000274, drought: 0.002569, waterRisk: 0.005592, total: 0.00843 },
-  ssp585_2050: { wildfire: 0.000274, drought: 0.001007, waterRisk: 0.005457, total: 0.00674 },
+  // Updated from model output (2025 values, annualized impact on generation capacity)
+  // baseline: SSP1-2.6 (2024) - Optimistic climate pathway
+  baseline: { wildfire: 0.000307, drought: 0.000938, waterRisk: 0.0, total: 0.00121 },
+  // ssp126_2040: SSP1-2.6 (2040) - Low emission scenario, mid-century
+  // Uses RCP4.5 climate factors applied to baseline wildfire
+  ssp126_2040: { wildfire: 0.000307, drought: 0.002569, waterRisk: 0.005592, total: 0.00843 },
+  // ssp585_2050: SSP5-8.5 (2050) - High emission scenario, late century
+  // Uses direct RCP8.5 wildfire projections (lower than baseline due to projection data)
+  ssp585_2050: { wildfire: 0.000096, drought: 0.001007, waterRisk: 0.005457, total: 0.00674 },
 };
