@@ -11,6 +11,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 
+import numpy as np
 import pandas as pd
 
 logger = logging.getLogger(__name__)
@@ -320,10 +321,61 @@ class CRPModelRunner:
         Falls back to load_yearly_from_output_csv() if PLANiT results are empty.
         """
         if not self._planit_results:
-            logger.warning("No PLANiT results; falling back to static CSV physical adjustments.")
-            return load_yearly_from_output_csv(start_year=start_year, end_year=end_year)
+            logger.warning("No PLANiT results; falling back to static CSV physical adjustments with climate factors.")
+            # Load baseline CSV and apply climate factors for scenario variation
+            from ..data.loaders import get_climate_factor
+            from pathlib import Path as _Path
+            import csv as _csv
 
-        import numpy as np
+            csv_adj = load_yearly_from_output_csv(start_year=start_year, end_year=end_year)
+
+            # Get scenario mapping
+            ssp, _target_year = PHYSICAL_SCENARIO_SSP_MAP.get(scenario_name, ("ssp126", 2024))
+            ssp_to_crp = {"ssp126": "SSP1-2.6", "ssp245": "RCP4.5", "ssp585": "RCP8.5"}
+            crp_label = ssp_to_crp.get(ssp, "SSP1-2.6")
+
+            # Load scenario-specific wildfire data from physical_risk_output.csv
+            try:
+                csv_path = _Path(__file__).parent.parent.parent / "data" / "physical_risk_steps" / "output" / "physical_risk_output.csv"
+                scenario_wildfire_data = {}
+                with open(csv_path, newline="") as f:
+                    reader = _csv.DictReader(f)
+                    for row in reader:
+                        if row.get("scenario") == crp_label:
+                            year = int(row["year"])
+                            wildfire_pct = float(row["wildfire_projected_pct"])
+                            scenario_wildfire_data[year] = wildfire_pct
+
+                if scenario_wildfire_data:
+                    # Interpolate wildfire values for all years
+                    anchor_years = sorted(scenario_wildfire_data.keys())
+                    anchor_values = [scenario_wildfire_data[y] for y in anchor_years]
+                    wildfire_rates = np.interp(csv_adj.years, anchor_years, anchor_values)
+                    csv_adj.outage_rates = wildfire_rates
+                    csv_adj.scenario_name = f"physical_risk_output.csv (wildfire {crp_label})"
+                    logger.info(
+                        "Loaded scenario-specific wildfire data: scenario=%s, years=%d-%d, avg_wildfire=%.6f",
+                        crp_label, start_year, end_year, wildfire_rates.mean()
+                    )
+                else:
+                    logger.warning(
+                        "Scenario %s not found in physical_risk_output.csv; using baseline RCP8.5 with climate factors",
+                        crp_label
+                    )
+                    # Fall back to climate factor application
+                    adjusted_outage_rates = []
+                    for year in csv_adj.years:
+                        climate_factor = get_climate_factor("wildfire", int(year), crp_label)
+                        idx = list(csv_adj.years).index(year)
+                        adjusted_rate = csv_adj.outage_rates[idx] * climate_factor
+                        adjusted_outage_rates.append(adjusted_rate)
+                    csv_adj.outage_rates = np.array(adjusted_outage_rates)
+                    csv_adj.scenario_name = f"physical_risk_output.csv ({crp_label} with climate factors)"
+
+            except Exception as e:
+                logger.warning("Failed to apply scenario-specific wildfire data: %s. Using baseline.", e)
+
+            return csv_adj
 
         ssp, _target_year = PHYSICAL_SCENARIO_SSP_MAP.get(
             scenario_name, ("ssp126", 2024)
