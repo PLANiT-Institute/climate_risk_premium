@@ -12,7 +12,7 @@ import {
   ReferenceLine,
 } from "recharts";
 import { SCENARIO_COLORS, SCENARIO_LABELS, CHART_MARGIN } from "@/lib/constants";
-import { CreditRatingRow } from "@/lib/supabase/types";
+import { CreditRatingRow } from "@/lib/types";
 
 interface DscrTimeSeriesProps {
   data: CreditRatingRow[];

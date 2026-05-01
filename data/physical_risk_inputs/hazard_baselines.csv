@@ -1,8 +1,0 @@
-hazard_type,baseline_value,unit,return_period_years,source,notes
-wildfire,25.0,FWI,annual,Korea Forest Service (2023),Fire Weather Index annual average
-tropical_cyclone,35.0,m/s,25,KMA Typhoon Center (1951-2020),Mean max wind speed at landfall
-river_flood,2.5,m,50,MOLIT (2020),50-year return period flood depth
-coastal_flood,3.0,m,100,KHOA (2021),100-year storm surge + tide
-drought,-1.2,SPEI,10,KMA (1991-2020),10-year drought SPEI threshold
-heat_stress,33.0,°C,annual,KMA (1991-2020),Heat wave threshold temperature
-sea_level_rise,3.4,mm/yr,baseline,KHOA (2021),Current rate of SLR at East Coast

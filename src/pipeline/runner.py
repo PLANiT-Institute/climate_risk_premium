@@ -1,8 +1,4 @@
-"""
-Class-based orchestration for CRP runs using CSV inputs and CSV/plot outputs.
-
-Updated to support new class-based risk models (src.models).
-"""
+"""Class-based orchestration for CRP runs using CSV inputs and CSV/plot outputs."""
 from __future__ import annotations
 
 import logging
@@ -33,7 +29,7 @@ from src.risk.financing import calculate_financing_with_counterfactual
 from src.risk.attribution import decompose_risk_shapley
 from src.financials import compute_cashflows_timeseries, calculate_metrics, CashFlowTimeSeries, FinancialMetrics
 from src.scenarios.korea_power_plan import load_korea_power_plan_scenarios
-from src.risk.physical import get_physical_risk_scenario, PhysicalAdjustments, load_yearly_from_output_csv, YearlyPhysicalAdjustments
+from src.risk.physical import PhysicalAdjustments, load_yearly_from_output_csv, YearlyPhysicalAdjustments
 from src.planit import PLANiTRunner, PLANiTAdapter, PLANiTIntegrationConfig
 
 # Conditional import for enhanced 11th Basic Plan
@@ -43,15 +39,6 @@ try:
 except ImportError:
     ENHANCED_PLAN_AVAILABLE = False
     create_enhanced_11th_plan = None
-
-# New class-based models (optional import for backward compatibility)
-try:
-    from src.models import ClimateRiskAPI, CombinedRiskResult
-    NEW_MODELS_AVAILABLE = True
-except ImportError:
-    NEW_MODELS_AVAILABLE = False
-    ClimateRiskAPI = None
-    CombinedRiskResult = None
 
 
 # CRP physical scenario → PLANiT SSP + target year
@@ -256,10 +243,10 @@ class CRPModelRunner:
             params = dict(financing)
         else:
             params = {}
-        # Also add plant finance params
+        # Also add plant finance params (must come from CSV — raise if missing)
         plant_params = self._get_plant_params()
-        params['debt_fraction'] = plant_params.get('debt_fraction', 0.70)
-        params['equity_fraction'] = plant_params.get('equity_fraction', 0.30)
+        params['debt_fraction'] = plant_params['debt_fraction']
+        params['equity_fraction'] = plant_params['equity_fraction']
         return params
 
     def _load_transition_scenario(self, scenario_name: str) -> TransitionScenario:
@@ -372,8 +359,21 @@ class CRPModelRunner:
                     csv_adj.outage_rates = np.array(adjusted_outage_rates)
                     csv_adj.scenario_name = f"physical_risk_output.csv ({crp_label} with climate factors)"
 
+            except FileNotFoundError as e:
+                logger.error(
+                    "ERROR: physical_risk_output.csv not found at %s. "
+                    "This file is required for scenario-specific wildfire calculations. "
+                    "Please ensure the file exists or run the physical risk model first.",
+                    csv_path
+                )
+                raise
             except Exception as e:
-                logger.warning("Failed to apply scenario-specific wildfire data: %s. Using baseline.", e)
+                logger.error(
+                    "ERROR: Failed to load scenario-specific wildfire data from %s: %s. "
+                    "Check file format and content.",
+                    csv_path, e
+                )
+                raise
 
             return csv_adj
 
@@ -490,11 +490,11 @@ class CRPModelRunner:
         metrics = calculate_metrics(cashflow, plant_params)
 
         avg_ebitda = float(cashflow.ebitda.mean())
-        capacity_mw = plant_params.get('capacity_mw', 2000)
-        total_capex = plant_params.get('total_capex_million', 3200) * 1e6
-        debt_fraction = plant_params.get('debt_fraction', 0.70)
-        equity_fraction = plant_params.get('equity_fraction', 0.30)
-        debt_interest = plant_params.get('debt_interest_rate', 0.05)
+        capacity_mw = plant_params['capacity_mw']
+        total_capex = plant_params['total_capex_million'] * 1e6
+        debt_fraction = plant_params['debt_fraction']
+        equity_fraction = plant_params['equity_fraction']
+        debt_interest = plant_params['debt_interest_rate']
 
         fixed_assets = total_capex
         total_debt = total_capex * debt_fraction
@@ -615,6 +615,9 @@ class CRPModelRunner:
         )
 
         # Build the primary ScenarioResult from the combined run
+        cf_total_capex = plant_params['total_capex_million'] * 1e6
+        cf_debt_fraction = plant_params['debt_fraction']
+        cf_avg_ebitda = float(combined.cashflow.ebitda.mean())
         result = ScenarioResult(
             scenario_name=scenario_name,
             cashflow=combined.cashflow,
@@ -622,18 +625,14 @@ class CRPModelRunner:
             credit_rating=combined.credit_rating,
             counterfactual_crp=assess_rating_with_counterfactual(
                 calculate_rating_metrics_from_financials(
-                    capacity_mw=plant_params.get('capacity_mw', 2000),
-                    ebitda=float(combined.cashflow.ebitda.mean()),
-                    fixed_assets=plant_params.get('total_capex_million', 3200) * 1e6,
-                    interest_expense=(plant_params.get('total_capex_million', 3200) * 1e6
-                                      * plant_params.get('debt_fraction', 0.70)
-                                      * plant_params.get('debt_interest_rate', 0.05)),
-                    total_debt=(plant_params.get('total_capex_million', 3200) * 1e6
-                                * plant_params.get('debt_fraction', 0.70)),
-                    cash_and_equivalents=float(combined.cashflow.ebitda.mean()) * 0.1,
-                    total_equity=(plant_params.get('total_capex_million', 3200) * 1e6
-                                  * plant_params.get('equity_fraction', 0.30)),
-                    total_assets=plant_params.get('total_capex_million', 3200) * 1e6,
+                    capacity_mw=plant_params['capacity_mw'],
+                    ebitda=cf_avg_ebitda,
+                    fixed_assets=cf_total_capex,
+                    interest_expense=cf_total_capex * cf_debt_fraction * plant_params['debt_interest_rate'],
+                    total_debt=cf_total_capex * cf_debt_fraction,
+                    cash_and_equivalents=cf_avg_ebitda * 0.1,
+                    total_equity=cf_total_capex * plant_params['equity_fraction'],
+                    total_assets=cf_total_capex,
                     dscr=combined.metrics.avg_dscr,
                 )
             ),
@@ -646,8 +645,8 @@ class CRPModelRunner:
 
         # No-risk adjustments
         no_transition = TransitionAdjustments(
-            capacity_factor=float(plant_params.get("capacity_factor", 0.85)),
-            operating_years=int(plant_params.get("operating_years", 40)),
+            capacity_factor=float(plant_params['capacity_factor']),
+            operating_years=int(plant_params['operating_years']),
             notes="No transition risk (baseline)",
         )
         no_physical = PhysicalAdjustments(
@@ -770,7 +769,7 @@ class CRPModelRunner:
         # Calculate financing impacts using counterfactual baseline
         plant_params = self._get_plant_params()
         financing_params = self._get_financing_params()
-        total_capex = plant_params.get('total_capex_million', 3200) * 1e6
+        total_capex = plant_params['total_capex_million'] * 1e6
 
         # Get counterfactual rating (A = no risk world)
         counterfactual_rating = get_counterfactual_baseline_rating()
@@ -877,152 +876,3 @@ class CRPModelRunner:
 
         return paths
 
-    # =========================================================================
-    # NEW CLASS-BASED API METHODS
-    # =========================================================================
-
-    def run_with_new_models(
-        self,
-        climate_scenario: str = "RCP8.5",
-        carbon_scenario: str = "korea_ets_current",
-        policy_scenario: str = "korea_10th_plan",
-        damage_functions: Dict[str, str] = None,
-        years: List[int] = None,
-    ) -> Dict[str, Any]:
-        """
-        Run analysis using new class-based models.
-
-        This method uses the new ClimateRiskAPI for cleaner scenario selection.
-
-        Args:
-            climate_scenario: Climate scenario (RCP or SSP)
-            carbon_scenario: Carbon pricing scenario
-            policy_scenario: Policy phase-out scenario
-            damage_functions: Dict mapping hazard type to function name
-            years: List of years to analyze
-
-        Returns:
-            Dict with results and summary table
-        """
-        if not NEW_MODELS_AVAILABLE:
-            raise ImportError("New models not available. Check src.models imports.")
-
-        if years is None:
-            years = [2024, 2030, 2050]
-
-        # Initialize API
-        api = ClimateRiskAPI()
-
-        # Configure
-        api.configure(
-            climate_scenario=climate_scenario,
-            carbon_scenario=carbon_scenario,
-            policy_scenario=policy_scenario,
-            damage_functions=damage_functions or {},
-        )
-
-        # Calculate for each year
-        results = {}
-        for year in years:
-            plant_params = self._get_plant_params()
-            result = api.calculate(
-                year=year,
-                emissions_rate=plant_params.get('emissions_tCO2_per_mwh', 0.85),
-                baseline_cf=plant_params.get('capacity_factor', 0.85),
-            )
-            results[year] = result
-
-        # Get summary table
-        summary = api.get_summary_table(years)
-
-        return {
-            "results": results,
-            "summary": summary,
-            "configuration": {
-                "climate_scenario": climate_scenario,
-                "carbon_scenario": carbon_scenario,
-                "policy_scenario": policy_scenario,
-                "damage_functions": damage_functions,
-            },
-        }
-
-    def list_available_options(self) -> Dict[str, Any]:
-        """
-        List all available scenarios and damage functions.
-
-        Uses new class-based API.
-        """
-        if not NEW_MODELS_AVAILABLE:
-            return {"error": "New models not available"}
-
-        api = ClimateRiskAPI()
-        return api.list_available()
-
-    def export_new_model_results(
-        self,
-        results: Dict[str, Any],
-        output_dir: Path,
-    ) -> Dict[str, Path]:
-        """
-        Export results from new model API to CSV.
-
-        Args:
-            results: Output from run_with_new_models()
-            output_dir: Output directory
-
-        Returns:
-            Dict of output paths
-        """
-        output_dir = Path(output_dir)
-        output_dir.mkdir(parents=True, exist_ok=True)
-
-        paths = {}
-
-        # Export summary table
-        summary = results.get("summary", {})
-        if summary:
-            rows = []
-            years = sorted(set().union(*[set(v.keys()) for v in summary.values()]))
-            for year in years:
-                row = {"year": year}
-                for metric, values in summary.items():
-                    row[metric] = values.get(year, 0)
-                rows.append(row)
-
-            df = pd.DataFrame(rows)
-            path = output_dir / "new_model_summary.csv"
-            df.to_csv(path, index=False)
-            paths["summary"] = path
-
-        # Export detailed results
-        year_results = results.get("results", {})
-        if year_results:
-            rows = []
-            for year, result in year_results.items():
-                row = {
-                    "year": year,
-                    "total_risk_premium_bps": result.total_risk_premium,
-                    "transition_value": result.transition_result.value,
-                    "physical_value": result.physical_result.value,
-                }
-                # Add components
-                for k, v in result.transition_result.components.items():
-                    row[f"transition_{k}"] = v
-                for k, v in result.physical_result.components.items():
-                    row[f"physical_{k}"] = v
-                rows.append(row)
-
-            df = pd.DataFrame(rows)
-            path = output_dir / "new_model_detailed.csv"
-            df.to_csv(path, index=False)
-            paths["detailed"] = path
-
-        # Export configuration
-        config = results.get("configuration", {})
-        if config:
-            config_df = pd.DataFrame([config])
-            path = output_dir / "new_model_config.csv"
-            config_df.to_csv(path, index=False)
-            paths["config"] = path
-
-        return paths

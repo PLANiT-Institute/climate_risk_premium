@@ -1,4 +1,0 @@
-hazard,base_rate_decimal,base_rate_percent,unit,source_paper,source_doi,derivation_method,time_period
-Wildfire,0.00055,0.055%,annual outage rate,Kim et al. (2025) Natural Hazards,10.1007/s11069-025-07169-4,"2 fires/yr near transmission × 10% impact prob × 24h outage / 8760h",1991-2020
-Flood,0.00003,0.003%,annual outage rate,Kang & Lee (2024) Water,10.3390/w16202987,"0.3% storm surge prob × 70% impact × 120h / 8760h (plant at 10m elevation)",2020-2100 projection
-SLR_Derate,0.0022,0.22%,capacity derate per meter SLR,Van Vliet et al. (2016) Nature Climate Change,10.1038/nclimate2903,"Engineering estimate for coastal thermal plant cooling degradation",2030-2100 projection

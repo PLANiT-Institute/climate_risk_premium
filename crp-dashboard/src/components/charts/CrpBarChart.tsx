@@ -12,7 +12,7 @@ import {
   ReferenceLine,
 } from "recharts";
 import { SCENARIO_LABELS, SCENARIO_COLORS, CHART_MARGIN } from "@/lib/constants";
-import { ScenarioResult } from "@/lib/supabase/types";
+import { ScenarioResult } from "@/lib/types";
 
 interface CrpBarChartProps {
   data: ScenarioResult[];

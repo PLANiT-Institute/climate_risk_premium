@@ -13,8 +13,8 @@ import {
   ReferenceLine,
 } from "recharts";
 import { RATING_COLORS, CHART_MARGIN } from "@/lib/constants";
-import { CreditRatingRow } from "@/lib/supabase/types";
-import { CashflowRow } from "@/lib/supabase/types";
+import { CreditRatingRow } from "@/lib/types";
+import { CashflowRow } from "@/lib/types";
 
 const RATING_NUMERIC: Record<string, number> = {
   AAA: 1, AA: 2, A: 3, BBB: 4, BB: 5, B: 6, CCC: 7, CC: 8, C: 9, D: 10,

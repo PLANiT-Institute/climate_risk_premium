@@ -1,8 +1,0 @@
-event_type,hazard_1,hazard_2,correlation,amplification_factor,description,source
-drought_heat,drought,heat_stress,0.65,1.35,Drought conditions amplify heat wave impacts,Zscheischler et al. (2018) Nature Climate Change
-tc_flood,tropical_cyclone,river_flood,0.80,1.50,Typhoon rainfall causes compound flooding,Wahl et al. (2015) Nature Climate Change
-heat_wildfire,heat_stress,wildfire,0.55,1.25,Heat waves increase fire risk and spread,Compound Events Review - Leonard et al. (2014)
-slr_surge,sea_level_rise,coastal_flood,0.95,1.40,SLR raises baseline for storm surge,IPCC AR6 Chapter 9 - Ocean and Cryosphere
-drought_wildfire,drought,wildfire,0.70,1.45,Drought increases fuel availability,Korea Forest Service (2021) + literature
-tc_surge,tropical_cyclone,coastal_flood,0.85,1.55,Typhoon wind and storm surge compound,Emanuel (2017) + KHOA analysis
-heat_drought,heat_stress,drought,0.65,1.30,Bidirectional heat-drought feedback,Miralles et al. (2019) Nature Geoscience

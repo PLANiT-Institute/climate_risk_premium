@@ -1,7 +1,7 @@
 "use client";
 
 import { RATING_COLORS, SCENARIO_LABELS } from "@/lib/constants";
-import { CreditRatingRow } from "@/lib/supabase/types";
+import { CreditRatingRow } from "@/lib/types";
 
 interface RatingMigrationProps {
   data: CreditRatingRow[];

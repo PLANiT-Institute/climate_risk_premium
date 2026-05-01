@@ -1,11 +1,12 @@
 "use client";
 
 import EquationBlock from "@/components/methodology/EquationBlock";
+import { PLANT } from "@/lib/generated/data";
 
 const INPUT_TABLE = [
-  { group: "Plant", item: "Capacity", value: "2,100 MW", source: "data/raw/plant_parameters.csv" },
-  { group: "Plant", item: "Base CF", value: "0.85", source: "data/raw/plant_parameters.csv" },
-  { group: "Plant", item: "CAPEX", value: "4,900M USD", source: "data/raw/plant_parameters.csv" },
+  { group: "Plant", item: "Capacity", value: `${PLANT.capacity_mw.toLocaleString()} MW`, source: "data/raw/plant_parameters.csv" },
+  { group: "Plant", item: "Base CF", value: PLANT.capacity_factor.toFixed(2), source: "data/raw/plant_parameters.csv" },
+  { group: "Plant", item: "CAPEX", value: `${PLANT.total_capex_million.toLocaleString()}M USD`, source: "data/raw/plant_parameters.csv" },
   { group: "Transition", item: "Policy scenarios", value: "baseline/moderate/aggressive", source: "data/raw/policy.csv" },
   { group: "Transition", item: "Enhanced plan", value: "11th plan trajectory", source: "data/raw/enhanced_korea_power_plan.csv" },
   { group: "Physical", item: "Wildfire event frequency", value: "CLIMADA output", source: "Physicalrisk_PLANiT/data/results/*.csv" },

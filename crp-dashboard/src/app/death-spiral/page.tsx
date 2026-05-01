@@ -1,49 +1,19 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import ScenarioSelector from "@/components/dashboard/ScenarioSelector";
 import DeathSpiralChart from "@/components/charts/DeathSpiralChart";
-import { CreditRatingRow, CashflowRow, RawCashflowRow, normalizeCashflowRow } from "@/lib/supabase/types";
-import { SCENARIO_LABELS, RATING_COLORS } from "@/lib/constants";
+import { RATING_COLORS, SCENARIO_LABELS } from "@/lib/constants";
+import { getRatingsByScenario } from "@/lib/queries/ratings";
+import { getCashflows } from "@/lib/queries/cashflows";
 
 export default function DeathSpiralPage() {
   const [selected, setSelected] = useState(["severe_drought"]);
-  const [ratings, setRatings] = useState<CreditRatingRow[]>([]);
-  const [cashflows, setCashflows] = useState<Record<string, CashflowRow[]>>({});
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function load() {
-      const [ratingsModule, ...cashflowModules] = await Promise.all([
-        import("@/data/yearly_ratings.json"),
-        ...Object.keys(SCENARIO_LABELS).map(async (s) => {
-          try {
-            const mod = await import(`@/data/cashflows/${s}.json`);
-            return {
-              scenario: s,
-              data: (mod.default as RawCashflowRow[]).map((r) =>
-                normalizeCashflowRow(r, s)
-              ),
-            };
-          } catch {
-            return { scenario: s, data: [] as CashflowRow[] };
-          }
-        }),
-      ]);
-      setRatings(ratingsModule.default as CreditRatingRow[]);
-      const cfMap: Record<string, CashflowRow[]> = {};
-      for (const m of cashflowModules) {
-        cfMap[m.scenario] = m.data;
-      }
-      setCashflows(cfMap);
-      setLoading(false);
-    }
-    load();
-  }, []);
+  const loading = false;
 
   const scenario = selected[0] || "severe_drought";
-  const scenarioRatings = ratings.filter((r) => r.scenario === scenario);
-  const scenarioCashflows = cashflows[scenario] || [];
+  const scenarioRatings = getRatingsByScenario(scenario);
+  const scenarioCashflows = getCashflows(scenario);
 
   return (
     <>

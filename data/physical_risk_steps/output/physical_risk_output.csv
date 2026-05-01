@@ -1,3 +1,10 @@
+# FIXED REFERENCE DATA - NOT AUTO-GENERATED MODEL OUTPUT
+# This file contains agreed-upon assumptions for physical risk factors across climate scenarios.
+# Columns show: baseline frequency, applied climate factor multiplier, and projected impact.
+# Status field indicates whether each value is based on verified data (VERIFIED), 
+# assumptions from literature (ASSUMPTION), or derived calculations (DERIVED).
+# DO NOT edit values without team consensus. Use for calibration and sensitivity analysis.
+#
 year,scenario,wildfire_base_pct,wildfire_factor,wildfire_projected_pct,wildfire_status,tc_base_pct,tc_factor,tc_projected_pct,tc_status,flood_pct,temp_delta_c,temp_mean_derate_pct,temp_heatwave_pct,temp_total_pct,slr_m,total_acute_pct,total_chronic_pct,total_risk_pct
 2024,RCP8.5,0.000082,1.00,0.000082,ASSUMPTION,0.000205,1.00,0.000205,ASSUMPTION,0.000000,0.00,0.000000,0.000548,0.000548,0.00,0.000288,0.000548,0.000836
 2030,RCP8.5,0.000082,2.00,0.000164,ASSUMPTION,0.000205,1.05,0.000216,ASSUMPTION,0.000000,1.00,0.001864,0.000655,0.002519,0.06,0.000380,0.002519,0.002899
