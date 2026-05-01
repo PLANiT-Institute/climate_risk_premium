@@ -4,15 +4,9 @@ from .transition import TransitionAdjustments, apply_transition, YearlyTransitio
 from .physical import (
     PhysicalAdjustments,
     YearlyPhysicalAdjustments,
-    apply_physical,
+    get_physical_risk_scenario,
+    load_yearly_from_output_csv,
 )
-
-# Optional imports for PLANiT integration
-try:
-    from .physical import get_physical_risk_from_planit, create_yearly_physical_adjustments_from_planit
-except ImportError:
-    get_physical_risk_from_planit = None
-    create_yearly_physical_adjustments_from_planit = None
 from .financing import (
     FinancingImpact,
     map_expected_loss_to_spreads,
@@ -36,9 +30,8 @@ __all__ = [
     "create_yearly_transition_adjustments",
     "PhysicalAdjustments",
     "YearlyPhysicalAdjustments",
-    "apply_physical",
-    "get_physical_risk_from_planit",
-    "create_yearly_physical_adjustments_from_planit",
+    "get_physical_risk_scenario",
+    "load_yearly_from_output_csv",
     "FinancingImpact",
     "map_expected_loss_to_spreads",
     "calculate_expected_loss",

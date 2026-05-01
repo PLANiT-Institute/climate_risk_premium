@@ -1,9 +1,0 @@
-hazard,source,data_period,events_at_location,total_events,max_intensity,intensity_unit,annual_frequency,outage_probability,outage_duration_hrs,annual_outage_rate,calculation
-Wildfire,CLIMADA API - NASA FIRMS,2001-2020,6,20,310.4,MW (FRP),0.3,0.1,24,8.219178082191781e-05,events/years × P(outage|event) × duration/8760
-Tropical Cyclone,CLIMADA API - IBTrACS,1980-2020,15,3890,48.8001070626933,m/s (wind),0.125,0.3,48,0.0002054794520547945,damaging_events/years × P(outage|event) × duration/8760
-River Flood (historical 1980_2000),CLIMADA API - ISIMIP,1980_2000,0,920,0.0,m (depth),0.0,0.5,120,0.0,No flooding at 10m elevation
-River Flood (rcp26 2030_2050),CLIMADA API - ISIMIP,2030_2050,0,480,0.0,m (depth),0.0,0.5,120,0.0,No flooding at 10m elevation
-River Flood (rcp60 2030_2050),CLIMADA API - ISIMIP,2030_2050,0,480,0.0,m (depth),0.0,0.5,120,0.0,No flooding at 10m elevation
-River Flood (rcp85 2030_2050),CLIMADA API - ISIMIP,2030_2050,0,480,0.0,m (depth),0.0,0.5,120,0.0,No flooding at 10m elevation
-River Flood (rcp85 2050_2070),CLIMADA API - ISIMIP,2050_2070,0,480,0.0,m (depth),0.0,0.5,120,0.0,No flooding at 10m elevation
-River Flood (rcp85 2070_2090),CLIMADA API - ISIMIP,2070_2090,0,480,0.0,m (depth),0.0,0.5,120,0.0,No flooding at 10m elevation

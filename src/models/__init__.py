@@ -27,14 +27,8 @@ from .transition import (
     KOREA_POWER_PLANS,
 )
 
-# Physical risk (hazards, scenarios, damage functions)
-from .physical import (
-    PhysicalRiskModel,
-    HazardType,
-    HAZARD_BASELINES,
-    RCP_SCENARIOS,
-    SSP_SCENARIOS,
-)
+# Physical risk (temperature model only)
+from .physical import TemperatureModel
 
 __all__ = [
     # Base classes
@@ -50,10 +44,6 @@ __all__ = [
     "TransitionRiskModel",
     "KoreaPowerPlan",
     "KOREA_POWER_PLANS",
-    # Physical (hazards + scenarios)
-    "PhysicalRiskModel",
-    "HazardType",
-    "HAZARD_BASELINES",
-    "RCP_SCENARIOS",
-    "SSP_SCENARIOS",
+    # Physical
+    "TemperatureModel",
 ]

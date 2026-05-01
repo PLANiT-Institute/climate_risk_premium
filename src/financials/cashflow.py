@@ -175,10 +175,10 @@ def compute_cashflows_timeseries(
         )
         base_cf_series = np.minimum(1.0, base_cf_series * demand_factors)
 
-    # Apply capacity derates (year-by-year)
+    # Capacity derates from Chronic hazards (Drought) reduce generation capacity
     cf_series = base_cf_series * (1 - capacity_derates)
 
-    # Apply water constraints (year-by-year hard cap)
+    # Water constraints (Chronic - WaterRisk) impose hard cap on capacity factor
     cf_series = np.minimum(cf_series, water_constraints)
     cf_series = np.maximum(cf_series, 0.0)
 
@@ -209,6 +209,8 @@ def compute_cashflows_timeseries(
     variable_opex = actual_mwh * variable_opex_per_mwh
 
     # Fixed O&M: constant regardless of generation
+    # Acute hazard damage (Fire/Wind/Hail AAI) is added via outage_rate → lost revenue,
+    # not O&M. Chronic damage (Drought) already reduces CF above.
     fixed_opex = np.full(n_years, capacity_mw * 1000 * fixed_opex_per_kw)
 
     # Carbon costs (K-ETS)

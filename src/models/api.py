@@ -21,21 +21,7 @@ from typing import Dict, Any, Optional, List
 
 # Import models
 from .transition import TransitionRiskModel, KOREA_POWER_PLANS
-from .physical import (
-    PhysicalRiskModel,
-    HazardType,
-    HAZARD_BASELINES,
-    RCP_SCENARIOS,
-    SSP_SCENARIOS,
-    DamageFunctionRegistry,
-    FWILinearFunction,
-    FWIExponentialFunction,
-    KoreaForestServiceFunction,
-    DepthDamageFunction,
-    DurationDamageFunction,
-    WindSpeedPowerFunction,
-    HollandWindFunction,
-)
+from .physical import TemperatureModel
 from .base import RiskResult
 
 
