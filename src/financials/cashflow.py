@@ -134,29 +134,32 @@ def compute_cashflows_timeseries(
     # === PHYSICAL RISK: Get year-by-year or static adjustments ===
     if yearly_physical_adj is not None:
         # Dynamic year-by-year physical risks (climate change progression)
-        outage_rates = np.array(
-            [yearly_physical_adj.get_adjustment_for_year(int(y)).outage_rate for y in years]
-        )
-        capacity_derates = np.array(
-            [yearly_physical_adj.get_adjustment_for_year(int(y)).capacity_derate for y in years]
-        )
-        efficiency_losses = np.array(
-            [yearly_physical_adj.get_adjustment_for_year(int(y)).efficiency_loss for y in years]
-        )
-        water_constraints = np.array(
-            [
-                yearly_physical_adj.get_adjustment_for_year(int(y)).water_constrained_capacity
-                for y in years
-            ]
-        )
+        adjs = [yearly_physical_adj.get_adjustment_for_year(int(y)) for y in years]
+        plant_outage_rates = np.array([a.outage_rate for a in adjs])
+        capacity_derates = np.array([a.capacity_derate for a in adjs])
+        efficiency_losses = np.array([a.efficiency_loss for a in adjs])
+        water_constraints = np.array([a.water_constrained_capacity for a in adjs])
+        line_outage_rates = np.array([a.transmission_outage_rate for a in adjs])
+        capex_loss_rates = np.array([a.asset_capex_loss_rate for a in adjs])
     else:
         # Static physical risks (same for all years)
-        outage_rates = np.full(n_years, physical_adj.outage_rate)
+        plant_outage_rates = np.full(n_years, physical_adj.outage_rate)
         capacity_derates = np.full(n_years, physical_adj.capacity_derate)
         efficiency_losses = np.full(n_years, physical_adj.efficiency_loss)
         water_constraints = np.full(
             n_years, getattr(physical_adj, "water_constrained_capacity", 1.0)
         )
+        line_outage_rates = np.full(
+            n_years, getattr(physical_adj, "transmission_outage_rate", 0.0)
+        )
+        capex_loss_rates = np.full(
+            n_years, getattr(physical_adj, "asset_capex_loss_rate", 0.0)
+        )
+
+    # Combine plant + transmission as independent failure modes:
+    #   total_unavailable = 1 − (1 − plant)(1 − line)
+    # When the plant is up but the line is down, generation can't reach the grid → revenue loss.
+    outage_rates = 1.0 - (1.0 - plant_outage_rates) * (1.0 - line_outage_rates)
 
     # === CAPACITY FACTOR CALCULATION ===
     if yearly_transition_adj is not None:
@@ -297,8 +300,10 @@ def compute_cashflows_timeseries(
     # NOPAT = EBIT * (1 - Tax Rate)
     nopat = ebit * (1 - tax_rate)
 
-    # Capex (sustaining capex only, construction already completed)
-    capex = np.zeros(n_years)
+    # Capex: physical-risk asset destruction (annual fraction of total replacement value).
+    # Construction capex was already paid (treated as initial outflow in NPV); this is
+    # incremental damage from climate events to plant + transmission corridor.
+    capex = total_capex * capex_loss_rates
 
     fcf = nopat + depreciation - capex
 

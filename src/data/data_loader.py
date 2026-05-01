@@ -285,7 +285,15 @@ class DataLoader:
         if not path.exists():
             path = self.input_dir / "debt_repayment_schedule.csv"
         return pd.read_csv(path)
-    
+
+    def load_transmission_parameters(self) -> Dict[str, float]:
+        """Load transmission line + substation parameters."""
+        path = self.input_dir / "transmission.csv"
+        if not path.exists():
+            return {}
+        df = pd.read_csv(path)
+        return df.set_index('param_name')['value'].to_dict()
+
     def load_all(self) -> Dict[str, Any]:
         return {
             'plant': self.load_plant_parameters(),
@@ -296,6 +304,7 @@ class DataLoader:
             'financing': self.load_financing_parameters(),
             'credit_grid': self.load_credit_rating_grid(),
             'debt_schedule': self.load_debt_schedule(),
+            'transmission': self.load_transmission_parameters(),
         }
 
 
