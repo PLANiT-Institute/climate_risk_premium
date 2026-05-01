@@ -314,33 +314,35 @@ class CRPModelRunner:
             from pathlib import Path as _Path
             import csv as _csv
 
-            # Load RCP8.5 baseline acute hazard rates (wildfire + TC + flood combined)
+            # Anchor on 2024 RCP8.5 baseline values (factor=1.0), then scale by
+            # climate_factors.csv for the requested scenario. This avoids relying on
+            # physical_risk_output.csv's RCP8.5 trajectory (which is flat 2030→2050).
             csv_adj = load_yearly_from_output_csv(start_year=start_year, end_year=end_year)
 
-            # Map CRP scenario → climate factor scenario label
             ssp, _target_year = PHYSICAL_SCENARIO_SSP_MAP.get(scenario_name, ("ssp126", 2024))
             ssp_to_crp = {"ssp126": "SSP1-2.6", "ssp245": "RCP4.5", "ssp585": "RCP8.5"}
             crp_label = ssp_to_crp.get(ssp, "SSP1-2.6")
 
-            # Apply scenario climate factor to baseline rates uniformly across all CRP scenarios.
-            # Note: csv_adj.outage_rates already contains RCP8.5's projected trajectory; we rescale
-            # by (scenario_factor / RCP8.5_factor) so each CRP scenario reflects its own pathway.
+            # Pull 2024 RCP8.5 baseline (climate factor = 1.0 by definition)
+            base_outage_2024 = float(csv_adj.outage_rates[0]) / max(
+                get_climate_factor("wildfire", int(csv_adj.years[0]), "RCP8.5"), 1e-9
+            )
+            base_efficiency_2024 = float(csv_adj.efficiency_losses[0]) / max(
+                get_climate_factor("wildfire", int(csv_adj.years[0]), "RCP8.5"), 1e-9
+            )
+
             scaled_outage = []
             scaled_efficiency = []
             for year in csv_adj.years:
-                yr = int(year)
-                f_scenario = get_climate_factor("wildfire", yr, crp_label)
-                f_rcp85 = get_climate_factor("wildfire", yr, "RCP8.5") or 1.0
-                scenario_scale = f_scenario / f_rcp85
-                idx = list(csv_adj.years).index(year)
-                scaled_outage.append(csv_adj.outage_rates[idx] * scenario_scale)
-                scaled_efficiency.append(csv_adj.efficiency_losses[idx] * scenario_scale)
+                f = get_climate_factor("wildfire", int(year), crp_label)
+                scaled_outage.append(base_outage_2024 * f)
+                scaled_efficiency.append(base_efficiency_2024 * f)
             csv_adj.outage_rates = np.array(scaled_outage)
             csv_adj.efficiency_losses = np.array(scaled_efficiency)
-            csv_adj.scenario_name = f"physical_risk_output.csv (RCP8.5 baseline → {crp_label})"
+            csv_adj.scenario_name = f"baseline × climate_factor[{crp_label}]"
             logger.info(
-                "Physical adjustments for %s (%s): years=%d-%d, avg_outage=%.6f",
-                scenario_name, crp_label, start_year, end_year,
+                "Physical adjustments for %s (%s): base_outage=%.6f, avg_outage=%.6f",
+                scenario_name, crp_label, base_outage_2024,
                 csv_adj.outage_rates.mean(),
             )
             return csv_adj
