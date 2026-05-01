@@ -85,12 +85,12 @@ def calculate_metrics(
     """
     Calculate NPV, IRR, DSCR, LLCR from cash flow time series.
     """
-    # Extract parameters
-    total_capex = float(plant_params.get("total_capex_million", 3200)) * 1e6
-    discount_rate = float(plant_params.get("discount_rate", 0.08))
-    debt_fraction = float(plant_params.get("debt_fraction", 0.70))
-    debt_interest = float(plant_params.get("debt_interest_rate", 0.05))
-    debt_tenor = int(plant_params.get("debt_tenor_years", 20))
+    # All parameters must come from the loaded plant CSV; raise loudly if anything is missing
+    total_capex = float(plant_params["total_capex_million"]) * 1e6
+    discount_rate = float(plant_params["discount_rate"])
+    debt_fraction = float(plant_params["debt_fraction"])
+    debt_interest = float(plant_params["debt_interest_rate"])
+    debt_tenor = int(plant_params["debt_tenor_years"])
 
     # Free cash flows from operations
     fcf = cashflows.free_cash_flow

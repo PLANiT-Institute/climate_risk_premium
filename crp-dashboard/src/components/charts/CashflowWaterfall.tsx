@@ -11,7 +11,7 @@ import {
   Cell,
 } from "recharts";
 import { CHART_MARGIN } from "@/lib/constants";
-import { CashflowRow } from "@/lib/supabase/types";
+import { CashflowRow } from "@/lib/types";
 
 interface CashflowWaterfallProps {
   data: CashflowRow;

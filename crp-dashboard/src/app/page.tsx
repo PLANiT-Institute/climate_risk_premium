@@ -5,11 +5,22 @@ import NpvWaterfall from "@/components/charts/NpvWaterfall";
 import ScenarioRadar from "@/components/charts/ScenarioRadar";
 import ScenarioTable from "@/components/tables/ScenarioTable";
 import { COLORS, RATING_COLORS } from "@/lib/constants";
+import { PLANT } from "@/lib/generated/data";
 
 export const revalidate = 3600;
 
 export default async function ExecutiveSummary() {
   const scenarios = await getScenarioResults();
+
+  if (scenarios.length === 0) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <p className="text-slate-500 text-sm">
+          No scenario data available. Run <code className="bg-slate-100 px-1 rounded">python scripts/regenerate_dashboard_data.py</code> to generate data.
+        </p>
+      </div>
+    );
+  }
 
   const baseline = scenarios.find((s) => s.scenario === "baseline");
   const maxCrp = scenarios.reduce((max, s) =>
@@ -27,7 +38,7 @@ export default async function ExecutiveSummary() {
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-slate-900">Executive Summary</h1>
         <p className="text-sm text-slate-500 mt-1">
-          Climate Risk Premium analysis for Samcheok Blue Power (2,100 MW)
+          Climate Risk Premium analysis for {PLANT.name} ({PLANT.capacity_mw.toLocaleString()} MW)
         </p>
       </div>
 

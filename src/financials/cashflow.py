@@ -116,14 +116,12 @@ def compute_cashflows_timeseries(
     price = float(plant_params["power_price_per_mwh"])
     heat_rate = float(plant_params["heat_rate_mmbtu_mwh"])
     fuel_price = float(plant_params["fuel_price_per_mmbtu"])
-    fixed_opex_per_kw = float(
-        plant_params.get("fixed_opex_per_kw_year", plant_params.get("fixed_opex_per_kw", 35.0))
-    )
+    fixed_opex_per_kw = float(plant_params["fixed_opex_per_kw"])
     variable_opex_per_mwh = float(plant_params["variable_opex_per_mwh"])
 
     # Financial params for concretization
     total_capex = float(plant_params["total_capex_million"]) * 1e6
-    useful_life = int(plant_params.get("useful_life", plant_params.get("operating_years", 40)))
+    useful_life = int(plant_params["useful_life"])
     tax_rate = float(plant_params["tax_rate"])
     debt_fraction = float(plant_params["debt_fraction"])
     debt_interest = float(plant_params["debt_interest_rate"])
@@ -336,47 +334,3 @@ def compute_cashflows_timeseries(
     )
 
 
-# Keep old function for backward compatibility
-@dataclass
-class CashFlowResult:
-    annual_revenue: float
-    annual_costs: float
-    ebitda: float
-    free_cash_flow: float
-    notes: str
-
-
-def compute_cashflows(
-    plant_params: Dict[str, Any],
-    transition: TransitionAdjustments,
-    physical: PhysicalAdjustments,
-) -> CashFlowResult:
-    """
-    Legacy single-period calculator. Use compute_cashflows_timeseries instead.
-    """
-    capacity_mw = float(plant_params.get("capacity_mw", 2000))
-    price = float(plant_params.get("power_price_per_mwh", 80))
-    heat_rate = float(plant_params.get("heat_rate_mmbtu_mwh", 8.8))
-    fuel_price = float(plant_params.get("fuel_price_per_mmbtu", 3.2))
-    fixed_opex = float(plant_params.get("fixed_opex_per_kw_year", 42))
-    variable_opex = float(plant_params.get("variable_opex_per_mwh", 4.5))
-    cf = max(0.0, transition.capacity_factor * (1 - physical.capacity_derate))
-
-    annual_mwh = capacity_mw * 8760 * cf
-    fuel_cost = annual_mwh * heat_rate * fuel_price
-    variable_costs = annual_mwh * variable_opex
-    fixed_costs = capacity_mw * 1000 * fixed_opex
-    outage_penalty = annual_mwh * physical.outage_rate * price
-
-    revenue = annual_mwh * price
-    costs = fuel_cost + variable_costs + fixed_costs + outage_penalty
-    ebitda = revenue - costs
-    fcf = ebitda
-    notes = "Legacy single-period; use compute_cashflows_timeseries instead."
-    return CashFlowResult(
-        annual_revenue=revenue,
-        annual_costs=costs,
-        ebitda=ebitda,
-        free_cash_flow=fcf,
-        notes=notes,
-    )

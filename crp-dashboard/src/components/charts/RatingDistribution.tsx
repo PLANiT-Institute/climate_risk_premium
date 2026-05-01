@@ -1,7 +1,7 @@
 "use client";
 
 import { RATING_COLORS, SCENARIO_LABELS } from "@/lib/constants";
-import { ScenarioResult } from "@/lib/supabase/types";
+import { ScenarioResult } from "@/lib/types";
 
 interface RatingDistributionProps {
   data: ScenarioResult[];

@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import EquationBlock from "@/components/methodology/EquationBlock";
 import { RATING_COLORS, RATING_SPREADS } from "@/lib/constants";
+import { PLANT } from "@/lib/generated/data";
 
 type SectionKey =
   | "overview"
@@ -181,14 +182,14 @@ export default function ModelPipelinePage() {
               <h3 className="text-sm font-semibold text-slate-700 mb-3">Plant Parameters</h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {[
-                  { label: "Capacity", value: "2,100 MW" },
-                  { label: "Capacity Factor", value: "85%" },
-                  { label: "Plant Life", value: "40 years" },
-                  { label: "CAPEX", value: "USD 4.9B" },
-                  { label: "Fuel Cost", value: "$2.5/GJ" },
-                  { label: "Heat Rate", value: "8.8 GJ/MWh" },
-                  { label: "Emission Factor", value: "0.82 tCO₂/MWh" },
-                  { label: "Discount Rate", value: "8%" },
+                  { label: "Capacity", value: `${PLANT.capacity_mw.toLocaleString()} MW` },
+                  { label: "Capacity Factor", value: `${(PLANT.capacity_factor * 100).toFixed(0)}%` },
+                  { label: "Plant Life", value: `${PLANT.operating_years} years` },
+                  { label: "CAPEX", value: `USD ${(PLANT.total_capex_million / 1000).toFixed(2)}B` },
+                  { label: "Useful Life", value: `${PLANT.useful_life} years` },
+                  { label: "Debt / Equity", value: `${(PLANT.debt_fraction * 100).toFixed(0)}% / ${(PLANT.equity_fraction * 100).toFixed(0)}%` },
+                  { label: "Discount Rate", value: `${(PLANT.discount_rate * 100).toFixed(0)}%` },
+                  { label: "Source", value: "data/raw/plant_parameters.csv" },
                 ].map((p) => (
                   <div
                     key={p.label}

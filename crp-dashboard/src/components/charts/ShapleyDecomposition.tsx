@@ -12,7 +12,7 @@ import {
   Cell,
 } from "recharts";
 import { CHART_MARGIN, COLORS } from "@/lib/constants";
-import { ScenarioResult } from "@/lib/supabase/types";
+import { ScenarioResult } from "@/lib/types";
 
 interface ShapleyDecompositionProps {
   scenarios: ScenarioResult[];

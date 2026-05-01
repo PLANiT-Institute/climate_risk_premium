@@ -1,6 +1,6 @@
 """Data access layer."""
 
-from src.data_loader import DataLoader, PlantParameters, TransitionScenario, PhysicalScenario, MarketScenario, CreditRatingGrid, load_data
+from src.data.data_loader import DataLoader, PlantParameters, TransitionScenario, PhysicalScenario, MarketScenario, CreditRatingGrid, load_data
 
 
 def load_inputs(base_dir):

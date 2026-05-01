@@ -11,7 +11,7 @@ import {
   Tooltip,
 } from "recharts";
 import { SCENARIO_COLORS, SCENARIO_LABELS } from "@/lib/constants";
-import { ScenarioResult } from "@/lib/supabase/types";
+import { ScenarioResult } from "@/lib/types";
 
 interface ScenarioRadarProps {
   data: ScenarioResult[];

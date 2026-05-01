@@ -11,7 +11,7 @@ import {
   Legend,
 } from "recharts";
 import { SCENARIO_COLORS, SCENARIO_LABELS, CHART_MARGIN } from "@/lib/constants";
-import { CashflowRow } from "@/lib/supabase/types";
+import { CashflowRow } from "@/lib/types";
 
 interface EbitdaTimeSeriesProps {
   data: Record<string, CashflowRow[]>;

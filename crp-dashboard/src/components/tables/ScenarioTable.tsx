@@ -1,7 +1,7 @@
 "use client";
 
 import { SCENARIO_LABELS, RATING_COLORS } from "@/lib/constants";
-import { ScenarioResult } from "@/lib/supabase/types";
+import { ScenarioResult } from "@/lib/types";
 
 interface ScenarioTableProps {
   data: ScenarioResult[];

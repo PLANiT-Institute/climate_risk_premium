@@ -4,7 +4,6 @@ from .transition import TransitionAdjustments, apply_transition, YearlyTransitio
 from .physical import (
     PhysicalAdjustments,
     YearlyPhysicalAdjustments,
-    get_physical_risk_scenario,
     load_yearly_from_output_csv,
 )
 from .financing import (
@@ -30,7 +29,6 @@ __all__ = [
     "create_yearly_transition_adjustments",
     "PhysicalAdjustments",
     "YearlyPhysicalAdjustments",
-    "get_physical_risk_scenario",
     "load_yearly_from_output_csv",
     "FinancingImpact",
     "map_expected_loss_to_spreads",

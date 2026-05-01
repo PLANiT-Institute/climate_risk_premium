@@ -5,36 +5,16 @@ import ScenarioSelector from "@/components/dashboard/ScenarioSelector";
 import CashflowWaterfall from "@/components/charts/CashflowWaterfall";
 import EbitdaTimeSeries from "@/components/charts/EbitdaTimeSeries";
 import FcfTimeSeries from "@/components/charts/FcfTimeSeries";
-import { CashflowRow, RawCashflowRow, normalizeCashflowRow } from "@/lib/supabase/types";
+import { CashflowRow } from "@/lib/types";
 import { SCENARIO_LABELS } from "@/lib/constants";
+import { getAllCashflows } from "@/lib/queries/cashflows";
 
 export default function CashflowsPage() {
   const [selected, setSelected] = useState(["baseline"]);
-  const [allData, setAllData] = useState<Record<string, CashflowRow[]>>({});
-  const [loading, setLoading] = useState(true);
   const [yearIndex, setYearIndex] = useState(0);
 
-  useEffect(() => {
-    async function load() {
-      const scenarios = Object.keys(SCENARIO_LABELS);
-      const result: Record<string, CashflowRow[]> = {};
-      await Promise.all(
-        scenarios.map(async (s) => {
-          try {
-            const mod = await import(`@/data/cashflows/${s}.json`);
-            result[s] = (mod.default as RawCashflowRow[]).map((r) =>
-              normalizeCashflowRow(r, s)
-            );
-          } catch {
-            result[s] = [];
-          }
-        })
-      );
-      setAllData(result);
-      setLoading(false);
-    }
-    load();
-  }, []);
+  const allData = getAllCashflows();
+  const loading = false;
 
   const primaryScenario = selected[0] || "baseline";
   const scenarioData = allData[primaryScenario] || [];
