@@ -1,42 +1,50 @@
+"""Cash-flow engine — transition risk only.
+
+Computes year-by-year free cash flows for a power plant under a transition
+policy scenario.  Physical risk channels are not included in this version;
+they will be layered in as a separate step.
+
+Key assumptions
+---------------
+- Capacity factor is reduced by the dispatch penalty from the policy scenario.
+- Carbon costs (K-ETS) are computed from ``YearlyTransitionAdjustments``.
+- Debt service uses a level-annuity schedule (standard project finance).
+- Depreciation is straight-line over ``useful_life`` years.
+- Free Cash Flow = NOPAT + Depreciation (no physical capex loss here).
 """
-Cash-flow engine for baseline vs risk-adjusted scenarios.
-
-Supports:
-- Year-by-year physical risk evolution (CLIMADA hazards)
-- Proper outage modeling (reduces revenue, not adds cost)
-- Efficiency loss from physical risks
-
-Note: Carbon pricing has been archived. This model focuses on dispatch and physical risks.
-"""
-
 from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
-from typing import Dict, Any, List, Optional, TYPE_CHECKING
+from typing import Dict, Any, List, TYPE_CHECKING
+
 import numpy as np
 import numpy_financial as npf
-
-from src.risk import TransitionAdjustments, PhysicalAdjustments
-from src.scenarios import TransitionScenario, MarketScenario
 
 logger = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
-    from src.risk.physical import YearlyPhysicalAdjustments
     from src.risk.transition import YearlyTransitionAdjustments
 
 
+# ---------------------------------------------------------------------------
+# Output container
+# ---------------------------------------------------------------------------
+
 @dataclass
 class CashFlowTimeSeries:
-    """Time-series cash flow projections."""
+    """Annual cash-flow projections for the plant's operating life.
+
+    All monetary arrays are in USD (not millions).  Convert at the output
+    layer if needed.
+    """
 
     years: np.ndarray
     revenue: np.ndarray
     fuel_costs: np.ndarray
     variable_opex: np.ndarray
     fixed_opex: np.ndarray
-    lost_revenue_from_outages: np.ndarray
+    carbon_costs: np.ndarray
     total_costs: np.ndarray
     ebitda: np.ndarray
     depreciation: np.ndarray
@@ -44,28 +52,24 @@ class CashFlowTimeSeries:
     interest_expense: np.ndarray
     tax_expense: np.ndarray
     net_income: np.ndarray
-    capex: np.ndarray
+    capex: np.ndarray             # maintenance / replacement capex (zero for now)
     free_cash_flow: np.ndarray
-    capacity_factor: np.ndarray
-    final_cf: np.ndarray
-    carbon_costs: np.ndarray = field(default=None)  # type: ignore[arg-type]
-    dscr: np.ndarray = field(default=None)  # type: ignore[arg-type]
+    capacity_factor: np.ndarray   # effective CF after dispatch penalty
+    dscr: np.ndarray = field(default_factory=lambda: np.array([]))
 
     def __post_init__(self) -> None:
-        if self.carbon_costs is None:
-            self.carbon_costs = np.zeros_like(self.years, dtype=float)
-        if self.dscr is None:
+        if self.dscr is None or len(self.dscr) == 0:
             self.dscr = np.zeros_like(self.years, dtype=float)
 
     def to_dict(self) -> Dict[str, List[float]]:
-        """Convert to dict for CSV export."""
+        """Flatten to a dict of lists (for CSV export)."""
         return {
             "year": self.years.tolist(),
             "revenue": self.revenue.tolist(),
             "fuel_costs": self.fuel_costs.tolist(),
             "variable_opex": self.variable_opex.tolist(),
             "fixed_opex": self.fixed_opex.tolist(),
-            "lost_revenue_from_outages": self.lost_revenue_from_outages.tolist(),
+            "carbon_costs": self.carbon_costs.tolist(),
             "total_costs": self.total_costs.tolist(),
             "ebitda": self.ebitda.tolist(),
             "depreciation": self.depreciation.tolist(),
@@ -76,50 +80,38 @@ class CashFlowTimeSeries:
             "capex": self.capex.tolist(),
             "free_cash_flow": self.free_cash_flow.tolist(),
             "capacity_factor": self.capacity_factor.tolist(),
-            "final_cf": self.final_cf.tolist(),
-            "carbon_costs": self.carbon_costs.tolist(),
             "dscr": self.dscr.tolist(),
         }
 
 
-def compute_cashflows_timeseries(
+# ---------------------------------------------------------------------------
+# Core computation
+# ---------------------------------------------------------------------------
+
+def compute_cashflows(
     plant_params: Dict[str, Any],
-    transition_scenario: TransitionScenario,
-    transition_adj: TransitionAdjustments,
-    physical_adj: PhysicalAdjustments,
-    market_scenario: MarketScenario | None = None,
+    yearly_transition_adj: "YearlyTransitionAdjustments",
     start_year: int = 2025,
-    yearly_physical_adj: Optional["YearlyPhysicalAdjustments"] = None,
-    yearly_transition_adj: Optional["YearlyTransitionAdjustments"] = None,
 ) -> CashFlowTimeSeries:
-    """
-    Compute annual cash flows over the plant's operating life.
+    """Compute annual cash flows over the plant's operating life.
 
     Args:
-        plant_params: Plant design parameters
-        transition_scenario: Transition risk scenario (dispatch penalties)
-        transition_adj: Static transition adjustments
-        physical_adj: Static physical adjustments (used if yearly_physical_adj is None)
-        market_scenario: Optional market scenario
-        start_year: First year of operation
-        yearly_physical_adj: Optional year-by-year physical adjustments for dynamic climate risk
+        plant_params: Flat dict from ``load_plant_params()``.
+        yearly_transition_adj: Per-year CFs and carbon costs from
+            ``build_yearly_transition_adjustments()``.
+        start_year: First calendar year of operations (unused here; years
+            come from ``yearly_transition_adj.years``).
 
-    Physical Risk Modeling:
-        - If yearly_physical_adj is provided, uses dynamic year-by-year hazards
-        - Otherwise, uses static physical_adj for all years
-        - Outages REDUCE revenue (lost sales), not add costs
-        - Efficiency loss reduces effective heat rate
+    Returns:
+        ``CashFlowTimeSeries`` spanning the scenario's retirement horizon.
     """
-    # Extract plant parameters
-    # Extract plant parameters (Assumes defaults are merged by caller)
+    # --- Plant parameters ---
     capacity_mw = float(plant_params["capacity_mw"])
     price = float(plant_params["power_price_per_mwh"])
     heat_rate = float(plant_params["heat_rate_mmbtu_mwh"])
     fuel_price = float(plant_params["fuel_price_per_mmbtu"])
     fixed_opex_per_kw = float(plant_params["fixed_opex_per_kw"])
     variable_opex_per_mwh = float(plant_params["variable_opex_per_mwh"])
-
-    # Financial params for concretization
     total_capex = float(plant_params["total_capex_million"]) * 1e6
     useful_life = int(plant_params["useful_life"])
     tax_rate = float(plant_params["tax_rate"])
@@ -127,189 +119,87 @@ def compute_cashflows_timeseries(
     debt_interest = float(plant_params["debt_interest_rate"])
     debt_tenor = int(plant_params["debt_tenor_years"])
 
-    # Operating years
-    n_years = transition_adj.operating_years
-    years = np.arange(start_year, start_year + n_years)
+    # --- Time axis ---
+    years = yearly_transition_adj.years.copy()
+    n_years = len(years)
 
-    # === PHYSICAL RISK: Get year-by-year or static adjustments ===
-    if yearly_physical_adj is not None:
-        # Dynamic year-by-year physical risks (climate change progression)
-        outage_rates = np.array(
-            [yearly_physical_adj.get_adjustment_for_year(int(y)).outage_rate for y in years]
-        )
-        capacity_derates = np.array(
-            [yearly_physical_adj.get_adjustment_for_year(int(y)).capacity_derate for y in years]
-        )
-        efficiency_losses = np.array(
-            [yearly_physical_adj.get_adjustment_for_year(int(y)).efficiency_loss for y in years]
-        )
-        water_constraints = np.array(
-            [
-                yearly_physical_adj.get_adjustment_for_year(int(y)).water_constrained_capacity
-                for y in years
-            ]
-        )
-    else:
-        # Static physical risks (same for all years)
-        outage_rates = np.full(n_years, physical_adj.outage_rate)
-        capacity_derates = np.full(n_years, physical_adj.capacity_derate)
-        efficiency_losses = np.full(n_years, physical_adj.efficiency_loss)
-        water_constraints = np.full(
-            n_years, getattr(physical_adj, "water_constrained_capacity", 1.0)
-        )
+    # --- Capacity factors from transition scenario ---
+    cf_series = np.array(
+        [yearly_transition_adj.get_cf_for_year(int(y)) for y in years]
+    )
 
-    # === CAPACITY FACTOR CALCULATION ===
-    if yearly_transition_adj is not None:
-        # Year-by-year CF from enhanced transition trajectory
-        base_cf_series = np.array([yearly_transition_adj.get_cf_for_year(int(y)) for y in years])
-    else:
-        base_cf = transition_adj.capacity_factor
-        base_cf_series = np.full(n_years, base_cf)
+    # --- Generation (MWh/year) ---
+    annual_mwh = capacity_mw * 8760 * cf_series
 
-    # Apply Market Demand factor if market scenario exists
-    if market_scenario:
-        demand_factors = np.array(
-            [market_scenario.get_demand_factor(int(year), start_year) for year in years]
-        )
-        base_cf_series = np.minimum(1.0, base_cf_series * demand_factors)
+    # --- Revenue ---
+    revenue = annual_mwh * price
 
-    # Capacity derates from Chronic hazards (Drought) reduce generation capacity
-    cf_series = base_cf_series * (1 - capacity_derates)
-
-    # Water constraints (Chronic - WaterRisk) impose hard cap on capacity factor
-    cf_series = np.minimum(cf_series, water_constraints)
-    cf_series = np.maximum(cf_series, 0.0)
-
-    # === GENERATION AND REVENUE ===
-    # Potential generation (before outages)
-    potential_mwh = capacity_mw * 8760 * cf_series
-
-    # Actual generation (after outages reduce availability)
-    # Outage = fraction of time plant is unavailable
-    actual_mwh = potential_mwh * (1 - outage_rates)
-
-    # Revenue is based on ACTUAL generation (outages reduce revenue)
-    if market_scenario:
-        prices = np.array(
-            [market_scenario.get_power_price(int(year), start_year) for year in years]
-        )
-    else:
-        prices = np.full(n_years, price)
-
-    revenue = actual_mwh * prices
-
-    # === COSTS ===
-    # Fuel costs: affected by efficiency loss (higher heat rate = more fuel)
-    effective_heat_rates = heat_rate * (1 + efficiency_losses)
-    fuel_costs = actual_mwh * effective_heat_rates * fuel_price
-
-    # Variable O&M: based on actual generation
-    variable_opex = actual_mwh * variable_opex_per_mwh
-
-    # Fixed O&M: constant regardless of generation
-    # Acute hazard damage (Fire/Wind/Hail AAI) is added via outage_rate → lost revenue,
-    # not O&M. Chronic damage (Drought) already reduces CF above.
+    # --- Operating costs ---
+    fuel_costs = annual_mwh * heat_rate * fuel_price
+    variable_opex = annual_mwh * variable_opex_per_mwh
     fixed_opex = np.full(n_years, capacity_mw * 1000 * fixed_opex_per_kw)
 
-    # Carbon costs (K-ETS)
-    if yearly_transition_adj is not None:
-        carbon_cost_per_mwh = np.array(
-            [yearly_transition_adj.get_carbon_cost_per_mwh_for_year(int(y)) for y in years]
-        )
-        carbon_costs = actual_mwh * carbon_cost_per_mwh
-    else:
-        carbon_costs = np.zeros(n_years)
-
-    # Outage costs: Now represents LOST REVENUE (for reporting), not an actual cash cost
-    # This is the revenue we would have earned but didn't due to outages
-    # We track this separately for transparency, but it's already reflected in reduced revenue
-    lost_revenue_from_outages = potential_mwh * outage_rates * prices  # Lost revenue from outages
+    # Carbon costs (K-ETS): interpolated from policy anchor years
+    carbon_cost_per_mwh = np.array(
+        [yearly_transition_adj.get_carbon_cost_per_mwh_for_year(int(y)) for y in years]
+    )
+    carbon_costs = annual_mwh * carbon_cost_per_mwh
 
     total_costs = fuel_costs + variable_opex + fixed_opex + carbon_costs
-    # Note: lost_revenue_from_outages NOT included in total_costs - it's informational only
 
-    # --- Financial Calculations ---
-
-    # 1. EBITDA Calculation
-    # EBITDA = Revenue - Total Costs (Fuel + O&M)
+    # --- EBITDA ---
     ebitda = revenue - total_costs
 
-    negative_years = years[ebitda < 0]
-    if len(negative_years) > 0:
+    negative_yrs = years[ebitda < 0]
+    if len(negative_yrs) > 0:
         logger.warning(
-            f"Negative EBITDA detected in {len(negative_years)} year(s): "
-            f"{negative_years.tolist()}"
+            "Scenario '%s': negative EBITDA in %d year(s): %s",
+            yearly_transition_adj.scenario_name,
+            len(negative_yrs),
+            negative_yrs.tolist(),
         )
 
-    # 2. Depreciation (Non-cash expense)
-    # Straight-line depreciation over useful life
-    # Assumption: Capex is fully depreciable, no salvage value
-    annual_depreciation = total_capex / useful_life
-    depreciation = np.full(n_years, annual_depreciation)
+    # --- Depreciation (straight-line) ---
+    annual_dep = total_capex / useful_life
+    depreciation = np.full(n_years, annual_dep)
 
-    # 3. EBIT (Earnings Before Interest and Taxes)
-    # EBIT = EBITDA - Depreciation
+    # --- EBIT ---
     ebit = ebitda - depreciation
 
-    # 4. Debt Service (Interest & Principal)
-    # Calculate amortization schedule for the debt portion
+    # --- Debt service (level annuity) ---
     debt_amount = total_capex * debt_fraction
     interest_expense = np.zeros(n_years)
-    balance = debt_amount
-
     annual_ds = 0.0
+
     if debt_interest > 0 and debt_tenor > 0:
-        # Calculate level annual payment (Annuity)
-        annual_ds = -npf.pmt(debt_interest, debt_tenor, debt_amount)
-
+        annual_ds = float(-npf.pmt(debt_interest, debt_tenor, debt_amount))
+        balance = debt_amount
         for i in range(min(n_years, debt_tenor)):
-            # Interest component
             interest = balance * debt_interest
-            # Principal component
             principal = annual_ds - interest
-
             interest_expense[i] = interest
+            balance = max(0.0, balance - principal)
 
-            # Update balance
-            balance -= principal
-            if balance < 0:
-                balance = 0
-
-    # 5. Tax Calculation
-    # Corporate Tax is applied to Earnings Before Tax (EBT)
-    # EBT = EBIT - Interest Expense
-    # Tax Shield: Interest expense reduces taxable income
+    # --- Tax (no carry-forward) ---
     taxable_income = ebit - interest_expense
-    # Tax cannot be negative (no carry-forward modeled for simplicity)
     tax_expense = np.maximum(0.0, taxable_income * tax_rate)
 
-    # 6. Net Income
-    # Net Income = EBT - Tax
+    # --- Net income ---
     net_income = ebit - interest_expense - tax_expense
 
-    # 7. Free Cash Flow (FCFF - Free Cash Flow to Firm)
-    # FCFF represents cash available to all capital providers (Debt + Equity)
-    # Formula: FCFF = EBIT * (1 - Tax Rate) + Depreciation - Capex - Change in WC
-    # Note: Interest tax shield is captured in WACC for NPV, so we use EBIT*(1-t)
-    # However, for consistency with the previous model which might have used a different definition,
-    # let's stick to the standard FCFF definition:
-    # FCFF = NOPAT + Depreciation - Capex
-    # NOPAT = EBIT * (1 - Tax Rate)
-    nopat = ebit * (1 - tax_rate)
-
-    # Capex (sustaining capex only, construction already completed)
+    # --- Free Cash Flow (FCFF) ---
+    # FCFF = NOPAT + Depreciation  (maintenance capex is zero at this stage)
+    nopat = ebit * (1.0 - tax_rate)
     capex = np.zeros(n_years)
+    free_cash_flow = nopat + depreciation - capex
 
-    fcf = nopat + depreciation - capex
-
-    # DSCR (second pass, after tax_expense and capex are both defined)
-    cfads = ebitda - tax_expense - capex
-    dscr_series = np.zeros(n_years)
+    # --- DSCR (CFADS / debt service) ---
+    # NaN for post-debt years — DSCR is undefined once the loan is fully repaid.
+    cfads = ebitda - tax_expense
+    dscr_series = np.full(n_years, np.nan)
     if annual_ds > 0:
         n_debt = min(n_years, debt_tenor)
         dscr_series[:n_debt] = cfads[:n_debt] / annual_ds
-
-    final_cf_series = cf_series * (1 - outage_rates)
 
     return CashFlowTimeSeries(
         years=years,
@@ -317,7 +207,7 @@ def compute_cashflows_timeseries(
         fuel_costs=fuel_costs,
         variable_opex=variable_opex,
         fixed_opex=fixed_opex,
-        lost_revenue_from_outages=lost_revenue_from_outages,
+        carbon_costs=carbon_costs,
         total_costs=total_costs,
         ebitda=ebitda,
         depreciation=depreciation,
@@ -326,11 +216,7 @@ def compute_cashflows_timeseries(
         tax_expense=tax_expense,
         net_income=net_income,
         capex=capex,
-        free_cash_flow=fcf,
+        free_cash_flow=free_cash_flow,
         capacity_factor=cf_series,
-        final_cf=final_cf_series,
-        carbon_costs=carbon_costs,
         dscr=dscr_series,
     )
-
-

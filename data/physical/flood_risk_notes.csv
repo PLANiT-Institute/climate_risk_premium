@@ -1,8 +1,0 @@
-plant_id,plant_name,elevation_m,flood_zone,river_flood_risk,coastal_flood_risk,justification,verification_source,verification_date
-KR-SBP-001,Samcheok Blue Power,10.0,X,0.0,0.0,Plant situated at 10m elevation on coastal bluff. 100-year flood depth <1m at site. Storm surge would need to exceed 10m to cause impact (>1000-year return period).,Site survey + FEMA-equivalent analysis,2023-06-15
-KR-DJN-001,Dangjin Thermal Power,8.0,X,0.0,0.0,Coastal plant on elevated platform. Flood protection infrastructure in place. Historical maximum surge 2.3m (Typhoon Maemi 2003).,KEPCO engineering assessment,2023-06-15
-KR-TAE-001,Taean Thermal Power,7.0,X,0.0,0.0,Protected by seawall and drainage systems. No historical flood events recorded at plant level.,KEPCO engineering assessment,2023-06-15
-KR-BRY-001,Boryeong Thermal Power,6.0,X,0.0,0.0001,Slightly lower elevation; residual risk from extreme compound events (surge + heavy rainfall). Flood barriers installed 2015.,KEPCO flood risk study 2020,2023-06-15
-KR-HDG-001,Hadong Thermal Power,5.0,AE,0.0001,0.0001,Lowest elevation in fleet; located in AE flood zone. Plant has elevated critical equipment and flood pumps. Residual risk only.,KEPCO flood risk study 2020,2023-06-15
-KR-YGW-001,Yeongheung Thermal Power,9.0,X,0.0,0.0,Island location with high elevation. No significant flood risk identified.,KEPCO engineering assessment,2023-06-15
-KR-SIN-001,Sinseocheon Thermal Power,7.5,X,0.0,0.0,Modern plant with comprehensive flood protection designed to 500-year return period.,Design specifications,2023-06-15

@@ -1,7 +1,0 @@
-event_type,hazard1,hazard2,correlation,amplification,joint_probability,source
-drought_heat,drought,heat_stress,0.65,1.5,2.5,Zscheischler et al. (2018) Nature Climate Change
-tc_flood,tropical_cyclone,river_flood,0.45,1.3,1.8,Wahl et al. (2015) Nature Climate Change
-heat_wildfire,heat_stress,wildfire,0.55,1.4,2.0,Barbero et al. (2015) Climate Dynamics
-slr_surge,sea_level_rise,coastal_flood,1.0,2.0,1.0,Vousdoukas et al. (2018) Nature Communications
-drought_wildfire,drought,wildfire,0.60,1.6,2.2,Littell et al. (2016) Global Ecology and Biogeography
-flood_landslide,river_flood,river_flood,0.40,1.25,1.5,Caine (1980) + IPCC AR6 WG1 Chapter 11

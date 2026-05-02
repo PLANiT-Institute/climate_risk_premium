@@ -1,3 +1,32 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "climate-risk-premium"
+version = "0.1.0"
+description = "Climate Risk Premium model for Samcheok Blue Power (transition risk)"
+requires-python = ">=3.11"
+dependencies = [
+    "numpy>=1.26",
+    "numpy-financial>=1.0",
+    "pandas>=2.0",
+    "streamlit>=1.35",
+    "plotly>=5.20",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4",
+    "pytest-cov>=4.1",
+    "ruff>=0.4",
+    "mypy>=1.8",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
@@ -7,25 +36,18 @@ addopts = "-v --tb=short"
 
 [tool.coverage.run]
 source = ["src"]
-omit = [
-    "src/app/*",
-    "src/reporting/plots.py",
-    "src/outputs/*",
-    "src/climada/archive/*",
-]
 
 [tool.coverage.report]
 show_missing = true
 fail_under = 40
 
-[tool.black]
+[tool.ruff]
 line-length = 100
-target-version = ["py311"]
+target-version = "py311"
+exclude = ["archive"]
 
-[tool.flake8]
-max-line-length = 100
-extend-ignore = ["E203", "W503"]
-exclude = [".git", "__pycache__", "archive"]
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
 
 [tool.mypy]
 python_version = "3.11"
@@ -33,3 +55,4 @@ warn_return_any = false
 warn_unused_configs = true
 ignore_missing_imports = true
 no_implicit_optional = true
+exclude = ["archive"]

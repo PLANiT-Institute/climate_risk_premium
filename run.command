@@ -1,51 +1,21 @@
 #!/bin/bash
-DIR="$(cd "$(dirname "$0")" && pwd)"
+# Double-click in Finder (or run in Terminal) to launch the CRP Streamlit dashboard.
 
-# Finder-launched .command shells start with a minimal PATH; add common Homebrew/Node locations.
-export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
+cd "$(dirname "$0")"
 
-# Locate npm explicitly so we don't depend on PATH alone
-NPM_BIN="$(command -v npm)"
-if [ -z "$NPM_BIN" ]; then
-    if [ -x "/opt/homebrew/bin/npm" ]; then NPM_BIN="/opt/homebrew/bin/npm"
-    elif [ -x "/usr/local/bin/npm" ]; then NPM_BIN="/usr/local/bin/npm"
-    else
-        echo "ERROR: npm not found. Install Node.js from https://nodejs.org/"
-        read -p "Press Enter to close..."
-        exit 1
-    fi
-fi
+echo "======================================"
+echo "  Climate Risk Premium — Starting"
+echo "======================================"
 
-# Verify Python venv
-PY_BIN="$DIR/.venv_SH/bin/python3"
-if [ ! -x "$PY_BIN" ]; then
-    echo "ERROR: Python venv not found at $PY_BIN"
-    echo "Run: python3 -m venv .venv_SH && .venv_SH/bin/pip install -r requirements.txt"
-    read -p "Press Enter to close..."
-    exit 1
-fi
+# Kill any stale instance
+pkill -f "streamlit run dashboard/app.py" 2>/dev/null
+sleep 1
 
-# Regenerate dashboard data from model
-echo "Running model..."
-"$PY_BIN" "$DIR/scripts/regenerate_dashboard_data.py"
-if [ $? -ne 0 ]; then
-    echo ""
-    echo "Model failed. Fix errors above, then re-run."
-    read -p "Press Enter to close..."
-    exit 1
-fi
+# Install / sync dependencies if needed
+uv sync --quiet 2>/dev/null || true
 
-# Start Next.js dev server (clear stale Turbopack cache first)
-echo ""
-echo "Starting dashboard..."
-cd "$DIR/crp-dashboard" || exit 1
-rm -rf .next
-"$NPM_BIN" run dev &
-NPM_PID=$!
-
-# Open browser once server is ready
-sleep 4
-open http://localhost:3000
-
-# Keep terminal open; Ctrl+C kills the dev server
-wait $NPM_PID
+# Launch Streamlit
+echo "Opening http://localhost:8501 ..."
+uv run streamlit run dashboard/app.py \
+  --server.headless false \
+  --browser.gatherUsageStats false

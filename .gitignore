@@ -10,15 +10,17 @@
 __pycache__/
 *.pyc
 *.egg-info/
+uv.lock
 .venv/
+.venv_SH/
 .venv-climada/
 venv/
+archive/
 
-# Reproducibility note:
-# `results/` and `data/processed/` are intentionally versioned in this repo.
 
 # OS
 .DS_Store
+**/.DS_Store
 Thumbs.db
 
 # LaTeX build artifacts
