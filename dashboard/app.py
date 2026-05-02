@@ -470,38 +470,53 @@ def page_credit(data: dict) -> None:
     ]
     pivot = df_heatmap.pivot(index="year", columns="scenario", values="rating")
     pivot.columns = [label(c) for c in pivot.columns]
-    # Convert integer years to strings so px.imshow treats them as discrete
-    # categorical labels rather than continuous positions (avoids 0–2050 axis).
-    pivot.index = pivot.index.astype(str)
+    pivot = pivot.sort_index()
 
-    # Map rating string → numeric for color
+    # Explicit string arrays force a categorical (discrete) axis — passing
+    # numeric years lets Plotly auto-range continuously from 0.
+    years_str = [str(int(y)) for y in pivot.index]
+    scenarios_list = list(pivot.columns)
+
     rating_num = {r: i for i, r in enumerate(RATING_ORDER)}
     pivot_num = pivot.map(lambda x: rating_num.get(x, 9) if pd.notna(x) else 9)
 
-    fig3 = px.imshow(
-        pivot_num.T,
-        color_continuous_scale=[
-            [i / 9, RATING_COLORS[r]] for i, r in enumerate(RATING_ORDER)
-        ],
-        zmin=0, zmax=9,
-        labels={"x": "Year", "y": "Scenario", "color": "Rating (0=AAA, 9=D)"},
-        aspect="auto",
+    # Build colorscale; collapse duplicate stops so plotly accepts it
+    colorscale = [
+        [i / max(1, len(RATING_ORDER) - 1), RATING_COLORS[r]]
+        for i, r in enumerate(RATING_ORDER)
+    ]
+
+    fig3 = go.Figure(
+        data=go.Heatmap(
+            z=pivot_num.T.values,
+            x=years_str,
+            y=scenarios_list,
+            colorscale=colorscale,
+            zmin=0,
+            zmax=len(RATING_ORDER) - 1,
+            showscale=False,
+            hovertemplate="Year: %{x}<br>Scenario: %{y}<br>Rating: %{customdata}<extra></extra>",
+            customdata=pivot.T.values,
+        )
     )
-    # Add rating text annotations
+    # Add rating text annotations on each cell
     annotations = []
-    for r_idx, row_name in enumerate(pivot.columns):
-        for c_idx, year in enumerate(pivot.index):
+    for r_idx, scen_name in enumerate(scenarios_list):
+        for c_idx, year_label in enumerate(years_str):
+            text_val = pivot.iloc[c_idx, r_idx]
             annotations.append(dict(
-                x=c_idx, y=r_idx,
-                text=pivot.iloc[c_idx][row_name] if pd.notna(pivot.iloc[c_idx][row_name]) else "",
+                x=year_label,
+                y=scen_name,
+                text=text_val if pd.notna(text_val) else "",
                 showarrow=False,
                 font=dict(size=8, color="white"),
             ))
     fig3.update_layout(
-        height=max(200, len(selected_scenarios) * 40 + 60),
+        height=max(200, len(scenarios_list) * 40 + 60),
         margin=dict(l=0, r=0, t=10, b=10),
         annotations=annotations,
-        coloraxis_showscale=False,
+        xaxis=dict(type="category", title="Year"),
+        yaxis=dict(type="category", title="Scenario"),
     )
     st.plotly_chart(fig3, width="stretch")
 
