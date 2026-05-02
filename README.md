@@ -62,8 +62,23 @@ Default parameters in `src/planit/config.py`:
 - `wildfire_outage_duration_hours = 24`
 - `hours_per_year = 8760`
 
+Sourcing caveat: `0.10` is a central modeling assumption, not a directly
+observed KEPCO/KPX fire-to-outage statistic. It is benchmarked against Dale et
+al. (2018, CCCA4-CEC-2018-002), which reports that most wildfires near
+California transmission paths have little/no grid impact. Reviewer-facing
+results should include `wildfire_outage_probability` sensitivity `[0.05, 0.20]`.
+The `24h` duration is benchmarked against PG&E's 2025 CAISO transmission
+availability report, where mean forced-outage durations for higher-voltage
+classes are around one day; use duration sensitivity `[12h, 72h]`.
+
 If event-frequency metadata is unavailable, wildfire outage defaults to 0.0
 (or explicit CSV baseline when provided).
+
+Appendix sensitivity table:
+
+```bash
+python scripts/wildfire_outage_sensitivity.py
+```
 
 ### Drought and water risk conversion
 

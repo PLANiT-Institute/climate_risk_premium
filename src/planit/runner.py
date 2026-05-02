@@ -341,6 +341,15 @@ class PLANiTRunner:
         if "wildfire_max_probabilistic_seasons" not in hazard:
             hazard["wildfire_max_probabilistic_seasons"] = 100
 
+        # Load wildfire i_half from damage_function_params.csv (source of truth)
+        # so the value stays in sync with the paper's data provenance.
+        try:
+            from ..data.loaders import get_wildfire_i_half
+            vuln = climada.setdefault("vulnerability", {})
+            vuln["i_half"] = get_wildfire_i_half(default=vuln.get("i_half", 45.0))
+        except Exception:
+            pass
+
     def _apply_dynamic_location_override(self, cfg: Dict[str, Any]) -> None:
         """Override PLANiT asset GeoJSON from env-provided location."""
         lat_raw = os.getenv("CRP_PLANIT_LAT", "").strip()
@@ -654,11 +663,14 @@ if ht in ("wildfire", "fire"):
         annual_freq = float(_np.sum(freq)) if freq is not None else None
         n_events = len(getattr(haz, "event_name", []))
         years_covered = float(n_events) / annual_freq if annual_freq and annual_freq > 0 else None
+        _sp = cfg.get("climada", {{}}).get("hazard", {{}}).get("scenario_params", {{}}).get(scenario, {{}})
         results["scenarios"][scenario] = {{
             "n_events": n_events,
             "legacy_impact_krw": float(getattr(imp, "aai_agg", 0)),
             "annual_frequency_per_year": annual_freq,
             "years_covered": years_covered,
+            "seed": int(_os.environ.get("CRP_WILDFIRE_SEED", "42")),
+            "n_probabilistic_seasons": _sp.get("n_probabilistic_seasons", 100),
         }}
 else:
     results = {{"hazard_type": hazard_type, "raw_response": hazards if isinstance(hazards, str) else str(hazards)}}
