@@ -460,11 +460,15 @@ def page_credit(data: dict) -> None:
 
     st.divider()
 
-    # Rating migration heatmap (year × scenario)
+    # Rating migration heatmap (year × scenario) — 2025 to 2050 (or data max)
     st.subheader("Rating Migration Heatmap")
-    pivot = df_r[df_r["scenario"].isin(selected_scenarios)].pivot(
-        index="year", columns="scenario", values="rating"
-    )
+    heatmap_year_max = min(2050, int(df_r["year"].max()))
+    df_heatmap = df_r[
+        df_r["scenario"].isin(selected_scenarios)
+        & (df_r["year"] >= 2025)
+        & (df_r["year"] <= heatmap_year_max)
+    ]
+    pivot = df_heatmap.pivot(index="year", columns="scenario", values="rating")
     pivot.columns = [label(c) for c in pivot.columns]
 
     # Map rating string → numeric for color
