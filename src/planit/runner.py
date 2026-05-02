@@ -311,7 +311,7 @@ class PLANiTRunner:
         Environment variables (optional):
         - CRP_PLANIT_WILDFIRE_MAX_IT
         - CRP_PLANIT_WILDFIRE_BLURR_STEPS
-        - CRP_PLANIT_WILDFIRE_MAX_PROB_SEASONS
+        - CRP_PLANIT_WILDFIRE_MAX_PROB_SEASONS  (minimum 10; 0 is rejected)
         """
         climada = cfg.setdefault("climada", {})
         hazard = climada.setdefault("hazard", {})
@@ -324,7 +324,22 @@ class PLANiTRunner:
             hazard["wildfire_blurr_steps"] = int(raw)
         raw = os.getenv("CRP_PLANIT_WILDFIRE_MAX_PROB_SEASONS")
         if raw:
-            hazard["wildfire_max_probabilistic_seasons"] = int(raw)
+            n = int(raw)
+            if n <= 0:
+                logger.warning(
+                    "CRP_PLANIT_WILDFIRE_MAX_PROB_SEASONS=%d would disable "
+                    "probabilistic fire seasons and collapse SSP scenario "
+                    "differentiation. Clamping to minimum 10.",
+                    n,
+                )
+                n = 10
+            hazard["wildfire_max_probabilistic_seasons"] = n
+
+        # Ensure a sensible default so probabilistic seasons are never
+        # silently skipped (the per-scenario config default of 10 is too
+        # few for Monte Carlo convergence).
+        if "wildfire_max_probabilistic_seasons" not in hazard:
+            hazard["wildfire_max_probabilistic_seasons"] = 100
 
     def _apply_dynamic_location_override(self, cfg: Dict[str, Any]) -> None:
         """Override PLANiT asset GeoJSON from env-provided location."""
@@ -520,7 +535,15 @@ class PLANiTRunner:
         try:
             raw = self._planit_run(planit_cfg, hazard, plot=False)
         except Exception as e:
-            logger.warning(f"In-process PLANiT failed for {hazard}: {e}")
+            import traceback as _tb
+            tb_lines = _tb.format_exception(type(e), e, e.__traceback__)
+            last_frames = "".join(tb_lines[-4:])
+            logger.warning(
+                "In-process PLANiT failed for %s.\n"
+                "  Exception: %s: %s\n"
+                "  Last frames:\n%s",
+                hazard, type(e).__name__, e, last_frames,
+            )
             logger.info("Attempting subprocess PLANiT run via .venv-climada...")
             raw = self._run_planit_subprocess(hazard, planit_cfg)
             if raw is None:
@@ -599,11 +622,22 @@ cfg["years"] = overrides.get("years", cfg.get("years", []))
 import os as _os
 max_prob = _os.environ.get("CRP_PLANIT_WILDFIRE_MAX_PROB_SEASONS")
 if max_prob is not None:
-    cfg.setdefault("climada", {{}}).setdefault("hazard", {{}})["wildfire_max_probabilistic_seasons"] = int(max_prob)
+    n = int(max_prob)
+    if n <= 0:
+        import sys as _sys
+        print(
+            "WARNING: CRP_PLANIT_WILDFIRE_MAX_PROB_SEASONS=%d disables probabilistic "
+            "fire seasons. All SSP scenarios will have IDENTICAL wildfire events. "
+            "SSP differentiation will be lost. Clamping to 10." % n,
+            file=_sys.stderr,
+        )
+        n = 10
+    cfg.setdefault("climada", {{}}).setdefault("hazard", {{}})["wildfire_max_probabilistic_seasons"] = n
 
 from core.hazard import get_hazard
 from core.exposure import load_assets_from_geojson, get_exposure
 from core.vulnerability import calculate_impact
+import numpy as _np
 
 hazard_type = {hazard!r}
 ht = hazard_type.lower()
@@ -616,9 +650,15 @@ if ht in ("wildfire", "fire"):
     results = {{"hazard_type": hazard_type, "scenarios": {{}}}}
     for scenario, haz in hazards.items():
         imp = calculate_impact(cfg, hazard_type, haz, exposure)
+        freq = getattr(haz, "frequency", None)
+        annual_freq = float(_np.sum(freq)) if freq is not None else None
+        n_events = len(getattr(haz, "event_name", []))
+        years_covered = float(n_events) / annual_freq if annual_freq and annual_freq > 0 else None
         results["scenarios"][scenario] = {{
-            "n_events": len(getattr(haz, "event_name", [])),
+            "n_events": n_events,
             "legacy_impact_krw": float(getattr(imp, "aai_agg", 0)),
+            "annual_frequency_per_year": annual_freq,
+            "years_covered": years_covered,
         }}
 else:
     results = {{"hazard_type": hazard_type, "raw_response": hazards if isinstance(hazards, str) else str(hazards)}}
@@ -632,7 +672,7 @@ print("__PLANIT_RESULT_END__")
                 [str(venv_python), "-c", script],
                 capture_output=True, text=True, timeout=600,
                 cwd=str(planit_root),
-                env={**os.environ, "CRP_PLANIT_WILDFIRE_MAX_PROB_SEASONS": "0"},
+                env={**os.environ},
             )
             if proc.returncode != 0:
                 logger.warning("PLANiT subprocess stderr: %s", proc.stderr[-500:] if proc.stderr else "(empty)")
