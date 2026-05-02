@@ -1,5 +1,5 @@
 hazard_type,primary_source,fallback_source,data_status,coverage_years,spatial_resolution,notes
-wildfire,CLIMADA WildFire + NASA FIRMS,Korea Forest Service statistics,literature_fallback,2001-2023,10km grid,CLIMADA requires installation; falls back to KFS annual statistics
+wildfire,CLIMADA WildFire + NASA FIRMS,Korea Forest Service statistics,literature_fallback,2001-2023,1km grid,CLIMADA with MODIS FIRMS at native 1 km resolution (centr_res_factor=1.0)
 tropical_cyclone,CLIMADA TropCyclone + IBTrACS,KMA typhoon records,literature_fallback,1980-2023,track-based,IBTrACS via CLIMADA preferred; KMA records used for Korea-specific calibration
 river_flood,CLIMADA RiverFlood + ISIMIP,Plant elevation analysis,not_applicable,1971-2010,30m grid,Korean coal plants at 5-10m elevation; flood risk negligible. See flood_risk_notes.
 coastal_flood,CLIMADA CoastalFlood + GTSR,Plant elevation analysis,not_applicable,1979-present,coastal grid,Storm surge must exceed 10m to impact plants; extremely rare. See flood_risk_notes.

@@ -40,6 +40,13 @@ Active hazards in CRP pipeline:
 - `drought` (PhysRisk output via PLANiT)
 - `water_risk` (PhysRisk output via PLANiT)
 
+The ambient-temperature heat-derate channel is explicitly disabled by
+`PLANiTIntegrationConfig.efficiency_channel.enabled = false`. The repository
+does not currently include site-level daily ERA5 temperature histories or
+downscaled SSP temperature series for Samcheok, so total physical risk is
+underestimated and reported physical risk premium values should be read as
+conservative with respect to thermal-efficiency losses.
+
 ### Wildfire conversion
 
 Primary method (`event_probability`):

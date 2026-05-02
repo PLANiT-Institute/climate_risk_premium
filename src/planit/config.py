@@ -8,6 +8,13 @@ from typing import List, Optional
 
 
 @dataclass
+class EfficiencyChannelConfig:
+    """Configuration for ambient-temperature thermal-efficiency derating."""
+
+    enabled: bool = False
+
+
+@dataclass
 class PLANiTIntegrationConfig:
     """Configuration for PLANiT → CRP pipeline integration.
 
@@ -19,6 +26,9 @@ class PLANiTIntegrationConfig:
         cache_ttl_hours: Cache time-to-live in hours
         enabled: Whether PLANiT integration is active
         planit_hazards: Hazard types sourced from PLANiT (wildfire, drought, water_risk)
+        efficiency_channel: Explicit switch for ambient-temperature derating.
+            Disabled until site-level daily temperature series and SSP
+            projections are available.
         csv_fallback_hazards: Hazard types that always fall back to CSV
         anchor_years: PLANiT projection years used as interpolation anchors
         drought_severity_scale: Scaling factor for drought impact_mean → capacity_derate
@@ -46,6 +56,9 @@ class PLANiTIntegrationConfig:
     enabled: bool = True
     planit_hazards: List[str] = field(
         default_factory=lambda: ["wildfire", "drought", "water_risk"]
+    )
+    efficiency_channel: EfficiencyChannelConfig = field(
+        default_factory=EfficiencyChannelConfig
     )
     csv_fallback_hazards: List[str] = field(
         default_factory=lambda: []

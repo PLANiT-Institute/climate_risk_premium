@@ -73,6 +73,7 @@ class PLANiTAdapter:
 
     def __init__(self, config: Optional[PLANiTIntegrationConfig] = None):
         self._config = config or PLANiTIntegrationConfig()
+        self._efficiency_channel_warning_emitted = False
 
     @staticmethod
     def _normalize_scenario(crp_scenario: str) -> str:
@@ -144,6 +145,7 @@ class PLANiTAdapter:
         efficiency_loss = 0.0
         water_constrained_capacity = 1.0
         notes_parts: List[str] = []
+        self._warn_if_efficiency_channel_disabled()
 
         # --- Wildfire (CLIMADA) → outage_rate ---
         wf_rows = by_hazard_scenario.get("wildfire", {})
@@ -456,3 +458,14 @@ class PLANiTAdapter:
                 return vals[j] + w * (vals[j + 1] - vals[j])
 
         return vals[-1]
+
+    def _warn_if_efficiency_channel_disabled(self) -> None:
+        """Warn once when the heat-derate channel is intentionally disabled."""
+        enabled = bool(getattr(self._config.efficiency_channel, "enabled", False))
+        if enabled or self._efficiency_channel_warning_emitted:
+            return
+        logger.warning(
+            "Heat-derate channel is disabled. Total physical risk is "
+            "underestimated; reported risk premium is conservative."
+        )
+        self._efficiency_channel_warning_emitted = True
