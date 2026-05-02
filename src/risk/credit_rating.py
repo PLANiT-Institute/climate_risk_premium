@@ -9,18 +9,50 @@ Reference:
 - KIS Rating Methodology: Power Generation Sector (2023)
 - Moody's Global Infrastructure Finance Rating Methodology (2021)
 - S&P Project Finance Rating Criteria (2022)
+
+All threshold constants, component weights, and spread mappings are loaded from:
+  data/raw/rating_thresholds.csv
+  data/raw/rating_weights.csv
+  data/raw/rating_spreads.csv
+  data/raw/model_assumptions.csv
 """
 
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
-from typing import Dict, Any, Optional
 from enum import Enum
+from typing import Any, Dict, Optional
 
+from src.data.loaders import (
+    load_model_assumptions,
+    load_rating_spreads,
+    load_rating_thresholds,
+    load_rating_weights,
+)
+
+logger = logging.getLogger(__name__)
+
+# ---------------------------------------------------------------------------
+# Module-level config loaded once at import time
+# ---------------------------------------------------------------------------
+
+_THRESHOLDS: Dict[str, Dict[str, float]] = load_rating_thresholds()
+_WEIGHTS: Dict[str, float] = load_rating_weights()
+_SPREADS: Dict[str, float] = load_rating_spreads()
+_ASSUMPTIONS: Dict[str, Any] = load_model_assumptions()
+
+# Rating evaluation order — from best to worst
+_RATING_ORDER = ["AAA", "AA", "A", "BBB", "BB", "B", "CCC", "CC", "C", "D"]
+
+
+# ---------------------------------------------------------------------------
+# Rating enum
+# ---------------------------------------------------------------------------
 
 class Rating(Enum):
     """
-    Credit rating categories - Extended scale including distressed ratings.
+    Credit rating categories — extended scale including distressed ratings.
 
     Investment Grade: AAA, AA, A, BBB
     Speculative Grade: BB, B
@@ -41,30 +73,15 @@ class Rating(Enum):
     C = 9  # Near Default
     D = 10  # In Default
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
     def to_spread_bps(self) -> float:
-        """
-        Convert rating to typical spread over risk-free rate (bps).
+        """Convert rating to typical spread over risk-free rate (bps).
 
-        Spreads based on historical corporate bond spreads (BBB-CCC from
-        Bloomberg US Corporate Bond Index, 2020-2024 average).
-        Distressed ratings (CC, C, D) use distressed debt trading levels.
+        Values are loaded from ``data/raw/rating_spreads.csv``.
         """
-        spread_map = {
-            Rating.AAA: 50,
-            Rating.AA: 100,
-            Rating.A: 150,
-            Rating.BBB: 250,
-            Rating.BB: 400,
-            Rating.B: 600,
-            Rating.CCC: 900,  # Substantial risk - typical CCC bond spread
-            Rating.CC: 1500,  # Very high risk - distressed debt territory
-            Rating.C: 2500,  # Near default - deep distress
-            Rating.D: 5000,  # Default - recovery value pricing
-        }
-        return spread_map[self]
+        return _SPREADS[self.name]
 
     @property
     def numeric_score(self) -> int:
@@ -81,6 +98,10 @@ class Rating(Enum):
         """Check if rating indicates financial distress (CCC or worse)."""
         return self.value >= 7
 
+
+# ---------------------------------------------------------------------------
+# Dataclasses
+# ---------------------------------------------------------------------------
 
 @dataclass
 class RatingMetrics:
@@ -144,232 +165,155 @@ class RatingAssessment:
         }
 
 
+# ---------------------------------------------------------------------------
+# Generic table-driven rating helpers
+# ---------------------------------------------------------------------------
+
+def _rate_higher_is_better(value: float, metric: str) -> Rating:
+    """Assign rating for a metric where higher value means better credit.
+
+    Iterates from AAA (best) to D (worst); returns the first rating whose
+    threshold (minimum value) is met.  Falls back to the last rating in the
+    table if no threshold is satisfied.
+
+    Thresholds are loaded from ``data/raw/rating_thresholds.csv``.
+    """
+    thresholds = _THRESHOLDS[metric]
+    for rating_name in _RATING_ORDER:
+        if rating_name in thresholds and value >= thresholds[rating_name]:
+            return Rating[rating_name]
+    # Ultimate fallback — should only trigger if table has no negative sentinel
+    return Rating.D
+
+
+def _rate_lower_is_better(value: float, metric: str) -> Rating:
+    """Assign rating for a metric where lower value means better credit.
+
+    Iterates from AAA (best) to D (worst); returns the first rating whose
+    threshold (maximum value) is not exceeded.
+
+    Thresholds are loaded from ``data/raw/rating_thresholds.csv``.
+    """
+    thresholds = _THRESHOLDS[metric]
+    for rating_name in _RATING_ORDER:
+        if rating_name in thresholds and value <= thresholds[rating_name]:
+            return Rating[rating_name]
+    return Rating.D
+
+
+# ---------------------------------------------------------------------------
+# Component rating functions
+# ---------------------------------------------------------------------------
+
 def rate_capacity(capacity_mw: float) -> Rating:
     """Rate based on installed capacity (MW)."""
-    if capacity_mw >= 2000:
-        return Rating.AAA
-    elif capacity_mw >= 800:
-        return Rating.AA
-    elif capacity_mw >= 400:
-        return Rating.A
-    elif capacity_mw >= 100:
-        return Rating.BBB
-    elif capacity_mw >= 20:
-        return Rating.BB
-    else:
-        return Rating.B
+    return _rate_higher_is_better(capacity_mw, "capacity_mw")
 
 
 def rate_profitability(ebitda_to_fixed_assets: float, is_negative: bool = False) -> Rating:
-    """
-    Rate based on EBITDA/Fixed Assets (%).
+    """Rate based on EBITDA/Fixed Assets (%).
 
-    Enhanced to handle negative EBITDA cases which indicate severe distress.
-    """
-    # Handle negative EBITDA - distressed ratings
-    if is_negative or ebitda_to_fixed_assets < -20:
-        return Rating.CC  # Severe loss
-    elif ebitda_to_fixed_assets < -10:
-        return Rating.CCC  # Significant loss
-    elif ebitda_to_fixed_assets < 0:
-        return Rating.B  # Marginal loss
+    The ``is_negative`` flag (derived from actual EBITDA sign) overrides to
+    Rating.CC regardless of the ratio value — it indicates declared distress
+    that the ratio alone may not fully capture.
 
-    # Standard thresholds for positive EBITDA
-    if ebitda_to_fixed_assets >= 15:
-        return Rating.AAA
-    elif ebitda_to_fixed_assets >= 11:
-        return Rating.AA
-    elif ebitda_to_fixed_assets >= 8:
-        return Rating.A
-    elif ebitda_to_fixed_assets >= 4:
-        return Rating.BBB
-    elif ebitda_to_fixed_assets >= 1:
-        return Rating.BB
-    else:
-        return Rating.B
+    Thresholds merge the positive and distressed zones into one monotone scale;
+    see ``data/raw/rating_thresholds.csv`` for breakpoints.
+    """
+    if is_negative:
+        # Hard override: explicitly negative EBITDA = severe credit distress
+        return Rating.CC
+    return _rate_higher_is_better(ebitda_to_fixed_assets, "profitability_pct")
 
 
 def rate_coverage(ebitda_to_interest: float) -> Rating:
-    """
-    Rate based on EBITDA/Interest Expense (times).
+    """Rate based on EBITDA/Interest Expense (times).
 
-    Enhanced to handle negative coverage ratios (negative EBITDA).
-    Negative EBITDA/Interest indicates inability to cover interest
-    from operations - a severe credit concern.
+    Handles negative coverage ratios (negative EBITDA / inability to cover
+    interest) through the distressed thresholds in the table.
     """
-    # Handle negative coverage - distressed ratings
-    if ebitda_to_interest < -5:
-        return Rating.D  # Severe - cannot cover interest, likely default
-    elif ebitda_to_interest < -2:
-        return Rating.C  # Near default
-    elif ebitda_to_interest < 0:
-        return Rating.CC  # Cannot cover interest from EBITDA
-    elif ebitda_to_interest < 0.5:
-        return Rating.CCC  # Barely any coverage
-
-    # Standard thresholds for positive coverage
-    if ebitda_to_interest >= 12:
-        return Rating.AAA
-    elif ebitda_to_interest >= 6:
-        return Rating.AA
-    elif ebitda_to_interest >= 4:
-        return Rating.A
-    elif ebitda_to_interest >= 2:
-        return Rating.BBB
-    elif ebitda_to_interest >= 1:
-        return Rating.BB
-    else:
-        return Rating.B
+    return _rate_higher_is_better(ebitda_to_interest, "coverage_times")
 
 
 def rate_dscr(dscr: float) -> Rating:
-    """
-    Rate based on Debt Service Coverage Ratio (DSCR).
+    """Rate based on Debt Service Coverage Ratio (DSCR).
 
-    DSCR = Cash Flow Available for Debt Service / Total Debt Service
+    DSCR = Cash Flow Available for Debt Service / Total Debt Service.
 
     This is the PRIMARY metric for project finance credit assessment.
-    Thresholds based on:
-    - Moody's Global Infrastructure Finance (2021)
-    - S&P Project Finance Criteria (2022)
-
-    Project finance typically requires minimum DSCR of 1.2-1.4x.
+    Thresholds based on Moody's Global Infrastructure Finance (2021) and
+    S&P Project Finance Criteria (2022).
     """
-    # Handle negative/very low DSCR - distressed
-    if dscr < 0:
-        return Rating.D  # Cannot service debt - default likely
-    elif dscr < 0.5:
-        return Rating.C  # Severe shortfall
-    elif dscr < 0.8:
-        return Rating.CC  # Significant shortfall
-    elif dscr < 1.0:
-        return Rating.CCC  # Below breakeven
-
-    # Standard thresholds (project finance standards)
-    if dscr >= 2.5:
-        return Rating.AAA  # Very strong coverage
-    elif dscr >= 2.0:
-        return Rating.AA  # Strong coverage
-    elif dscr >= 1.6:
-        return Rating.A  # Good coverage
-    elif dscr >= 1.3:
-        return Rating.BBB  # Adequate - investment grade minimum
-    elif dscr >= 1.1:
-        return Rating.BB  # Weak but serviceable
-    else:
-        return Rating.B  # Marginal - high risk
+    return _rate_higher_is_better(dscr, "dscr")
 
 
-def rate_net_debt_leverage(net_debt_to_ebitda: float, is_ebitda_negative: bool = False) -> Rating:
+def rate_net_debt_leverage(
+    net_debt_to_ebitda: float, is_ebitda_negative: bool = False
+) -> Rating:
+    """Rate based on Net Debt/EBITDA (times). Lower is better.
+
+    When EBITDA is negative the ratio loses meaning; Rating.CC is returned
+    directly to reflect that the leverage position cannot be assessed normally.
+    A net cash position (ratio < 0) maps to AAA via the lower_is_better logic.
     """
-    Rate based on Net Debt/EBITDA (times). Lower is better.
-
-    Enhanced to handle negative EBITDA cases where ratio becomes meaningless
-    or negative.
-    """
-    # Handle negative EBITDA - ratio is not meaningful, use distressed rating
     if is_ebitda_negative:
         return Rating.CC  # Negative EBITDA makes this ratio meaningless
-
-    # Handle extreme or negative ratios (negative net debt = net cash position)
     if net_debt_to_ebitda < 0:
         return Rating.AAA  # Net cash position
-    elif net_debt_to_ebitda > 20:
-        return Rating.CCC  # Extreme leverage
-
-    # Standard thresholds
-    if net_debt_to_ebitda <= 1:
-        return Rating.AAA
-    elif net_debt_to_ebitda <= 4:
-        return Rating.AA
-    elif net_debt_to_ebitda <= 7:
-        return Rating.A
-    elif net_debt_to_ebitda <= 10:
-        return Rating.BBB
-    elif net_debt_to_ebitda <= 12:
-        return Rating.BB
-    else:
-        return Rating.B
+    return _rate_lower_is_better(net_debt_to_ebitda, "net_debt_ebitda")
 
 
 def rate_equity_leverage(debt_to_equity: float) -> Rating:
     """Rate based on Debt-to-Equity Ratio (%). Lower is better."""
-    if debt_to_equity <= 80:
-        return Rating.AAA
-    elif debt_to_equity <= 150:
-        return Rating.AA
-    elif debt_to_equity <= 250:
-        return Rating.A
-    elif debt_to_equity <= 300:
-        return Rating.BBB
-    elif debt_to_equity <= 400:
-        return Rating.BB
-    else:
-        return Rating.B
+    return _rate_lower_is_better(debt_to_equity, "equity_leverage")
 
 
 def rate_asset_leverage(debt_to_assets: float) -> Rating:
     """Rate based on Debt-to-Assets Ratio (%). Lower is better."""
-    if debt_to_assets <= 20:
-        return Rating.AAA
-    elif debt_to_assets <= 40:
-        return Rating.AA
-    elif debt_to_assets <= 60:
-        return Rating.A
-    elif debt_to_assets <= 80:
-        return Rating.BBB
-    elif debt_to_assets <= 90:
-        return Rating.BB
-    else:
-        return Rating.B
+    return _rate_lower_is_better(debt_to_assets, "asset_leverage")
 
+
+# ---------------------------------------------------------------------------
+# Overall rating assessment
+# ---------------------------------------------------------------------------
 
 def assess_credit_rating(metrics: RatingMetrics) -> RatingAssessment:
-    """
-    Assess overall credit rating based on KIS methodology.
+    """Assess overall credit rating based on KIS methodology.
 
-    ENHANCED: Uses weighted approach with DSCR as primary metric for project finance.
-    Handles negative EBITDA by using distressed rating scale (CCC, CC, C, D).
+    Uses a weighted average of component ratings.  DSCR provides an
+    additional one-notch downgrade override when DSCR < 1.0, reflecting
+    standard project finance covenants.  Negative DSCR forces Rating.D.
 
-    Rating Philosophy:
-    1. DSCR is the primary driver for project finance (40% weight)
-    2. Coverage (EBITDA/Interest) is secondary (20% weight)
-    3. Leverage ratios provide context (40% combined)
-    4. Distress indicators can override to lower ratings
+    Component weights and the fixed policy/industry rating are loaded from
+    ``data/raw/rating_weights.csv`` and ``data/raw/model_assumptions.csv``.
     """
-    # Determine if EBITDA is negative (triggers distress logic)
     is_ebitda_negative = metrics.is_ebitda_negative or metrics.ebitda_to_fixed_assets < 0
 
-    # Calculate component ratings with distress awareness
-    component_ratings = {
-        "policy_industry": Rating.AA,  # fixed AA for all scenarios; not in weighted score
+    # Fixed sector/policy rating loaded from model_assumptions
+    policy_industry_name: str = str(_ASSUMPTIONS["policy_industry_rating"])
+    policy_industry_rating = Rating[policy_industry_name]
+
+    component_ratings: Dict[str, Rating] = {
+        "policy_industry": policy_industry_rating,
         "profitability": rate_profitability(metrics.ebitda_to_fixed_assets, is_ebitda_negative),
         "coverage": rate_coverage(metrics.ebitda_to_interest),
         "dscr": rate_dscr(metrics.dscr),  # distress override only; excluded from weights
-        "net_debt_leverage": rate_net_debt_leverage(metrics.net_debt_to_ebitda, is_ebitda_negative),
+        "net_debt_leverage": rate_net_debt_leverage(
+            metrics.net_debt_to_ebitda, is_ebitda_negative
+        ),
         "equity_leverage": rate_equity_leverage(metrics.debt_to_equity),
         "asset_leverage": rate_asset_leverage(metrics.debt_to_assets),
     }
 
-    # Weighted average approach for project finance
-    # DSCR is most important (standard project finance practice)
-    weights = {
-        "policy_industry": 0.50,  # Policy & industry risk (fixed AA)
-        "profitability": 0.10,    # Operating efficiency
-        "coverage": 0.12,         # Interest coverage
-        "net_debt_leverage": 0.12,  # Leverage
-        "asset_leverage": 0.08,   # Balance sheet strength
-        "equity_leverage": 0.08,  # Capital structure
-    }
-
-    # Calculate weighted score
+    # Weighted average — DSCR component intentionally excluded from the weight
+    # sum (it acts as an override, not a weighted input)
     weighted_score = sum(
-        component_ratings[metric].value * weight for metric, weight in weights.items()
+        component_ratings[component].value * weight
+        for component, weight in _WEIGHTS.items()
     )
 
-    # Round to nearest rating
     rounded_score = round(weighted_score)
-    rounded_score = max(1, min(10, rounded_score))  # Clamp to valid range
+    rounded_score = max(1, min(10, rounded_score))
 
     if metrics.dscr < 0:
         rounded_score = Rating.D.value
@@ -396,6 +340,10 @@ def assess_credit_rating(metrics: RatingMetrics) -> RatingAssessment:
     )
 
 
+# ---------------------------------------------------------------------------
+# Financial metric → RatingMetrics conversion
+# ---------------------------------------------------------------------------
+
 def calculate_rating_metrics_from_financials(
     capacity_mw: float,
     ebitda: float,
@@ -410,75 +358,66 @@ def calculate_rating_metrics_from_financials(
     cfads: Optional[float] = None,
     consecutive_loss_years: int = 0,
 ) -> RatingMetrics:
-    """
-    Calculate rating metrics from financial statement items.
+    """Calculate rating metrics from financial statement items.
+
+    When ``dscr`` is not pre-calculated and ``total_debt_service`` is also
+    unavailable, the function estimates debt service using
+    ``estimated_debt_rate`` and ``estimated_debt_tenor`` from
+    ``data/raw/model_assumptions.csv`` rather than hardcoded fallbacks.
 
     Args:
-        capacity_mw: Installed capacity
-        ebitda: Earnings before interest, taxes, depreciation, amortization
-        fixed_assets: Property, plant & equipment
-        interest_expense: Annual interest payments
-        total_debt: Total debt outstanding
-        cash_and_equivalents: Liquid assets
-        total_equity: Total shareholder equity
-        total_assets: Total assets
-        dscr: Debt Service Coverage Ratio (if pre-calculated)
-        total_debt_service: Total annual debt service (P+I) for DSCR calculation
-        cfads: Cash Flow Available for Debt Service (for DSCR calculation)
-        consecutive_loss_years: Number of consecutive years with negative EBITDA
+        capacity_mw: Installed capacity in MW.
+        ebitda: Earnings before interest, taxes, depreciation & amortization.
+        fixed_assets: Property, plant & equipment (book value).
+        interest_expense: Annual interest payments.
+        total_debt: Total debt outstanding.
+        cash_and_equivalents: Liquid assets.
+        total_equity: Total shareholder equity.
+        total_assets: Total assets.
+        dscr: Pre-calculated DSCR; skips estimation when provided.
+        total_debt_service: Annual P+I for DSCR calculation.
+        cfads: Cash Flow Available for Debt Service.
+        consecutive_loss_years: Consecutive years with negative EBITDA.
     """
-    # Track if EBITDA is negative for distress handling
     is_ebitda_negative = ebitda < 0
 
-    # Calculate ratios - preserve actual values including negative
-    ebitda_to_fixed_assets = (ebitda / fixed_assets * 100) if fixed_assets > 0 else 0
+    ebitda_to_fixed_assets = (ebitda / fixed_assets * 100) if fixed_assets > 0 else 0.0
 
-    # For negative EBITDA, show actual negative ratio (important for credit assessment)
     if interest_expense > 0:
         ebitda_to_interest = ebitda / interest_expense
     else:
         ebitda_to_interest = 999.0 if ebitda >= 0 else -999.0
 
-    # Net Debt / EBITDA - handle negative EBITDA case
     net_debt = total_debt - cash_and_equivalents
     if is_ebitda_negative:
-        # Negative EBITDA: ratio is meaningless, set high to trigger distress
         net_debt_to_ebitda = 999.0 if net_debt > 0 else -999.0
     elif ebitda > 0:
         net_debt_to_ebitda = net_debt / ebitda
     else:
         net_debt_to_ebitda = 999.0
 
-    # Leverage ratios - standard calculation
     debt_to_equity = (total_debt / total_equity * 100) if total_equity > 0 else 999.0
-    debt_to_assets = (total_debt / total_assets * 100) if total_assets > 0 else 100
+    debt_to_assets = (total_debt / total_assets * 100) if total_assets > 0 else 100.0
 
-    # DSCR calculation - primary metric for project finance
+    # DSCR — use provided value, or estimate from config-loaded fallback parameters
     if dscr is not None:
-        # Use provided DSCR
         calculated_dscr = dscr
     elif total_debt_service is not None and total_debt_service > 0:
-        # Calculate from CFADS and debt service
         if cfads is not None:
             calculated_dscr = cfads / total_debt_service
         else:
-            # Use EBITDA as proxy for CFADS (simplified)
-            calculated_dscr = (
-                ebitda / total_debt_service if ebitda > 0 else ebitda / total_debt_service
-            )
+            calculated_dscr = ebitda / total_debt_service
     elif interest_expense > 0:
-        # Use proper annuity formula: PMT = P * r(1+r)^n / ((1+r)^n - 1)
-        # Estimate from interest expense: P ≈ interest / rate, typical rate ~5%, tenor ~20yr
-        estimated_rate = 0.05
-        estimated_tenor = 20
-        annuity_factor = (estimated_rate * (1 + estimated_rate) ** estimated_tenor) / (
-            (1 + estimated_rate) ** estimated_tenor - 1
+        # Estimate debt service via annuity formula using config-defined fallback params
+        est_rate = float(_ASSUMPTIONS["estimated_debt_rate"])
+        est_tenor = float(_ASSUMPTIONS["estimated_debt_tenor"])
+        annuity_factor = (est_rate * (1 + est_rate) ** est_tenor) / (
+            (1 + est_rate) ** est_tenor - 1
         )
-        estimated_principal = interest_expense / estimated_rate
+        estimated_principal = interest_expense / est_rate
         estimated_debt_service = estimated_principal * annuity_factor
-        calculated_dscr = ebitda / estimated_debt_service if estimated_debt_service > 0 else 0
+        calculated_dscr = ebitda / estimated_debt_service if estimated_debt_service > 0 else 0.0
     else:
-        # No debt service info - assume coverage equals EBITDA/Interest
         calculated_dscr = ebitda_to_interest if ebitda_to_interest < 100 else 2.0
 
     return RatingMetrics(
@@ -494,18 +433,75 @@ def calculate_rating_metrics_from_financials(
     )
 
 
+# ---------------------------------------------------------------------------
+# CRP and counterfactual helpers
+# ---------------------------------------------------------------------------
+
+def calculate_crp_from_ratings(
+    baseline_rating: Rating,
+    scenario_rating: Rating,
+    risk_free_rate: float,
+    debt_fraction: float,
+) -> float:
+    """Calculate Climate Risk Premium (CRP) in basis points from rating migration.
+
+    Algorithm:
+        CRP = (WACC_scenario − WACC_baseline) × 10⁴
+
+    where WACC uses debt cost from rating spreads and equity cost scaled by
+    notch difference.  ``baseline_equity_rate`` and ``equity_premium_per_notch``
+    are loaded from ``data/raw/model_assumptions.csv``.
+
+    Args:
+        baseline_rating: Credit rating for the counterfactual (no-risk) scenario.
+        scenario_rating: Credit rating for the climate-risk scenario.
+        risk_free_rate: Risk-free rate (plant-specific, from plant_parameters.csv).
+        debt_fraction: Debt share of capital structure.
+
+    Returns:
+        CRP in basis points.
+    """
+    equity_fraction = 1.0 - debt_fraction
+    equity_premium_per_notch = float(_ASSUMPTIONS["equity_premium_per_notch"])
+    baseline_equity_rate = float(_ASSUMPTIONS["baseline_equity_rate"])
+
+    baseline_debt_rate = risk_free_rate + (baseline_rating.to_spread_bps() / 10000)
+    scenario_debt_rate = risk_free_rate + (scenario_rating.to_spread_bps() / 10000)
+
+    notch_diff = scenario_rating.value - baseline_rating.value
+    scenario_equity_rate = baseline_equity_rate + (notch_diff * equity_premium_per_notch)
+
+    wacc_baseline = debt_fraction * baseline_debt_rate + equity_fraction * baseline_equity_rate
+    wacc_scenario = debt_fraction * scenario_debt_rate + equity_fraction * scenario_equity_rate
+
+    return (wacc_scenario - wacc_baseline) * 10000
+
+
+def get_counterfactual_baseline_rating() -> Rating:
+    """Return the counterfactual credit rating (no climate transition risk).
+
+    The rating is loaded from ``data/raw/model_assumptions.csv``
+    (``counterfactual_rating`` key).  Default in the config file is ``A``,
+    reflecting that a 2,100 MW baseload plant with no carbon exposure would
+    be expected to achieve upper-medium-grade status based on capacity scale,
+    positive EBITDA, and DSCR > 1.5x at standard project finance leverage.
+    """
+    rating_name: str = str(_ASSUMPTIONS["counterfactual_rating"])
+    return Rating[rating_name]
+
+
 def rating_migration_analysis(
     baseline_rating: RatingAssessment,
     risk_rating: RatingAssessment,
 ) -> Dict[str, Any]:
-    """
-    Analyze credit rating migration from baseline to risk scenario.
+    """Analyse credit rating migration from baseline to risk scenario.
 
-    Returns dictionary with migration details and impact.
+    Returns a dictionary with migration details and impact metrics.
     """
     notch_change = risk_rating.overall_rating.value - baseline_rating.overall_rating.value
     spread_change = (
-        risk_rating.overall_rating.to_spread_bps() - baseline_rating.overall_rating.to_spread_bps()
+        risk_rating.overall_rating.to_spread_bps()
+        - baseline_rating.overall_rating.to_spread_bps()
     )
 
     if notch_change == 0:
@@ -515,13 +511,11 @@ def rating_migration_analysis(
     else:
         migration = f"Upgrade by {abs(notch_change)} notch(es)"
 
-    # Identify which metrics deteriorated most
-    metric_changes = {}
-    for metric_name in baseline_rating.component_ratings.keys():
-        baseline_val = baseline_rating.component_ratings[metric_name].value
-        risk_val = risk_rating.component_ratings[metric_name].value
-        metric_changes[metric_name] = risk_val - baseline_val
-
+    metric_changes = {
+        metric: risk_rating.component_ratings[metric].value
+        - baseline_rating.component_ratings[metric].value
+        for metric in baseline_rating.component_ratings
+    }
     worst_metric = max(metric_changes.items(), key=lambda x: x[1])
 
     return {
@@ -532,104 +526,36 @@ def rating_migration_analysis(
         "spread_increase_bps": spread_change,
         "worst_deteriorating_metric": worst_metric[0],
         "worst_deterioration_notches": worst_metric[1],
-        "metric_changes": {k: v for k, v in metric_changes.items()},
+        "metric_changes": dict(metric_changes),
     }
-
-
-def calculate_crp_from_ratings(
-    baseline_rating: Rating,
-    scenario_rating: Rating,
-    risk_free_rate: float = 0.03,
-    debt_fraction: float = 0.70,
-    baseline_equity_rate: float = 0.12,
-) -> float:
-    """
-    Calculate Climate Risk Premium (CRP) in basis points from rating migration.
-
-    CRP = WACC_scenario - WACC_baseline (in bps)
-
-    This provides the clean spread differential driven purely by credit
-    rating changes, which is the core measure of climate risk pricing.
-
-    Args:
-        baseline_rating: Credit rating for baseline scenario
-        scenario_rating: Credit rating for risk scenario
-        risk_free_rate: Risk-free rate (default 3%)
-        debt_fraction: Debt share of capital structure (default 70%)
-        baseline_equity_rate: Baseline equity cost of capital (default 12%)
-
-    Returns:
-        CRP in basis points
-    """
-    equity_fraction = 1 - debt_fraction
-
-    # Debt cost from ratings
-    baseline_debt_rate = risk_free_rate + (baseline_rating.to_spread_bps() / 10000)
-    scenario_debt_rate = risk_free_rate + (scenario_rating.to_spread_bps() / 10000)
-
-    # Equity premium scales with rating (rough heuristic: 0.5% per notch)
-    equity_premium_per_notch = 0.005
-    notch_diff = scenario_rating.value - baseline_rating.value
-    scenario_equity_rate = baseline_equity_rate + (notch_diff * equity_premium_per_notch)
-
-    # WACC calculations
-    wacc_baseline = debt_fraction * baseline_debt_rate + equity_fraction * baseline_equity_rate
-    wacc_scenario = debt_fraction * scenario_debt_rate + equity_fraction * scenario_equity_rate
-
-    # CRP in basis points
-    crp_bps = (wacc_scenario - wacc_baseline) * 10000
-
-    return crp_bps
-
-
-def get_counterfactual_baseline_rating() -> Rating:
-    """
-    Returns the expected baseline rating for a no-carbon counterfactual scenario.
-
-    In a no-carbon world, a 2100 MW coal plant like Samcheok would be
-    expected to achieve investment-grade rating (A-range) based on:
-    - Large capacity (2100 MW → AAA on capacity)
-    - Positive EBITDA (~$800M+ annually)
-    - DSCR > 1.5x (typical for baseload power)
-    - Moderate leverage (70% D/E typical for project finance)
-
-    This provides the proper comparison point for calculating CRP.
-    """
-    return Rating.A
 
 
 def assess_rating_with_counterfactual(
     scenario_metrics: RatingMetrics,
     counterfactual_rating: Optional[Rating] = None,
 ) -> Dict[str, Any]:
-    """
-    Assess credit rating and calculate CRP against counterfactual baseline.
+    """Assess credit rating and calculate CRP against counterfactual baseline.
 
     This is the recommended approach for climate risk premium calculation:
-    - Counterfactual: What would the rating be WITHOUT climate risks?
-    - Scenario: What IS the rating WITH climate risks?
-    - CRP: Spread differential between the two
+    - Counterfactual: rating WITHOUT climate risks (loaded from config)
+    - Scenario: rating WITH climate risks
+    - CRP: spread differential between the two
 
     Args:
-        scenario_metrics: Financial metrics for the scenario to assess
-        counterfactual_rating: Override counterfactual rating (default: A)
+        scenario_metrics: Financial metrics for the scenario to assess.
+        counterfactual_rating: Override counterfactual rating; defaults to
+            ``get_counterfactual_baseline_rating()``.
 
     Returns:
-        Dictionary with rating assessment and CRP calculation
+        Dictionary with rating assessment and CRP calculation.
     """
     if counterfactual_rating is None:
         counterfactual_rating = get_counterfactual_baseline_rating()
 
-    # Assess scenario rating
     scenario_assessment = assess_credit_rating(scenario_metrics)
 
-    # Calculate CRP
-    crp_bps = calculate_crp_from_ratings(
-        baseline_rating=counterfactual_rating,
-        scenario_rating=scenario_assessment.overall_rating,
-    )
-
-    # Rating migration
+    # Note: risk_free_rate and debt_fraction are not available here;
+    # callers who need CRP should use calculate_crp_from_ratings directly.
     notch_change = scenario_assessment.overall_rating.value - counterfactual_rating.value
     if notch_change == 0:
         migration_desc = "No change"
@@ -645,7 +571,6 @@ def assess_rating_with_counterfactual(
         "scenario_spread_bps": scenario_assessment.overall_rating.to_spread_bps(),
         "rating_migration": migration_desc,
         "notch_change": notch_change,
-        "crp_bps": crp_bps,
         "scenario_assessment": scenario_assessment,
         "is_investment_grade": scenario_assessment.overall_rating.is_investment_grade,
         "is_distressed": scenario_assessment.overall_rating.is_distressed,

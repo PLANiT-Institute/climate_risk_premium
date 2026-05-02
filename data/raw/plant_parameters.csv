@@ -1,4 +1,5 @@
 param_name,value,unit,description
+plant_name,Samcheok Blue Power,name,Official project name
 capacity_mw,2100,MW,Total capacity (2 units x 1050MW)
 capacity_factor,0.60,decimal,Base load capacity factor
 efficiency,0.39,decimal,Supercritical efficiency (3.412/8.8)

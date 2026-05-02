@@ -1,0 +1,14 @@
+param_name,value,unit,description
+start_year,2025,year,First calendar year of plant operations
+hours_per_year,8760,hours,Hours in a calendar year
+base_rate,0.0675,decimal,Base interest rate used in cost-of-debt calculations in the dashboard pipeline
+equity_premium_per_notch,0.005,decimal,Equity cost premium per credit rating notch deterioration (0.5% per notch downgrade)
+baseline_equity_rate,0.12,decimal,Baseline unleveraged cost of equity assuming no climate transition risk (12%)
+cash_ratio,0.10,decimal,Cash-and-equivalents buffer as fraction of annual EBITDA for credit metric estimation
+equity_slope,0.8,decimal,Equity premium scaling factor: equity_premium_pct = expected_loss_pct * equity_slope
+spread_slope,50,bps_per_pct,Debt spread increase per percentage point of expected loss (reduced-form / linear model)
+baseline_spread_bps,150,bps,Baseline credit spread corresponding to A-rated corporate bond (A = 150 bps)
+estimated_debt_rate,0.05,decimal,Fallback interest rate used to estimate debt service when actual rate is unknown
+estimated_debt_tenor,20,years,Fallback debt tenor used to estimate debt service when actual tenor is unknown
+counterfactual_rating,A,rating,Counterfactual baseline credit rating assumed in the absence of climate transition risk
+policy_industry_rating,AA,rating,Fixed sector/policy risk rating for private power generation under KIS methodology

@@ -1,0 +1,54 @@
+metric,rating,threshold,direction,notes
+capacity_mw,AAA,2000,higher,Installed capacity (MW); minimum MW to achieve each rating
+capacity_mw,AA,800,higher,
+capacity_mw,A,400,higher,
+capacity_mw,BBB,100,higher,
+capacity_mw,BB,20,higher,
+capacity_mw,B,0,higher,Fallback — all capacities below BB threshold
+profitability_pct,AAA,15,higher,EBITDA/Fixed Assets (%); merges standard and distressed zones into one monotone scale
+profitability_pct,AA,11,higher,
+profitability_pct,A,8,higher,
+profitability_pct,BBB,4,higher,
+profitability_pct,BB,1,higher,
+profitability_pct,B,-10,higher,Covers both standard [0-1%) and distressed [-10-0%) zones
+profitability_pct,CCC,-20,higher,Significant operating loss zone [-20--10%)
+profitability_pct,CC,-999,higher,Severe loss fallback (<-20%) or triggered by is_ebitda_negative flag
+coverage_times,AAA,12,higher,EBITDA/Interest Expense (times); negative values indicate severe distress
+coverage_times,AA,6,higher,
+coverage_times,A,4,higher,
+coverage_times,BBB,2,higher,
+coverage_times,BB,1,higher,
+coverage_times,B,0.5,higher,
+coverage_times,CCC,0,higher,
+coverage_times,CC,-2,higher,
+coverage_times,C,-5,higher,
+coverage_times,D,-999,higher,Severe negative coverage fallback
+dscr,AAA,2.5,higher,Debt Service Coverage Ratio CFADS/TotalDebtService (times)
+dscr,AA,2.0,higher,
+dscr,A,1.6,higher,
+dscr,BBB,1.3,higher,
+dscr,BB,1.1,higher,
+dscr,B,1.0,higher,
+dscr,CCC,0.8,higher,
+dscr,CC,0.5,higher,
+dscr,C,0.0,higher,
+dscr,D,-999,higher,Negative DSCR fallback (cannot service debt)
+net_debt_ebitda,AAA,1,lower,Net Debt/EBITDA (times); lower is better; net cash position (<0) also maps to AAA
+net_debt_ebitda,AA,4,lower,
+net_debt_ebitda,A,7,lower,
+net_debt_ebitda,BBB,10,lower,
+net_debt_ebitda,BB,12,lower,
+net_debt_ebitda,B,20,lower,
+net_debt_ebitda,CCC,999,lower,Extreme leverage fallback (>20x)
+equity_leverage,AAA,80,lower,Total Debt/Total Equity (%); lower is better
+equity_leverage,AA,150,lower,
+equity_leverage,A,250,lower,
+equity_leverage,BBB,300,lower,
+equity_leverage,BB,400,lower,
+equity_leverage,B,999,lower,Fallback
+asset_leverage,AAA,20,lower,Total Debt/Total Assets (%); lower is better
+asset_leverage,AA,40,lower,
+asset_leverage,A,60,lower,
+asset_leverage,BBB,80,lower,
+asset_leverage,BB,90,lower,
+asset_leverage,B,100,lower,Fallback

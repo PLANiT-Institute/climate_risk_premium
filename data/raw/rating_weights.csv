@@ -1,0 +1,7 @@
+component,weight,notes
+policy_industry,0.50,Policy and industry risk — fixed sector score per KIS IPP methodology
+profitability,0.10,Operating efficiency — EBITDA / Fixed Assets ratio
+coverage,0.12,Interest coverage — EBITDA / Interest Expense ratio
+net_debt_leverage,0.12,Financial leverage — Net Debt / EBITDA ratio
+asset_leverage,0.08,Balance sheet strength — Total Debt / Total Assets ratio
+equity_leverage,0.08,Capital structure — Total Debt / Total Equity ratio

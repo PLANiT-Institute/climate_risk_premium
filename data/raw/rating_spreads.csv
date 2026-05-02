@@ -1,0 +1,11 @@
+rating,spread_bps,notes
+AAA,50,Prime — sovereign-equivalent quality
+AA,100,High grade
+A,150,Upper medium grade
+BBB,250,Lower medium grade (lowest investment grade)
+BB,400,Non-investment speculative
+B,600,Highly speculative
+CCC,900,Substantial risk — typical CCC bond spread (Bloomberg US Corp 2020-2024 avg)
+CC,1500,Very high risk / default imminent — distressed debt territory
+C,2500,Near default — deep distress pricing
+D,5000,In default — recovery value pricing

@@ -509,7 +509,6 @@ def page_risk_decomposition(data: dict) -> None:
     no_carbon = next((s for s in scenarios if s["scenario"] == "no_carbon_baseline"), None)
     carbon_scenarios = [s for s in scenarios if s["scenario"] != "no_carbon_baseline"]
     no_carbon_npv = no_carbon["npv_million"] if no_carbon else 0.0
-    no_carbon_crp = no_carbon["crp_bps"] if no_carbon else 0.0
 
     st.warning(
         "**Why CRP is identical for all carbon scenarios:** The KIS rating model floors at **D** "
@@ -731,10 +730,7 @@ def page_model_pipeline(data: dict) -> None:
         )
 
         st.subheader("Rating → Spread Mapping")
-        spread_data = {
-            "AAA": 50, "AA": 100, "A": 150, "BBB": 250,
-            "BB": 400, "B": 600, "CCC": 900, "CC": 1500, "C": 2500, "D": 5000,
-        }
+        spread_data = data["plant"]["rating_spreads"]
         df_sp = pd.DataFrame(
             [(r, s, "Investment" if r in ("AAA", "AA", "A", "BBB") else "Speculative/Default")
              for r, s in spread_data.items()],

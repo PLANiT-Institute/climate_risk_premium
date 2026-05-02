@@ -17,18 +17,24 @@ _REPO = Path(__file__).parent.parent
 if str(_REPO) not in sys.path:
     sys.path.insert(0, str(_REPO))
 
-from src.data.loaders import load_plant_params, load_policy_scenarios
-from src.scenarios.base import TransitionScenario
-from src.risk.transition import build_yearly_transition_adjustments
+from src.data.loaders import (
+    load_model_assumptions,
+    load_plant_params,
+    load_policy_scenarios,
+    load_rating_spreads,
+)
 from src.financials.cashflow import compute_cashflows
-from src.financials.metrics import calculate_metrics, calculate_debt_service
+from src.financials.metrics import calculate_debt_service, calculate_metrics
 from src.risk.credit_rating import (
-    calculate_rating_metrics_from_financials,
+    Rating,
     assess_credit_rating,
-    get_counterfactual_baseline_rating,
     calculate_crp_from_ratings,
+    calculate_rating_metrics_from_financials,
+    get_counterfactual_baseline_rating,
 )
 from src.risk.financing import calculate_financing_with_counterfactual
+from src.risk.transition import build_yearly_transition_adjustments
+from src.scenarios.base import TransitionScenario
 
 
 def _float(v: Any) -> float:
@@ -52,6 +58,8 @@ def run_pipeline() -> dict:
     """
     plant = load_plant_params()
     policy_rows = load_policy_scenarios()
+    assumptions = load_model_assumptions()
+    spreads = load_rating_spreads()
 
     total_capex = float(plant["total_capex_million"]) * 1e6
     debt_fraction = float(plant["debt_fraction"])
@@ -60,22 +68,26 @@ def run_pipeline() -> dict:
     depreciation_years = int(plant["depreciation_years"])
     capacity_mw = float(plant["capacity_mw"])
     base_cf = float(plant["capacity_factor"])
-    emissions = float(
-        plant.get("emissions_tCO2_per_mwh", plant.get("emissions_tco2_per_mwh", 0.82))
-    )
-    risk_free = float(plant.get("risk_free_rate", 0.035))
+    emissions = float(plant["emissions_tCO2_per_mwh"])
+    risk_free = float(plant["risk_free_rate"])
     equity_fraction = float(plant["equity_fraction"])
+    start_year = int(assumptions["start_year"])
+    base_rate = float(assumptions["base_rate"])
+    cash_ratio = float(assumptions["cash_ratio"])
+    plant_name = str(plant["plant_name"])
+
+    # Rating scale ordered from best to worst (derived from Rating enum)
+    rating_order = [r.name for r in sorted(Rating, key=lambda r: r.value)]
 
     counterfactual = get_counterfactual_baseline_rating()
     debt_struct = calculate_debt_service(total_capex, debt_fraction, debt_interest, debt_tenor)
     cumulative_principal = debt_struct.principal_schedule.cumsum()
 
-    RATING_ORDER = ["AAA", "AA", "A", "BBB", "BB", "B", "CCC", "CC", "C", "D"]
-    SPREAD_MAP: dict[str, int] = {
-        "AAA": 50, "AA": 100, "A": 150, "BBB": 250,
-        "BB": 400, "B": 600, "CCC": 900, "CC": 1500, "C": 2500, "D": 5000,
+    financing_params = {
+        "risk_free_rate": risk_free,
+        "debt_fraction": debt_fraction,
+        "equity_fraction": equity_fraction,
     }
-    BASE_RATE = 0.0675
 
     scenario_comparison: list[dict] = []
     cashflows: dict[str, list[dict]] = {}
@@ -125,11 +137,7 @@ def run_pipeline() -> dict:
             counterfactual_spread_bps=counterfactual.to_spread_bps(),
             npv_loss=0.0,
             total_capex=total_capex,
-            params={
-                "risk_free_rate": risk_free,
-                "debt_fraction": debt_fraction,
-                "equity_fraction": equity_fraction,
-            },
+            params=financing_params,
             scenario_notch=scenario_rating.value,
             counterfactual_notch=counterfactual.value,
         )
@@ -149,7 +157,9 @@ def run_pipeline() -> dict:
             "avg_dscr": _float(metrics.avg_dscr),
             "min_dscr": _float(metrics.min_dscr),
             "llcr": _float(metrics.llcr),
-            "payback_years": _float(metrics.payback_years) if metrics.payback_years is not None else None,
+            "payback_years": (
+                _float(metrics.payback_years) if metrics.payback_years is not None else None
+            ),
             "crp_bps": _float(crp_bps),
             "wacc_baseline_pct": _float(financing.wacc_baseline_pct),
             "wacc_adjusted_pct": _float(financing.wacc_adjusted_pct),
@@ -188,7 +198,9 @@ def run_pipeline() -> dict:
                 "free_cash_flow": _float(cf_ts.free_cash_flow[i]),
                 "capacity_factor": _float(cf_ts.capacity_factor[i]),
                 # None for post-debt years so charts don't draw a false zero line
-                "dscr": None if (dscr_val is None or np.isnan(dscr_val)) else float(dscr_val),
+                "dscr": (
+                    None if (dscr_val is None or np.isnan(dscr_val)) else float(dscr_val)
+                ),
             })
         cashflows[scenario.name] = cf_rows
 
@@ -203,11 +215,8 @@ def run_pipeline() -> dict:
                 debt_out = total_capex * debt_fraction - (
                     _float(cumulative_principal[i - 1]) if i > 0 else 0.0
                 )
-                principal_i = _float(debt_struct.principal_schedule[i])
-                debt_svc_i = interest_i + principal_i
             else:
                 debt_out = 0.0
-                debt_svc_i = 0.0
 
             fixed_assets_i = total_capex * max(0.0, 1 - i / depreciation_years)
             total_equity_i = max(0.0, fixed_assets_i - debt_out)
@@ -219,7 +228,8 @@ def run_pipeline() -> dict:
                 fixed_assets=total_assets_i if total_assets_i > 0 else total_capex,
                 interest_expense=interest_i,
                 total_debt=debt_out,
-                cash_and_equivalents=max(0.0, ebitda_i * 0.1),
+                # Cash buffer: fraction of EBITDA loaded from model_assumptions
+                cash_and_equivalents=max(0.0, ebitda_i * cash_ratio),
                 total_equity=total_equity_i,
                 total_assets=total_assets_i if total_assets_i > 0 else total_capex,
                 dscr=dscr_i,
@@ -232,22 +242,22 @@ def run_pipeline() -> dict:
                 if dscr_i < 0:
                     rating_str = "D"
                 elif dscr_i < 1.0:
-                    idx = RATING_ORDER.index(rating_str)
-                    rating_str = RATING_ORDER[min(idx + 1, len(RATING_ORDER) - 1)]
+                    idx = rating_order.index(rating_str)
+                    rating_str = rating_order[min(idx + 1, len(rating_order) - 1)]
 
-            spread = SPREAD_MAP.get(rating_str, 900)
+            spread = spreads.get(rating_str, spreads.get("CCC", 900))
             yearly_ratings.append({
                 "scenario": scenario.name,
                 "year": int(year),
                 "dscr": round(dscr_i, 3) if dscr_i is not None else None,
                 "rating": rating_str,
                 "spread_bps": spread,
-                "cost_of_debt": round(BASE_RATE + spread / 10000, 6),
+                "cost_of_debt": round(base_rate + spread / 10000, 6),
                 "ebitda": round(ebitda_i / 1e6, 2),
             })
 
     plant_out = {
-        "name": "Samcheok Blue Power",
+        "name": plant_name,
         "capacity_mw": float(plant["capacity_mw"]),
         "capacity_factor": float(plant["capacity_factor"]),
         "total_capex_million": float(plant["total_capex_million"]),
@@ -257,12 +267,12 @@ def run_pipeline() -> dict:
         "useful_life": int(plant["useful_life"]),
         "discount_rate": float(plant["discount_rate"]),
         "debt_tenor_years": debt_tenor,
-        "debt_payoff_year": 2025 + debt_tenor - 1,   # last year with debt service
-        "emissions_tco2_per_mwh": float(
-            plant.get("emissions_tCO2_per_mwh", plant.get("emissions_tco2_per_mwh", 0.82))
-        ),
-        "heat_rate_mmbtu_per_mwh": float(plant.get("heat_rate_mmbtu_per_mwh", 8.8)),
-        "power_price_usd_per_mwh": float(plant.get("power_price_usd_per_mwh", 80)),
+        "debt_payoff_year": start_year + debt_tenor - 1,
+        "emissions_tco2_per_mwh": float(plant["emissions_tCO2_per_mwh"]),
+        "heat_rate_mmbtu_per_mwh": float(plant["heat_rate_mmbtu_mwh"]),
+        "power_price_usd_per_mwh": float(plant["power_price_per_mwh"]),
+        # Pass rating spread map to UI so it can render without hardcoding
+        "rating_spreads": {k: int(v) for k, v in spreads.items()},
     }
 
     return {
