@@ -470,6 +470,9 @@ def page_credit(data: dict) -> None:
     ]
     pivot = df_heatmap.pivot(index="year", columns="scenario", values="rating")
     pivot.columns = [label(c) for c in pivot.columns]
+    # Convert integer years to strings so px.imshow treats them as discrete
+    # categorical labels rather than continuous positions (avoids 0–2050 axis).
+    pivot.index = pivot.index.astype(str)
 
     # Map rating string → numeric for color
     rating_num = {r: i for i, r in enumerate(RATING_ORDER)}
