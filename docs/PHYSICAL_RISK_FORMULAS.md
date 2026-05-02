@@ -33,8 +33,8 @@
 │  │            = 0.000274 (0.027%)                   │       │
 │  └─────────────────────────────────────────────────┘       │
 │    freq = n_events / reference_years                        │
-│    P_outage = 0.10 (산불 1건당 정전 확률)                     │
-│    T_outage = 24h (정전 지속시간)                             │
+│    P_outage = 0.10 (중앙 가정; sensitivity 0.05-0.20)          │
+│    T_outage = 24h (중앙 가정; sensitivity 12-72h)              │
 │    T_year = 8,760h                                          │
 │                                                             │
 │  가뭄 → capacity_derate:                                    │
@@ -99,6 +99,14 @@
 │                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```
+
+`P_outage=0.10`은 공개 KEPCO/KPX 이벤트 단위 통계에서 직접 관측된 값이
+아니라 중앙 가정이다. Dale et al. (2018, CCCA4-CEC-2018-002)의 wildfire
+grid-impact distribution은 대부분의 wildfire가 transmission path에 유의미한
+영향을 주지 않는다는 점을 보여주므로, 본 연구에서는 `0.05-0.20` 범위
+sensitivity로 방어한다. `T_outage=24h`는 PG&E 2025 CAISO transmission
+availability report의 forced-outage duration benchmark를 사용하며 `12-72h`
+범위 sensitivity로 보고한다.
 
 ## 시나리오별 SSP 매핑
 

@@ -7,6 +7,13 @@ from typing import Dict, List, Optional, Tuple
 import numpy as np
 
 from .config import PLANiTIntegrationConfig
+from .outage_assumptions import (
+    OUTAGE_DURATION_HOURS,
+    OUTAGE_DURATION_HOURS_SENSITIVITY,
+    OUTAGE_RATE_PER_EVENT,
+    OUTAGE_RATE_PER_EVENT_SENSITIVITY,
+    event_freq_to_outage_rate,
+)
 from .runner import PLANiTHazardResult
 from ..data.loaders import get_climate_factor
 
@@ -315,7 +322,12 @@ class PLANiTAdapter:
             outage_prob = min(1.0, max(0.0, float(self._config.wildfire_outage_probability)))
             outage_hours = max(0.0, float(self._config.wildfire_outage_duration_hours))
             hours_per_year = max(1.0, float(self._config.hours_per_year))
-            outage_rate = event_frequency_per_year * outage_prob * (outage_hours / hours_per_year)
+            outage_rate = event_freq_to_outage_rate(
+                event_frequency_per_year,
+                outage_probability=outage_prob,
+                outage_duration_hours=outage_hours,
+                hours_per_year=hours_per_year,
+            )
 
             # Apply climate factor multiplier if year and scenario provided
             if target_year is not None and crp_scenario is not None:

@@ -81,7 +81,22 @@ class HazardBaseline:
 
 @dataclass
 class ClimateFactor:
-    """Climate change factor from CSV."""
+    """Climate change factor row from ``data/physical/climate_factors.csv``.
+
+    Columns:
+        scenario/year identify the projection path and interpolation anchor.
+        wildfire, tropical_cyclone, river_flood, coastal_flood, drought, and
+        heat_stress are multiplicative factors applied to baseline hazard
+        frequencies or impacts (1.0 = current-climate baseline).
+        slr_meters is an absolute sea-level-rise assumption kept in the CSV for
+        documentation; ``get_factor("sea_level_rise")`` intentionally returns
+        1.0 because SLR is not a multiplicative hazard factor in this loader.
+        source is the high-level evidence label from the CSV.
+
+    These are scenario multipliers, not observed event counts. Current rows cite
+    IPCC AR6/KMA/WWA summary assumptions and should be sensitivity-tested before
+    being presented as calibrated Korea site-level projections.
+    """
     scenario: str
     year: int
     wildfire: float
@@ -240,9 +255,35 @@ def load_damage_function_params() -> Dict[str, DamageFunctionParams]:
     return params
 
 
+def get_wildfire_i_half(default: float = 45.0) -> float:
+    """Return wildfire i_half from damage_function_params.csv, or *default*."""
+    try:
+        params = load_damage_function_params()
+        wf = params.get("wildfire")
+        if wf is not None:
+            return wf.i_half
+    except Exception:
+        pass
+    return default
+
+
 def get_climate_factor(hazard_type: str, year: int, scenario: str = "RCP8.5") -> float:
     """
-    Get interpolated climate factor for a hazard at a given year.
+    Get an interpolated climate multiplier for a hazard at a given year.
+
+    Data source and assumptions:
+        Reads ``data/physical/climate_factors.csv`` through
+        ``load_climate_factors()``. The CSV columns are:
+        ``scenario``, ``year``, ``wildfire``, ``tropical_cyclone``,
+        ``river_flood``, ``coastal_flood``, ``drought``, ``heat_stress``,
+        ``slr_meters``, and ``source``.
+
+        Hazard columns are dimensionless multipliers applied to baseline
+        frequencies or impact fractions. ``slr_meters`` is an absolute sea-level
+        rise assumption and is not returned by this multiplier function.
+        The ``source`` column is a summary label (currently IPCC AR6/KMA/WWA or
+        baseline); values are scenario assumptions, not directly observed
+        Samcheok plant measurements.
 
     Args:
         hazard_type: Type of hazard (e.g., "wildfire", "tropical_cyclone")
@@ -252,6 +293,10 @@ def get_climate_factor(hazard_type: str, year: int, scenario: str = "RCP8.5") ->
     Returns:
         Climate change multiplier (1.0 = no change from baseline)
     """
+    # Kill-switch: disable all climate factors (returns 1.0 = baseline for all)
+    if os.environ.get("CRP_DISABLE_CLIMATE_FACTOR") == "1":
+        return 1.0
+
     all_factors = load_climate_factors()
 
     if scenario not in all_factors:

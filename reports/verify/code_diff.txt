@@ -1,0 +1,98 @@
+## Prompt 1 — subprocess SSP collapse / seed / n_seasons
+src/planit/runner.py:314:        - CRP_PLANIT_WILDFIRE_MAX_PROB_SEASONS  (minimum 10; 0 is rejected)
+src/planit/runner.py:325:        raw = os.getenv("CRP_PLANIT_WILDFIRE_MAX_PROB_SEASONS")
+src/planit/runner.py:330:                    "CRP_PLANIT_WILDFIRE_MAX_PROB_SEASONS=%d would disable "
+src/planit/runner.py:336:            hazard["wildfire_max_probabilistic_seasons"] = n
+src/planit/runner.py:341:        if "wildfire_max_probabilistic_seasons" not in hazard:
+src/planit/runner.py:342:            hazard["wildfire_max_probabilistic_seasons"] = 100
+src/planit/runner.py:632:max_prob = _os.environ.get("CRP_PLANIT_WILDFIRE_MAX_PROB_SEASONS")
+src/planit/runner.py:638:            "WARNING: CRP_PLANIT_WILDFIRE_MAX_PROB_SEASONS=%d disables probabilistic "
+src/planit/runner.py:644:    cfg.setdefault("climada", {{}}).setdefault("hazard", {{}})["wildfire_max_probabilistic_seasons"] = n
+Binary file src/planit/__pycache__/runner.cpython-314.pyc matches
+Binary file Physicalrisk_PLANiT/src/core/__pycache__/hazard.cpython-314.pyc matches
+Binary file Physicalrisk_PLANiT/src/core/__pycache__/hazard.cpython-312.pyc matches
+Physicalrisk_PLANiT/src/core/hazard.py:65:    max_prob_seasons = int(hazard_cfg.get("wildfire_max_probabilistic_seasons", -1))
+
+Physicalrisk_PLANiT/src/core/hazard.py:102:            np.random.seed(seed)
+
+src/planit/runner.py:672:            "seed": int(_os.environ.get("CRP_WILDFIRE_SEED", "42")),
+Binary file src/planit/__pycache__/runner.cpython-314.pyc matches
+Binary file Physicalrisk_PLANiT/src/core/__pycache__/provenance.cpython-312.pyc matches
+Binary file Physicalrisk_PLANiT/src/core/__pycache__/hazard.cpython-312.pyc matches
+Physicalrisk_PLANiT/src/core/hazard.py:101:            seed = int(os.environ.get("CRP_WILDFIRE_SEED", "42"))
+Physicalrisk_PLANiT/src/core/provenance.py:45:        "seed": int(os.environ.get("CRP_WILDFIRE_SEED", -1)),
+Binary file Physicalrisk_PLANiT/src/__pycache__/main.cpython-312.pyc matches
+Physicalrisk_PLANiT/src/main.py:106:                    "seed": int(os.environ.get("CRP_WILDFIRE_SEED", "42")),
+
+## Prompt 2 — heat-efficiency
+src/planit/config.py:41:        heat_efficiency_scale: Scaling factor for heatwave impact_mean → efficiency_loss
+src/planit/adapter.py:111:            Dict with keys: outage_rate, capacity_derate, efficiency_loss,
+src/planit/adapter.py:152:        efficiency_loss = 0.0
+src/planit/adapter.py:281:            "efficiency_loss": efficiency_loss,
+src/planit/adapter.py:404:        efficiency_losses, water_constraints — matching YearlyPhysicalAdjustments.
+src/planit/adapter.py:409:        efficiency_losses = np.zeros(len(years))
+src/planit/adapter.py:416:            efficiency_losses[i] = adj["efficiency_loss"]
+src/planit/adapter.py:423:            "efficiency_losses": efficiency_losses,
+Binary file src/planit/__pycache__/config.cpython-314.pyc matches
+Binary file src/planit/__pycache__/adapter.cpython-314.pyc matches
+src/pipeline/runner.py:296:            efficiency_loss=adj["efficiency_loss"],
+src/pipeline/runner.py:323:        efficiency_losses = np.zeros(len(all_years))
+src/pipeline/runner.py:332:            efficiency_losses[i] = adj["efficiency_loss"]
+src/pipeline/runner.py:340:            outage_rates.mean(), capacity_derates.mean(), efficiency_losses.mean(),
+src/pipeline/runner.py:347:            efficiency_losses=efficiency_losses,
+
+src/planit/adapter.py:480:            "Heat-derate channel is disabled. Total physical risk is "
+Binary file src/planit/__pycache__/adapter.cpython-314.pyc matches
+
+## Prompt 3 — magic 0.10
+src/pipeline/runner.py:375:            OUTAGE_DURATION_HOURS,
+src/pipeline/runner.py:376:            OUTAGE_RATE_PER_EVENT,
+src/pipeline/runner.py:399:        plant_wf_p = OUTAGE_RATE_PER_EVENT
+src/pipeline/runner.py:400:        plant_wf_dur = OUTAGE_DURATION_HOURS
+src/planit/config.py:11:    OUTAGE_DURATION_HOURS,
+src/planit/config.py:12:    OUTAGE_RATE_PER_EVENT,
+src/planit/config.py:82:    wildfire_outage_probability: float = OUTAGE_RATE_PER_EVENT
+src/planit/config.py:83:    wildfire_outage_duration_hours: float = OUTAGE_DURATION_HOURS
+src/planit/config.py:99:        raw = os.getenv("CRP_WILDFIRE_OUTAGE_DURATION_HOURS", "").strip()
+src/planit/adapter.py:11:    OUTAGE_DURATION_HOURS,
+src/planit/adapter.py:12:    OUTAGE_DURATION_HOURS_SENSITIVITY,
+src/planit/adapter.py:13:    OUTAGE_RATE_PER_EVENT,
+src/planit/adapter.py:14:    OUTAGE_RATE_PER_EVENT_SENSITIVITY,
+Binary file src/planit/__pycache__/config.cpython-314.pyc matches
+Binary file src/planit/__pycache__/vulnerability.cpython-314.pyc matches
+Binary file src/planit/__pycache__/outage_assumptions.cpython-314.pyc matches
+Binary file src/planit/__pycache__/adapter.cpython-314.pyc matches
+src/planit/outage_assumptions.py:12:OUTAGE_RATE_PER_EVENT = 0.10
+src/planit/outage_assumptions.py:13:OUTAGE_RATE_PER_EVENT_SENSITIVITY: Tuple[float, float, float] = (0.05, 0.10, 0.20)
+src/planit/outage_assumptions.py:15:OUTAGE_DURATION_HOURS = 24.0
+src/planit/outage_assumptions.py:16:OUTAGE_DURATION_HOURS_SENSITIVITY: Tuple[float, float, float] = (12.0, 24.0, 72.0)
+src/planit/outage_assumptions.py:47:    outage_probability: float = OUTAGE_RATE_PER_EVENT,
+src/planit/outage_assumptions.py:48:    outage_duration_hours: float = OUTAGE_DURATION_HOURS,
+src/planit/vulnerability.py:22:    OUTAGE_DURATION_HOURS,
+src/planit/vulnerability.py:23:    OUTAGE_RATE_PER_EVENT,
+src/planit/vulnerability.py:117:    outage_probability: float = OUTAGE_RATE_PER_EVENT,
+src/planit/vulnerability.py:118:    outage_duration_hours: float = OUTAGE_DURATION_HOURS,
+
+  none
+
+## Prompt 4 — spatial resolution
+Physicalrisk_PLANiT/src/core/exposure.py:42:    polygon_buffer_km, line_buffer_km = buffer_cfg.get("polygon_km", 0.0), buffer_cfg.get("line_km", 0.0)
+Physicalrisk_PLANiT/src/core/exposure.py:57:            buffer_km, flat_coords = polygon_buffer_km, _flatten_polygon_coords(coords)
+Physicalrisk_PLANiT/src/core/exposure.py:59:            buffer_km, flat_coords = polygon_buffer_km, [(coords[0], coords[1])]
+Physicalrisk_PLANiT/src/core/exposure.py:61:            buffer_km, flat_coords = line_buffer_km, [(c[0], c[1]) for c in coords]
+Binary file Physicalrisk_PLANiT/src/core/__pycache__/exposure.cpython-312.pyc matches
+Binary file Physicalrisk_PLANiT/src/core/__pycache__/exposure.cpython-314.pyc matches
+Physicalrisk_PLANiT/src/core/vulnerability.py:17:    i_half, haz_type = vuln_cfg.get("i_half", 45.0), vuln_cfg.get("haz_type", "WFseason")
+Physicalrisk_PLANiT/src/core/vulnerability.py:20:    if_wf.set_default_FIRMS(i_half=i_half)
+Physicalrisk_PLANiT/src/core/vulnerability.py:26:    logger.info(f"Created CLIMADA ImpfWildfire with i_half={i_half}, haz_type={haz_type}")
+
+## Prompt 5 — PhysRisk mode
+  none
+
+## Prompt 6 — n_probabilistic_seasons
+Physicalrisk_PLANiT/config/unified_config.yaml:95:    # n_probabilistic_seasons=100: Monte Carlo 수렴에 필요 (10은 SSP 신호 < MC 노이즈)
+Physicalrisk_PLANiT/config/unified_config.yaml:100:        n_probabilistic_seasons: 100
+Physicalrisk_PLANiT/config/unified_config.yaml:104:        n_probabilistic_seasons: 100
+Physicalrisk_PLANiT/config/unified_config.yaml:108:        n_probabilistic_seasons: 100
+Physicalrisk_PLANiT/config/unified_config.yaml:112:        n_probabilistic_seasons: 100
+

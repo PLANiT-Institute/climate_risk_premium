@@ -1,0 +1,30 @@
+{
+  "checks": {
+    "G2_in_process": true,
+    "G2_centroids_consistent": true,
+    "G2_probabilistic_active": false,
+    "G2_intensity_hash_differs": true,
+    "G2_aai_monotone": true,
+    "G2_freq_monotone": true,
+    "G3_haz_size": true,
+    "G3_intensity_sane": true,
+    "G3_imp_mat_nnz": true,
+    "G3_aai_nonzero": true,
+    "G3_bbox_overlap": true,
+    "G4_seed_changes_output": true,
+    "G5_max_csv_contribution": 0.0,
+    "G5_paper_framing": "CLIMADA-driven"
+  },
+  "frequencies": [
+    1.0000000000000002,
+    1.0000000000000002,
+    1.0000000000000002,
+    1.0000000000000002
+  ],
+  "csv_contribution": {
+    "historical": 0.0,
+    "ssp126": 0.0,
+    "ssp245": 0.0,
+    "ssp585": 0.0
+  }
+}

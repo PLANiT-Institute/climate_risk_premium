@@ -1,7 +1,7 @@
 parameter,value,unit,rationale,status
-outage_prob_wildfire,0.10,probability,Industry standard for fire impact on power infrastructure,ASSUMPTION
+outage_prob_wildfire,0.10,probability,"Central assumption benchmarked to Dale et al. (2018 CCCA4-CEC-2018-002); no direct KEPCO/KPX fire-to-outage statistic found; sensitivity [0.05,0.20]",ASSUMPTION_SENSITIVITY
 outage_prob_tc,0.30,probability,Based on KEPCO grid vulnerability assessments,ASSUMPTION
-outage_duration_wildfire,24,hours,Industry standard restoration time,ASSUMPTION
+outage_duration_wildfire,24,hours,"CAISO/PG&E 2025 transmission forced-outage duration benchmark; sensitivity [12,72] hours",ASSUMPTION_SENSITIVITY
 outage_duration_tc,48,hours,Industry standard for TC-related outages,ASSUMPTION
 outage_duration_flood,120,hours,Extended restoration for flood damage,ASSUMPTION
 outage_prob_flood,0.50,probability,High impact if flooding occurs,ASSUMPTION

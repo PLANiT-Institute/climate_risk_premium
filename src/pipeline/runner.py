@@ -371,6 +371,10 @@ class CRPModelRunner:
             transmission_outage_rate as _trans_outage,
             substation_outage_rate as _sub_outage,
         )
+        from ..planit.outage_assumptions import (
+            OUTAGE_DURATION_HOURS,
+            OUTAGE_RATE_PER_EVENT,
+        )
 
         baselines = _load_baselines()
         line_params = (
@@ -390,9 +394,10 @@ class CRPModelRunner:
         line_outage = np.zeros(n)
         capex_loss = np.zeros(n)
 
-        # Defaults for plant-level wildfire conversion (only used if PLANiT inputs missing)
-        plant_wf_p = 0.10
-        plant_wf_dur = 24.0
+        # Defaults for plant-level wildfire conversion (only used if PLANiT inputs missing).
+        # Source notes and sensitivity ranges are centralized in outage_assumptions.py.
+        plant_wf_p = OUTAGE_RATE_PER_EVENT
+        plant_wf_dur = OUTAGE_DURATION_HOURS
 
         wf = baselines.get("wildfire")
         tc = baselines.get("tropical_cyclone")
@@ -931,4 +936,3 @@ class CRPModelRunner:
             paths["risk_attribution"] = attr_path
 
         return paths
-

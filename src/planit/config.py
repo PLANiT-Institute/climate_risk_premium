@@ -6,6 +6,12 @@ import os
 from pathlib import Path
 from typing import List, Optional
 
+from .outage_assumptions import (
+    HOURS_PER_YEAR,
+    OUTAGE_DURATION_HOURS,
+    OUTAGE_RATE_PER_EVENT,
+)
+
 
 @dataclass
 class EfficiencyChannelConfig:
@@ -70,11 +76,12 @@ class PLANiTIntegrationConfig:
     drought_severity_scale: float = 1.0
     heat_efficiency_scale: float = 1.0
     flood_outage_scale: float = 1.0
-    # Wildfire conversion settings
+    # Wildfire conversion settings. Source notes and sensitivity ranges are in
+    # outage_assumptions.py; env vars below can override these for sensitivity.
     wildfire_outage_method: str = "event_probability"
-    wildfire_outage_probability: float = 0.10
-    wildfire_outage_duration_hours: float = 24.0
-    hours_per_year: float = 8760.0
+    wildfire_outage_probability: float = OUTAGE_RATE_PER_EVENT
+    wildfire_outage_duration_hours: float = OUTAGE_DURATION_HOURS
+    hours_per_year: float = HOURS_PER_YEAR
     wildfire_frequency_reference_years: float = 20.0
     drought_use_distribution: bool = True
     water_risk_use_distribution: bool = True
