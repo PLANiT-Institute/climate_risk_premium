@@ -1,8 +1,7 @@
 """FastAPI backend — serves transition risk pipeline results as JSON.
 
 Runs the full pipeline for all policy scenarios on startup, caches results
-in memory, and exposes them via REST endpoints.  The Next.js frontend fetches
-from these endpoints at request time — no pre-generated TypeScript files.
+in memory, and exposes them via REST endpoints.
 
 Endpoints
 ---------
@@ -21,7 +20,6 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 import numpy as np
-import numpy_financial as npf
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -30,20 +28,24 @@ _REPO = Path(__file__).parent.parent.parent
 if str(_REPO) not in sys.path:
     sys.path.insert(0, str(_REPO))
 
-from src.data.loaders import load_plant_params, load_policy_scenarios
-from src.scenarios.base import TransitionScenario
-from src.risk.transition import build_yearly_transition_adjustments
+from src.data.loaders import (
+    load_model_assumptions,
+    load_plant_params,
+    load_policy_scenarios,
+    load_rating_spreads,
+)
+from src.financials.cashflow import compute_cashflows
+from src.financials.metrics import calculate_debt_service, calculate_metrics
 from src.risk.credit_rating import (
     Rating,
-    calculate_rating_metrics_from_financials,
     assess_credit_rating,
-    get_counterfactual_baseline_rating,
     calculate_crp_from_ratings,
-    assess_rating_with_counterfactual,
+    calculate_rating_metrics_from_financials,
+    get_counterfactual_baseline_rating,
 )
 from src.risk.financing import calculate_financing_with_counterfactual
-from src.financials.cashflow import compute_cashflows
-from src.financials.metrics import calculate_metrics, calculate_debt_service
+from src.risk.transition import build_yearly_transition_adjustments
+from src.scenarios.base import TransitionScenario
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("api")
@@ -74,6 +76,9 @@ def _float(v: Any) -> float:
 def _build_cache() -> None:
     plant = load_plant_params()
     policy_rows = load_policy_scenarios()
+    assumptions = load_model_assumptions()
+    spreads = load_rating_spreads()
+
     total_capex = float(plant["total_capex_million"]) * 1e6
     debt_fraction = float(plant["debt_fraction"])
     debt_interest = float(plant["debt_interest_rate"])
@@ -81,13 +86,26 @@ def _build_cache() -> None:
     depreciation_years = int(plant["depreciation_years"])
     capacity_mw = float(plant["capacity_mw"])
     base_cf = float(plant["capacity_factor"])
-    emissions = float(plant.get("emissions_tCO2_per_mwh", plant.get("emissions_tco2_per_mwh", 0.82)))
-    risk_free = float(plant.get("risk_free_rate", 0.035))
+    emissions = float(plant["emissions_tCO2_per_mwh"])
+    risk_free = float(plant["risk_free_rate"])
     equity_fraction = float(plant["equity_fraction"])
+    plant_name = str(plant["plant_name"])
+    start_year = int(assumptions["start_year"])
+    base_rate = float(assumptions["base_rate"])
+    cash_ratio = float(assumptions["cash_ratio"])
+
+    # Rating scale ordered from best to worst (derived from Rating enum)
+    rating_order = [r.name for r in sorted(Rating, key=lambda r: r.value)]
 
     counterfactual = get_counterfactual_baseline_rating()
     debt_struct = calculate_debt_service(total_capex, debt_fraction, debt_interest, debt_tenor)
     cumulative_principal = debt_struct.principal_schedule.cumsum()
+
+    financing_params = {
+        "risk_free_rate": risk_free,
+        "debt_fraction": debt_fraction,
+        "equity_fraction": equity_fraction,
+    }
 
     scenario_comparison: List[Dict] = []
     cashflows: Dict[str, List[Dict]] = {}
@@ -105,10 +123,10 @@ def _build_cache() -> None:
         cf_ts = compute_cashflows(plant_params=plant, yearly_transition_adj=yearly_adj)
         metrics = calculate_metrics(cf_ts, plant)
 
-        # --- Scenario-level credit rating (average EBITDA) ---
+        # Scenario-level credit rating (average EBITDA over operating life)
         avg_ebitda = float(cf_ts.ebitda.mean())
         avg_interest = float(cf_ts.interest_expense.mean())
-        debt_mid = total_capex * debt_fraction * 0.5  # midlife balance
+        debt_mid = total_capex * debt_fraction * 0.5
         fixed_assets_avg = total_capex * 0.5
         total_equity_avg = max(0.0, fixed_assets_avg - debt_mid)
 
@@ -134,20 +152,12 @@ def _build_cache() -> None:
         )
         notch_change = scenario_rating.value - counterfactual.value
 
-        # Financing impact (for WACC spread reporting)
-        counterfactual_npv = 0.0  # placeholder; CRP is rating-driven not NPV-driven
-        scenario_npv_loss = max(0.0, counterfactual_npv - metrics.npv)
-        params = {
-            "risk_free_rate": risk_free,
-            "debt_fraction": debt_fraction,
-            "equity_fraction": equity_fraction,
-        }
         financing = calculate_financing_with_counterfactual(
             scenario_spread_bps=scenario_rating.to_spread_bps(),
             counterfactual_spread_bps=counterfactual.to_spread_bps(),
-            npv_loss=scenario_npv_loss,
+            npv_loss=0.0,
             total_capex=total_capex,
-            params=params,
+            params=financing_params,
             scenario_notch=scenario_rating.value,
             counterfactual_notch=counterfactual.value,
         )
@@ -160,7 +170,9 @@ def _build_cache() -> None:
             "avg_dscr": _float(metrics.avg_dscr),
             "min_dscr": _float(metrics.min_dscr),
             "llcr": _float(metrics.llcr),
-            "payback_years": _float(metrics.payback_years) if metrics.payback_years is not None else None,
+            "payback_years": (
+                _float(metrics.payback_years) if metrics.payback_years is not None else None
+            ),
             "expected_loss_pct": _float(financing.expected_loss_pct),
             "npv_loss_million": _float(financing.npv_loss_million),
             "debt_spread_bps": _float(financing.debt_spread_bps),
@@ -174,7 +186,7 @@ def _build_cache() -> None:
             "spread_bps": rd["spread_bps"],
             "is_investment_grade": rd["is_investment_grade"],
             "is_distressed": rd["is_distressed"],
-            "capacity_rating": "AA",  # per KIS methodology: 2100MW → AAA but capped at AA in rating grid
+            "capacity_rating": rd["policy_industry_rating"],
             "profitability_rating": rd["profitability_rating"],
             "coverage_rating": rd["coverage_rating"],
             "dscr_rating": rd["dscr_rating"],
@@ -192,16 +204,15 @@ def _build_cache() -> None:
             "rating_rationale": rd["rating_rationale"],
             "counterfactual_rating": str(counterfactual),
             "counterfactual_spread_bps": counterfactual.to_spread_bps(),
-            "scenario_rating_new": str(scenario_rating),
-            "scenario_spread_bps_new": scenario_rating.to_spread_bps(),
-            "rating_migration": f"Downgrade by {notch_change} notch(es)" if notch_change > 0
-                               else ("No change" if notch_change == 0
-                               else f"Upgrade by {abs(notch_change)} notch(es)"),
+            "rating_migration": (
+                f"Downgrade by {notch_change} notch(es)"
+                if notch_change > 0
+                else ("No change" if notch_change == 0 else f"Upgrade by {abs(notch_change)} notch(es)")
+            ),
             "notch_change": notch_change,
-            "counterfactual_crp_bps": _float(crp_bps),
         })
 
-        # --- Per-year cashflow rows ---
+        # Per-year cashflow rows
         cf_rows: List[Dict] = []
         for i, year in enumerate(cf_ts.years):
             cf_rows.append({
@@ -211,7 +222,6 @@ def _build_cache() -> None:
                 "fuel_costs": _float(cf_ts.fuel_costs[i]),
                 "variable_opex": _float(cf_ts.variable_opex[i]),
                 "fixed_opex": _float(cf_ts.fixed_opex[i]),
-                "outage_costs": 0.0,  # transition-only; physical risk not included yet
                 "carbon_costs": _float(cf_ts.carbon_costs[i]),
                 "total_costs": _float(cf_ts.total_costs[i]),
                 "ebitda": _float(cf_ts.ebitda[i]),
@@ -220,28 +230,23 @@ def _build_cache() -> None:
                 "interest_expense": _float(cf_ts.interest_expense[i]),
                 "tax_expense": _float(cf_ts.tax_expense[i]),
                 "net_income": _float(cf_ts.net_income[i]),
-                "capex": 0.0,
+                "capex": _float(cf_ts.capex[i]),
                 "free_cash_flow": _float(cf_ts.free_cash_flow[i]),
                 "capacity_factor": _float(cf_ts.capacity_factor[i]),
                 "dscr": _float(cf_ts.dscr[i]),
             })
         cashflows[scenario.name] = cf_rows
 
-        # --- Year-by-year credit ratings ---
-        RATING_ORDER = ["AAA", "AA", "A", "BBB", "BB", "B", "CCC", "CC", "C", "D"]
-        BASE_RATE = 0.0675
-        SPREAD_MAP = {
-            "AAA": 50, "AA": 100, "A": 150, "BBB": 250,
-            "BB": 400, "B": 600, "CCC": 900, "CC": 1500, "C": 2500, "D": 5000,
-        }
-
+        # Year-by-year credit ratings
         for i, year in enumerate(cf_ts.years):
             dscr_i = _float(cf_ts.dscr[i])
             ebitda_i = _float(cf_ts.ebitda[i])
             interest_i = _float(cf_ts.interest_expense[i])
 
             if i < debt_tenor:
-                debt_out = total_capex * debt_fraction - (_float(cumulative_principal[i - 1]) if i > 0 else 0.0)
+                debt_out = total_capex * debt_fraction - (
+                    _float(cumulative_principal[i - 1]) if i > 0 else 0.0
+                )
                 principal_i = _float(debt_struct.principal_schedule[i])
                 debt_svc_i = interest_i + principal_i
             else:
@@ -258,7 +263,7 @@ def _build_cache() -> None:
                 fixed_assets=total_assets_i if total_assets_i > 0 else total_capex,
                 interest_expense=interest_i,
                 total_debt=debt_out,
-                cash_and_equivalents=max(0.0, ebitda_i * 0.1),
+                cash_and_equivalents=max(0.0, ebitda_i * cash_ratio),
                 total_equity=total_equity_i,
                 total_assets=total_assets_i if total_assets_i > 0 else total_capex,
                 dscr=dscr_i,
@@ -268,11 +273,11 @@ def _build_cache() -> None:
 
             if dscr_i < 0:
                 rating_str = "D"
-            elif dscr_i < 1.0 and dscr_i >= 0:
-                idx = RATING_ORDER.index(rating_str)
-                rating_str = RATING_ORDER[min(idx + 1, len(RATING_ORDER) - 1)]
+            elif dscr_i < 1.0:
+                idx = rating_order.index(rating_str)
+                rating_str = rating_order[min(idx + 1, len(rating_order) - 1)]
 
-            spread = SPREAD_MAP.get(rating_str, 900)
+            spread = spreads.get(rating_str, spreads["CCC"])
             yearly_ratings.append({
                 "scenario": scenario.name,
                 "display_name": scenario.name.replace("_", " ").title(),
@@ -280,13 +285,13 @@ def _build_cache() -> None:
                 "dscr": round(dscr_i, 3),
                 "rating": rating_str,
                 "spread_bps": spread,
-                "cost_of_debt": round(BASE_RATE + spread / 10000, 6),
+                "cost_of_debt": round(base_rate + spread / 10000, 6),
                 "ebitda": round(ebitda_i, 2),
                 "debt_service": round(debt_svc_i, 2),
             })
 
     _cache["plant"] = {
-        "name": "Samcheok Blue Power",
+        "name": plant_name,
         "capacity_mw": float(plant["capacity_mw"]),
         "capacity_factor": float(plant["capacity_factor"]),
         "total_capex_million": float(plant["total_capex_million"]),
@@ -295,15 +300,21 @@ def _build_cache() -> None:
         "operating_years": int(plant["operating_years"]),
         "useful_life": int(plant["useful_life"]),
         "discount_rate": float(plant["discount_rate"]),
+        "debt_tenor_years": debt_tenor,
+        "debt_payoff_year": start_year + debt_tenor - 1,
     }
     _cache["scenarios"] = scenario_comparison
     _cache["cashflows"] = cashflows
     _cache["ratings"] = yearly_ratings
-    logger.info("Cache built: %d scenarios, %d rating rows", len(scenario_comparison), len(yearly_ratings))
+    logger.info(
+        "Cache built: %d scenarios, %d rating rows",
+        len(scenario_comparison),
+        len(yearly_ratings),
+    )
 
 
 @app.on_event("startup")
-def startup():
+def startup() -> None:
     _build_cache()
 
 
@@ -312,27 +323,27 @@ def startup():
 # ---------------------------------------------------------------------------
 
 @app.get("/api/health")
-def health():
+def health() -> Dict[str, Any]:
     return {"status": "ok", "scenarios": len(_cache.get("scenarios", []))}
 
 
 @app.get("/api/plant")
-def get_plant():
+def get_plant() -> Dict[str, Any]:
     return _cache.get("plant", {})
 
 
 @app.get("/api/scenarios")
-def get_scenarios():
+def get_scenarios() -> List[Dict]:
     return _cache.get("scenarios", [])
 
 
 @app.get("/api/cashflows")
-def get_all_cashflows():
+def get_all_cashflows() -> Dict[str, List[Dict]]:
     return _cache.get("cashflows", {})
 
 
 @app.get("/api/cashflows/{scenario}")
-def get_cashflows(scenario: str):
+def get_cashflows(scenario: str) -> List[Dict]:
     cf = _cache.get("cashflows", {}).get(scenario)
     if cf is None:
         raise HTTPException(status_code=404, detail=f"Scenario '{scenario}' not found")
@@ -340,5 +351,5 @@ def get_cashflows(scenario: str):
 
 
 @app.get("/api/ratings")
-def get_ratings():
+def get_ratings() -> List[Dict]:
     return _cache.get("ratings", [])
