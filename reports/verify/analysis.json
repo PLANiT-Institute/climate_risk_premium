@@ -12,8 +12,8 @@
     "G3_aai_nonzero": true,
     "G3_bbox_overlap": true,
     "G4_seed_changes_output": true,
-    "G5_max_csv_contribution": 0.0,
-    "G5_paper_framing": "CLIMADA-driven"
+    "G5_max_csv_contribution": 0.6291903197463737,
+    "G5_paper_framing": "CSV-driven (do NOT claim CLIMADA-driven SSP differentiation)"
   },
   "frequencies": [
     1.0000000000000002,
@@ -22,9 +22,9 @@
     1.0000000000000002
   ],
   "csv_contribution": {
-    "historical": 0.0,
-    "ssp126": 0.0,
-    "ssp245": 0.0,
-    "ssp585": 0.0
+    "historical": 0.2878519843846744,
+    "ssp126": 0.6291903197463737,
+    "ssp245": 0.011789247389644725,
+    "ssp585": 0.5097719377350407
   }
 }

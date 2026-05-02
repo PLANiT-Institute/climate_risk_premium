@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-05-02T12:56:06.846430",
+  "timestamp": "2026-05-02T13:27:09.293074",
   "ssp": "ssp585",
   "execution_path": "in_process",
   "climada_version": "unknown",
@@ -12,13 +12,13 @@
   "hazard": {
     "class": "climada_petals.hazard.wildfire.WildFire",
     "haz_type": "WFseason",
-    "n_events": 20,
+    "n_events": 30,
     "n_centroids": 7812,
-    "intensity_nnz": 1783,
+    "intensity_nnz": 3512,
     "intensity_max": 474.8,
-    "frequency_sum": 1.0000000000000002,
-    "event_id_hash": "db386abd44377d2c",
-    "intensity_hash": "16e8b0903719e3b1",
+    "frequency_sum": 1.0,
+    "event_id_hash": "4636c8ce8243aded",
+    "intensity_hash": "1131f9b55d326f5b",
     "centroid_bbox": [
       [
         37.24662951763864,
@@ -36,9 +36,9 @@
     "exp_bbox": null
   },
   "impact": {
-    "aai_agg": -695474946.0602552,
-    "n_events": 20,
-    "imp_mat_nnz": 23,
+    "aai_agg": -1050008556.9595643,
+    "n_events": 30,
+    "imp_mat_nnz": 60,
     "at_event_max": 0.0
   }
 }

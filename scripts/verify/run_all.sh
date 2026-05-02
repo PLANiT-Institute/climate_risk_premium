@@ -97,9 +97,10 @@ echo ""
 # STEP 3 — Run 9 CLIMADA invocations
 # ===========================================================================
 export CRP_WILDFIRE_SEED=42
-# Override for faster verification (production uses 100 from config)
-export CRP_PLANIT_WILDFIRE_MAX_PROB_SEASONS=10
-export CRP_PLANIT_WILDFIRE_MAX_IT=10000
+# Production config: n_probabilistic_seasons=100, max_it_propa=500000
+# For faster CI runs, uncomment these overrides:
+# export CRP_PLANIT_WILDFIRE_MAX_PROB_SEASONS=10
+# export CRP_PLANIT_WILDFIRE_MAX_IT=10000
 
 # --- Helper: inline CLIMADA runner that bypasses visualization imports ---
 RUNNER_SCRIPT='
@@ -143,8 +144,12 @@ for scenario, haz in hazards.items():
     freq = getattr(haz, "frequency", None)
     annual_freq = float(np.sum(freq)) if freq is not None else None
 
-    _sp = cfg.get("climada", {}).get("hazard", {}).get("scenario_params", {}).get(scenario, {})
+    _hcfg = cfg.get("climada", {}).get("hazard", {})
+    _sp = _hcfg.get("scenario_params", {}).get(scenario, {})
     n_proba = _sp.get("n_probabilistic_seasons", 100)
+    _max_ps = int(_hcfg.get("wildfire_max_probabilistic_seasons", -1))
+    if _max_ps >= 0:
+        n_proba = min(n_proba, _max_ps)
 
     print(f"  {scenario}: aai={imp.aai_agg:.0f}, events={len(imp.at_event)}, freq={annual_freq}")
 

@@ -1,24 +1,24 @@
 {
-  "timestamp": "2026-05-02T13:27:09.272737",
-  "ssp": "ssp126",
+  "timestamp": "2026-05-02T13:57:41.022777",
+  "ssp": "ssp585",
   "execution_path": "in_process",
   "climada_version": "unknown",
   "climada_path": "unknown",
   "python_version": "3.12.12",
   "platform": "macOS-26.3.1-arm64-arm-64bit",
   "seed": 42,
-  "csv_disabled": true,
+  "csv_disabled": false,
   "n_probabilistic_seasons": 100,
   "hazard": {
     "class": "climada_petals.hazard.wildfire.WildFire",
     "haz_type": "WFseason",
-    "n_events": 30,
+    "n_events": 110,
     "n_centroids": 7812,
-    "intensity_nnz": 1009,
+    "intensity_nnz": 18020,
     "intensity_max": 474.8,
-    "frequency_sum": 1.0,
-    "event_id_hash": "4636c8ce8243aded",
-    "intensity_hash": "f394d5ac9aa03577",
+    "frequency_sum": 0.9999999999999999,
+    "event_id_hash": "836d3c1bb33a227a",
+    "intensity_hash": "9151f74b1b64a388",
     "centroid_bbox": [
       [
         37.24662951763864,
@@ -33,12 +33,21 @@
   "exposure": {
     "n_points": 188,
     "value_sum": 4748226932237.657,
-    "exp_bbox": null
+    "exp_bbox": [
+      [
+        37.251243351706,
+        127.5036856089834
+      ],
+      [
+        37.60866397806935,
+        129.18098069691143
+      ]
+    ]
   },
   "impact": {
-    "aai_agg": -13557025.015906662,
-    "n_events": 30,
-    "imp_mat_nnz": 11,
+    "aai_agg": -428101546.0292617,
+    "n_events": 110,
+    "imp_mat_nnz": 199,
     "at_event_max": 0.0
   }
 }
