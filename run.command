@@ -1,21 +1,14 @@
 #!/bin/bash
-# Double-click in Finder (or run in Terminal) to launch the CRP Streamlit dashboard.
+# Double-click in Finder (or run in Terminal) to launch CarbonLens.
 
 cd "$(dirname "$0")"
 
 echo "======================================"
-echo "  Climate Risk Premium — Starting"
+echo "  CarbonLens — Climate × Credit"
 echo "======================================"
 
-# Kill any stale instance
-pkill -f "streamlit run dashboard/app.py" 2>/dev/null
-sleep 1
+# Open CarbonLens directly in the default browser
+open "dashboard/carbonlens/CarbonLens.html"
 
-# Install / sync dependencies if needed
-uv sync --quiet 2>/dev/null || true
-
-# Launch Streamlit
-echo "Opening http://localhost:8501 ..."
-uv run streamlit run dashboard/app.py \
-  --server.headless false \
-  --browser.gatherUsageStats false
+echo "CarbonLens opened in your browser."
+echo "(No server required — runs entirely in-browser.)"
