@@ -36,24 +36,24 @@ function ScreenOverview({ model, onEdit }) {
           value={fmtNum(baseline.npv_million, { digits: 0 })}
           unit="USD M"
           delta={<>Rating: <Rating value={baseline.overall_rating} /></>}
-          spark={baseline.rows.map(r => r.ebitda)}
+          spark={baseline.rows.map(r => r.ebitda / 1e6)}
           sparkColor={scenarioColor(baseline.id)} />
         <KPI label="No-Carbon NPV"
           value={noRisk ? fmtNum(noRisk.npv_million, { digits: 0 }) : "—"} unit="USD M"
           delta={noRisk ? <>Rating: <Rating value={noRisk.overall_rating} /></> : null}
-          spark={noRisk?.rows.map(r => r.ebitda)}
+          spark={noRisk?.rows.map(r => r.ebitda / 1e6)}
           sparkColor="var(--pos)" />
         <KPI label="Worst Scenario NPV"
           value={fmtNum(worst.npv_million, { digits: 0 })} unit="USD M"
           delta={<><span className="muted">{worst.name}</span></>}
           deltaPos={false}
-          spark={worst.rows.map(r => r.ebitda)}
+          spark={worst.rows.map(r => r.ebitda / 1e6)}
           sparkColor="var(--neg)" />
         <KPI label="Max CRP"
           value={fmtNum(maxCRP.crp_bps, { digits: 0 })} unit="bps"
           delta={<><span className="muted">{maxCRP.name}</span></>}
           deltaPos={false}
-          spark={maxCRP.rows.map(r => -r.ebitda)}
+          spark={maxCRP.rows.map(r => -r.ebitda / 1e6)}
           sparkColor="var(--warn)" />
       </div>
 

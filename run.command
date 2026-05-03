@@ -14,7 +14,7 @@ lsof -ti tcp:$PORT | xargs kill -9 2>/dev/null
 sleep 0.3
 
 # Start no-cache HTTP server (prevents browser from serving stale JS)
-python3 dashboard/carbonlens/serve.py $PORT &
+python3 serve.py $PORT &
 SERVER_PID=$!
 sleep 0.4
 
