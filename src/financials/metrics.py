@@ -17,7 +17,7 @@ class FinancialMetrics:
     """Project finance metrics."""
 
     npv: float
-    irr: float
+    irr: float | None  # None when IRR is undefined (e.g. all-negative cashflows)
     avg_dscr: float
     min_dscr: float
     llcr: float
@@ -26,7 +26,7 @@ class FinancialMetrics:
     def to_dict(self) -> Dict[str, Any]:
         return {
             "npv_million": self.npv / 1e6,
-            "irr_pct": self.irr * 100,
+            "irr_pct": (self.irr * 100) if self.irr is not None else None,
             "avg_dscr": self.avg_dscr,
             "min_dscr": self.min_dscr,
             "llcr": self.llcr,
@@ -153,7 +153,7 @@ def calculate_metrics(
 
     return FinancialMetrics(
         npv=npv,
-        irr=irr if not np.isnan(irr) else 0.0,
+        irr=irr if not np.isnan(irr) else None,
         avg_dscr=float(avg_dscr),
         min_dscr=min_dscr,
         llcr=llcr,

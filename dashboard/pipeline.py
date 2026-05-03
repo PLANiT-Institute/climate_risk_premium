@@ -60,6 +60,18 @@ def _float(v: Any) -> float:
     return float(v)
 
 
+def _float_or_none(v: Any) -> float | None:
+    """Like _float but returns None for NaN/None — use for IRR and other metrics
+    that are mathematically undefined when all cashflows are negative."""
+    if v is None:
+        return None
+    try:
+        f = float(v)
+    except (TypeError, ValueError):
+        return None
+    return None if np.isnan(f) else f
+
+
 def _build_blended_physical(
     physical_rows: list[dict],
     start_year: int,
@@ -269,7 +281,9 @@ def run_pipeline() -> dict:
             "carbon_price_2040": scenario.carbon_prices.get(2040, 0.0),
             "carbon_price_2050": scenario.carbon_prices.get(2050, 0.0),
             "npv_million": _float(metrics.npv / 1e6),
-            "irr_pct": _float(metrics.irr * 100),
+            "irr_pct": (
+                None if metrics.irr is None else _float_or_none(metrics.irr * 100)
+            ),
             "avg_dscr": _float(metrics.avg_dscr),
             "min_dscr": _float(metrics.min_dscr),
             "llcr": _float(metrics.llcr),

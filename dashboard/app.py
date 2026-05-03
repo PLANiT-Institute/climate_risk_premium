@@ -176,7 +176,9 @@ def page_scenarios(data: dict) -> None:
     df["Rating"] = df["overall_rating"]
     df["CRP (bps)"] = df["crp_bps"].round(0).astype(int)
     df["NPV ($M)"] = df["npv_million"].round(1)
-    df["IRR (%)"] = df["irr_pct"].round(2)
+    df["IRR (%)"] = df["irr_pct"].apply(
+        lambda x: f"{x:.2f}" if x is not None and not (isinstance(x, float) and np.isnan(x)) else "N/A"
+    )
     df["Avg DSCR"] = df["avg_dscr"].round(2)
     df["Min DSCR"] = df["min_dscr"].round(2)
     df["LLCR"] = df["llcr"].round(2)
