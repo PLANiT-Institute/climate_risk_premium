@@ -1,27 +1,35 @@
-"""Wildfire physical risk module.
+"""Physical risk module — wildfire, drought and heat/SST channels.
 
 Computes year-by-year physical risk adjustments for a coal power plant by
 reading CSV inputs from ``data/physical/`` and linearly interpolating to
 every operating year.
 
-Currently only the wildfire channel is active.  The data structure is designed
-to hold all hazard channels (TC, flood, temperature, SLR) so they can be
-activated later without changing the interface.
+Active channels
+---------------
+- **Wildfire outage** (plant + transmission): wildfire damage to equipment/lines.
+- **Drought capacity derate**: reduced CF from water/cooling constraints under drought.
+- **Heat/SST efficiency loss**: raised heat-rate from warmer ambient and seawater.
+
+Planned but not yet active: TC outage, flood outage, SLR, asset capex loss.
 
 Data sources (all in ``data/physical/``)
 -----------------------------------------
 - ``climada_data.csv``       — CLIMADA event counts (NASA FIRMS, IBTrACS, ISIMIP)
-- ``literature_data.csv``    — Verified climate factors (WWA 2025)
-- ``model_assumptions.csv``  — Outage probabilities and durations
+- ``literature_data.csv``    — Verified climate factors (WWA 2025, IPCC AR6, Kim 2016)
+- ``model_assumptions.csv``  — Outage probabilities, durations, base derate/loss rates
 - ``scenarios.csv``          — Physical scenario definitions incl. ``wildfire_scale``
 
-Physical scenario → SSP mapping and wildfire scale
+Physical scenario → SSP mapping and scenario scale
 ---------------------------------------------------
 Defined in ``data/physical/scenarios.csv`` (no hardcoded values in code):
   baseline         → ssp126, wildfire_scale = 0.30
   moderate_physical → ssp245, wildfire_scale = 0.60
   high_physical    → ssp585, wildfire_scale = 1.00
   severe_drought   → ssp585, wildfire_scale = 1.00
+
+The same ``wildfire_scale`` is reused as a universal SSP intensity scale for all
+hazard channels (drought factors, temperature change), since all are driven by
+the same greenhouse-gas trajectory.
 
 Algorithm (wildfire, outage_rate channel)
 -----------------------------------------
@@ -37,10 +45,30 @@ Algorithm (wildfire, outage_rate channel)
         = base_outage_rate × [1 + (wildfire_factor(year) − 1) × wildfire_scale]
 
 Transmission outage follows the same formula using outage_prob_tc and
-outage_duration_tc as a conservative proxy until TC data is activated.
+outage_duration_tc as a conservative proxy.
 
-Efficiency loss is zero for the wildfire-only implementation; that channel
-belongs to the temperature hazard (not yet activated).
+Algorithm (drought, capacity_derate channel)
+---------------------------------------------
+1.  drought_factor(year) = np.interp(year, anchor_years, factors)
+        (category DROUGHT, from literature_data.csv; SSP5-8.5 full scale)
+2.  drought_factor_scaled = 1 + (drought_factor − 1) × wildfire_scale
+3.  capacity_derate(year) = drought_base × drought_factor_scaled(year)
+        (drought_base from model_assumptions.csv)
+
+Samcheok Blue Power uses seawater cooling, so drought impact is lower than for
+inland plants; the base derate (0.5 %) reflects auxiliary system constraints only.
+
+Algorithm (heat/SST, efficiency_loss channel)
+----------------------------------------------
+1.  delta_T_ssp585(year) = np.interp(year, anchor_years, temp_changes)
+        (category HEAT, parameter korea_temp_change_ssp585, from literature_data.csv)
+2.  delta_T_scaled(year) = delta_T_ssp585(year) × wildfire_scale
+3.  eff_loss_per_C = (ambient_derate_model + sst_air_ratio × cooling_water_derate) / 100
+        (from EFFICIENCY rows in literature_data.csv)
+4.  efficiency_loss(year) = delta_T_scaled(year) × eff_loss_per_C
+
+Both the ambient air warming and the sea surface temperature (SST) rise reduce
+condenser efficiency; SST rise ≈ sst_air_ratio × air temperature rise.
 """
 from __future__ import annotations
 
@@ -239,46 +267,82 @@ def build_physical_adjustments(
         annual_frequency * outage_prob_transmission * (outage_dur_transmission / hours_per_year)
     )
 
-    # --- Literature: wildfire climate factors (WILDFIRE category) ---
-    wf_factor_rows = [
-        r for r in literature_rows
-        if r.get("category") == "WILDFIRE" and r.get("parameter") == "climate_factor"
-    ]
-    anchor_years_wf = sorted(int(r["year"]) for r in wf_factor_rows)
-    anchor_factors_wf = [
-        float(r["value"])
-        for r in sorted(wf_factor_rows, key=lambda x: int(x["year"]))
-    ]
+    # --- Helper: extract anchor (years, values) for one category+parameter ---
+    def _anchors(category: str, parameter: str):
+        rows = [
+            r for r in literature_rows
+            if r.get("category") == category and r.get("parameter") == parameter
+        ]
+        rows_sorted = sorted(rows, key=lambda x: int(x["year"]))
+        return (
+            [int(r["year"]) for r in rows_sorted],
+            [float(r["value"]) for r in rows_sorted],
+        )
 
-    # Interpolate climate factors to every operating year; hold constant beyond last anchor
-    climate_factors = np.interp(years, anchor_years_wf, anchor_factors_wf)
+    # -------------------------------------------------------------------------
+    # WILDFIRE channel — outage rates
+    # -------------------------------------------------------------------------
+    anchor_yrs_wf, anchor_vals_wf = _anchors("WILDFIRE", "climate_factor")
+    wf_climate_factors = np.interp(years, anchor_yrs_wf, anchor_vals_wf)
+    wf_scaled = 1.0 + (wf_climate_factors - 1.0) * wildfire_scale
 
-    # Apply SSP scenario scaling
-    climate_factors = 1.0 + (climate_factors - 1.0) * wildfire_scale
+    plant_outage_rates        = base_plant_outage        * wf_scaled
+    transmission_outage_rates = base_transmission_outage * wf_scaled
 
-    # --- Projected outage rates ---
-    plant_outage_rates = base_plant_outage * climate_factors
-    transmission_outage_rates = base_transmission_outage * climate_factors
+    # -------------------------------------------------------------------------
+    # DROUGHT channel — capacity derate
+    # -------------------------------------------------------------------------
+    drought_base = assumptions["drought_capacity_derate_base"]
 
-    # --- Efficiency loss ---
-    # Wildfire causes plant unavailability (outage_rate) not thermal efficiency
-    # loss; that channel belongs to the temperature hazard (activated later).
-    # Set to zero for the current wildfire-only implementation.
-    efficiency_losses = np.zeros(len(years))
+    anchor_yrs_dr, anchor_vals_dr = _anchors("DROUGHT", "climate_factor")
+    dr_climate_factors = np.interp(years, anchor_yrs_dr, anchor_vals_dr)
+    dr_scaled = 1.0 + (dr_climate_factors - 1.0) * wildfire_scale
+
+    capacity_derates = drought_base * dr_scaled
+
+    # -------------------------------------------------------------------------
+    # HEAT / SST channel — efficiency loss
+    # -------------------------------------------------------------------------
+    # Coefficients from EFFICIENCY rows (all-year entries, not year-anchored)
+    def _eff_param(param: str) -> float:
+        row = next(
+            (r for r in literature_rows
+             if r.get("category") == "EFFICIENCY" and r.get("parameter") == param),
+            None,
+        )
+        if row is None:
+            raise ValueError(f"EFFICIENCY/{param} not found in literature_data.csv")
+        return float(row["value"])
+
+    ambient_derate_pct  = _eff_param("ambient_derate_model")   # %/°C
+    cooling_derate_pct  = _eff_param("cooling_water_derate")    # %/°C
+    sst_air_ratio       = _eff_param("sst_air_ratio")           # dimensionless
+
+    # Fraction efficiency loss per °C of warming
+    eff_loss_per_C = (ambient_derate_pct + sst_air_ratio * cooling_derate_pct) / 100.0
+
+    anchor_yrs_tmp, anchor_vals_tmp = _anchors("HEAT", "korea_temp_change_ssp585")
+    delta_T_ssp585  = np.interp(years, anchor_yrs_tmp, anchor_vals_tmp)
+    delta_T_scaled  = delta_T_ssp585 * wildfire_scale   # scale ΔT by SSP intensity
+
+    efficiency_losses = delta_T_scaled * eff_loss_per_C
 
     n = len(years)
     logger.info(
-        "Built wildfire adjustments [%s / %s]: %d years, freq=%.3f/yr, "
-        "scale=%.2f, plant_outage_2050=%.5f, tx_outage_2050=%.5f",
-        physical_scenario, ssp, n, annual_frequency, wildfire_scale,
+        "Built physical adjustments [%s / %s]: %d years, scale=%.2f | "
+        "plant_outage_2050=%.5f, tx_outage_2050=%.5f | "
+        "capacity_derate_2050=%.4f, efficiency_loss_2050=%.4f",
+        physical_scenario, ssp, n, wildfire_scale,
         float(np.interp(2050, years, plant_outage_rates)),
         float(np.interp(2050, years, transmission_outage_rates)),
+        float(np.interp(2050, years, capacity_derates)),
+        float(np.interp(2050, years, efficiency_losses)),
     )
 
     return YearlyPhysicalAdjustments(
         years=years,
         outage_rates=plant_outage_rates,
-        capacity_derates=np.zeros(n),         # temperature/drought: activated later
+        capacity_derates=capacity_derates,
         efficiency_losses=efficiency_losses,
         water_constraints=np.ones(n),          # water risk: activated later
         transmission_outage_rates=transmission_outage_rates,

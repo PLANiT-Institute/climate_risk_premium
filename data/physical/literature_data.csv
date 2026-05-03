@@ -25,3 +25,11 @@ SLR,korea_projection,2100,0.63,meters,Sung et al. 2021,10.3390/atmos12010090,VER
 HEATWAVE,days_baseline,2024,5.0,days_per_year,Korea Herald,-,VERIFIED,Current heat wave days
 HEATWAVE,days_future,2100,17.4,days_per_year,WWA 2025,-,VERIFIED,SSP5-8.5 projection
 HEATWAVE,efficiency_loss,all,4.0,percent,Modeling assumption,-,ASSUMPTION,During extreme heat events
+HEAT,korea_temp_change_ssp585,2024,0.0,degrees_C,Baseline,-,VERIFIED,Reference year (relative to pre-industrial)
+HEAT,korea_temp_change_ssp585,2030,1.0,degrees_C,Kim et al. 2016,10.1007/s13143-016-0017-9,DERIVED,Linear interpolation
+HEAT,korea_temp_change_ssp585,2050,1.75,degrees_C,Kim et al. 2016,10.1007/s13143-016-0017-9,VERIFIED,RCP8.5 mid-century mean (2026-2050)
+HEAT,korea_temp_change_ssp585,2100,4.73,degrees_C,Kim et al. 2016,10.1007/s13143-016-0017-9,VERIFIED,RCP8.5 end-century mean (2076-2100)
+DROUGHT,climate_factor,2024,1.0,multiplier,Baseline,-,VERIFIED,Reference year
+DROUGHT,climate_factor,2030,1.12,multiplier,IPCC AR6 WG1 + archive,archive/data/physical/climate_factors.csv,VERIFIED,SSP5-8.5 2030 drought factor
+DROUGHT,climate_factor,2050,1.45,multiplier,IPCC AR6 WG1 + archive,archive/data/physical/climate_factors.csv,VERIFIED,SSP5-8.5 2050 drought factor
+DROUGHT,climate_factor,2100,2.00,multiplier,IPCC AR6 WG1 + archive,archive/data/physical/climate_factors.csv,VERIFIED,SSP5-8.5 2100 drought factor

@@ -8,3 +8,5 @@ outage_prob_flood,0.50,probability,High impact if flooding occurs,ASSUMPTION
 damaging_wind_threshold,30,m_per_s,TC winds causing power infrastructure damage,ASSUMPTION
 plant_elevation,10,meters,Samcheok Blue Power Plant elevation,VERIFIED
 hours_per_year,8760,hours,Standard calendar year,VERIFIED
+drought_capacity_derate_base,0.005,fraction,Baseline capacity derate from drought (0.5%); coastal seawater-cooled plant — lower than inland,VERIFIED
+drought_efficiency_loss_base,0.002,fraction,Baseline efficiency loss from drought (0.2%); auxiliary systems and condensate quality,ASSUMPTION

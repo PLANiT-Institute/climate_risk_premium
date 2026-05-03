@@ -1,10 +1,17 @@
-"""Unit tests for src/risk/physical.py — wildfire physical risk module.
+"""Unit tests for src/risk/physical.py — wildfire, drought and heat/SST channels.
 
 Numerical assertions use np.testing.assert_allclose so tolerances are explicit
 and failures show the actual vs expected values.
 
 Key values cross-checked against archive physical_risk_output.csv (RCP8.5):
     wildfire_projected_pct_2050 = 1.6438e-02 %  →  1.6438e-04 fraction
+
+Drought / heat expected values (high_physical, SSP5-8.5, scale=1.0):
+    drought_factor_2050      = 1.45  (from literature_data.csv DROUGHT anchor)
+    capacity_derate_2050     = 0.005 × 1.45 = 7.25e-3
+    delta_T_2050             = 1.75 °C
+    eff_loss_per_C           = (0.08 + 0.80 × 0.133) / 100 = 1.864e-3 /°C
+    efficiency_loss_2050     = 1.75 × 1.864e-3 = 3.262e-3
 """
 from __future__ import annotations
 
@@ -120,12 +127,13 @@ class TestWildfireFormula:
     def test_outage_rates_positive(self, adj_high):
         assert np.all(adj_high.outage_rates > 0)
 
-    def test_efficiency_losses_zero(self, adj_high):
-        """Wildfire efficiency loss is zero — belongs to temperature channel, not activated."""
-        np.testing.assert_array_equal(adj_high.efficiency_losses, 0.0)
+    def test_efficiency_losses_positive(self, adj_high):
+        """Heat/SST channel is now active — efficiency losses must be > 0."""
+        assert np.all(adj_high.efficiency_losses > 0)
 
-    def test_capacity_derates_zero(self, adj_high):
-        np.testing.assert_array_equal(adj_high.capacity_derates, 0.0)
+    def test_capacity_derates_positive(self, adj_high):
+        """Drought channel is now active — capacity derates must be > 0."""
+        assert np.all(adj_high.capacity_derates > 0)
 
     def test_water_constraints_one(self, adj_high):
         np.testing.assert_array_equal(adj_high.water_constraints, 1.0)
@@ -193,8 +201,8 @@ class TestGetAdjustmentForYear:
     def test_year_in_range(self, adj_high):
         result = adj_high.get_adjustment_for_year(2050)
         np.testing.assert_allclose(result.outage_rate, _EXPECTED_PLANT_OUTAGE_2050, rtol=1e-3)
-        assert result.capacity_derate == 0.0
-        assert result.efficiency_loss == 0.0
+        assert result.capacity_derate > 0.0    # drought channel active
+        assert result.efficiency_loss > 0.0    # heat/SST channel active
         assert result.water_constrained_capacity == 1.0
 
     def test_year_out_of_range_returns_zeros(self, adj_high):
@@ -230,3 +238,92 @@ class TestClimateFactorInterpolation:
         r_2100 = float(np.interp(2100, adj.years, adj.outage_rates))
         r_2124 = float(adj.outage_rates[-1])
         np.testing.assert_allclose(r_2124, r_2100, rtol=1e-6)
+
+
+# ---------------------------------------------------------------------------
+# Drought channel (capacity_derate)
+# ---------------------------------------------------------------------------
+# drought_capacity_derate_base = 0.005
+# drought_factor_2050 (SSP5-8.5, scale=1.0) = 1.45
+# capacity_derate_2050 = 0.005 × 1.45 = 7.25e-3
+
+_DROUGHT_BASE = 0.005
+_DROUGHT_FACTOR_2050_HIGH = 1.45
+_EXPECTED_CAPACITY_DERATE_2050 = _DROUGHT_BASE * _DROUGHT_FACTOR_2050_HIGH
+
+
+class TestDroughtChannel:
+    def test_capacity_derate_2050_high(self, adj_high):
+        val = float(np.interp(2050, adj_high.years, adj_high.capacity_derates))
+        np.testing.assert_allclose(val, _EXPECTED_CAPACITY_DERATE_2050, rtol=1e-4)
+
+    def test_capacity_derate_monotone_increasing(self, adj_high):
+        assert np.all(np.diff(adj_high.capacity_derates) >= -1e-15)
+
+    def test_capacity_derate_baseline_smaller_than_high(self, adj_baseline, adj_high):
+        b = float(np.interp(2050, adj_baseline.years, adj_baseline.capacity_derates))
+        h = float(np.interp(2050, adj_high.years, adj_high.capacity_derates))
+        assert b < h
+
+    def test_capacity_derate_at_base_year(self):
+        """At 2024 anchor drought_factor = 1.0 → derate = base × 1.0.
+        Use start_year=2024 so 2024 is exactly in the array (not clamped)."""
+        adj = build_physical_adjustments(start_year=2024, n_years=1, physical_scenario="high_physical")
+        np.testing.assert_allclose(float(adj.capacity_derates[0]), _DROUGHT_BASE, rtol=1e-6)
+
+    def test_capacity_derate_2100_scale_ratio(self, adj_baseline, adj_moderate, adj_high):
+        """
+        At 2100 drought_factor = 2.0 (SSP5-8.5):
+        high     scale=1.0 → derate_factor = 1 + 1.0×1.0 = 2.0 → derate = 0.005 × 2.0 = 0.01
+        moderate scale=0.6 → derate_factor = 1 + 1.0×0.6 = 1.6 → derate = 0.005 × 1.6 = 0.008
+        baseline scale=0.3 → derate_factor = 1 + 1.0×0.3 = 1.3 → derate = 0.005 × 1.3 = 0.0065
+        """
+        b = float(np.interp(2100, adj_baseline.years, adj_baseline.capacity_derates))
+        m = float(np.interp(2100, adj_moderate.years, adj_moderate.capacity_derates))
+        h = float(np.interp(2100, adj_high.years, adj_high.capacity_derates))
+        np.testing.assert_allclose(h, _DROUGHT_BASE * 2.0, rtol=1e-6)
+        np.testing.assert_allclose(m, _DROUGHT_BASE * 1.6, rtol=1e-6)
+        np.testing.assert_allclose(b, _DROUGHT_BASE * 1.3, rtol=1e-6)
+
+
+# ---------------------------------------------------------------------------
+# Heat / SST channel (efficiency_loss)
+# ---------------------------------------------------------------------------
+# eff_loss_per_C = (0.08 + 0.80 × 0.133) / 100 = (0.08 + 0.1064) / 100 = 1.864e-3
+# delta_T_2050 (SSP5-8.5, scale=1.0) = 1.75 °C
+# efficiency_loss_2050 = 1.75 × 1.864e-3 = 3.262e-3
+
+_EFF_LOSS_PER_C = (0.08 + 0.80 * 0.133) / 100.0   # 1.864e-3 /°C
+_DELTA_T_2050_SSP585 = 1.75                          # °C
+_EXPECTED_EFF_LOSS_2050 = _DELTA_T_2050_SSP585 * _EFF_LOSS_PER_C
+
+
+class TestHeatSSTChannel:
+    def test_efficiency_loss_2050_high(self, adj_high):
+        val = float(np.interp(2050, adj_high.years, adj_high.efficiency_losses))
+        np.testing.assert_allclose(val, _EXPECTED_EFF_LOSS_2050, rtol=1e-4)
+
+    def test_efficiency_loss_zero_at_baseline_year(self):
+        """At 2024 anchor delta_T = 0 → efficiency_loss = 0.
+        Use start_year=2024 so 2024 is exactly in the array (not clamped)."""
+        adj = build_physical_adjustments(start_year=2024, n_years=1, physical_scenario="high_physical")
+        np.testing.assert_allclose(float(adj.efficiency_losses[0]), 0.0, atol=1e-10)
+
+    def test_efficiency_loss_monotone_increasing(self, adj_high):
+        assert np.all(np.diff(adj_high.efficiency_losses) >= -1e-15)
+
+    def test_efficiency_loss_baseline_smaller_than_high(self, adj_baseline, adj_high):
+        b = float(np.interp(2050, adj_baseline.years, adj_baseline.efficiency_losses))
+        h = float(np.interp(2050, adj_high.years, adj_high.efficiency_losses))
+        assert b < h
+
+    def test_efficiency_loss_2030_anchor(self, adj_high):
+        """At 2030 delta_T = 1.0 °C (SSP5-8.5, scale=1.0)."""
+        val = float(np.interp(2030, adj_high.years, adj_high.efficiency_losses))
+        np.testing.assert_allclose(val, 1.0 * _EFF_LOSS_PER_C, rtol=1e-6)
+
+    def test_efficiency_loss_ssp_scale(self, adj_baseline, adj_high):
+        """baseline scale=0.30 → eff_loss = 0.30 × high_eff_loss at all years."""
+        b = np.interp(2100, adj_baseline.years, adj_baseline.efficiency_losses)
+        h = np.interp(2100, adj_high.years, adj_high.efficiency_losses)
+        np.testing.assert_allclose(b / h, 0.30, rtol=1e-6)
