@@ -8,6 +8,7 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
@@ -390,11 +391,6 @@ def page_credit(data: dict) -> None:
     debt_payoff_year = data["plant"]["debt_payoff_year"]
     df_r = pd.DataFrame(ratings)
 
-    # Clip the full year-by-year frame to 2025–2050 once, so every chart
-    # in this page (DSCR, spread, heatmap) shares the same window.
-    YEAR_MIN, YEAR_MAX = 2025, 2050
-    df_r = df_r[(df_r["year"] >= YEAR_MIN) & (df_r["year"] <= YEAR_MAX)].copy()
-
     # DSCR trajectories
     st.subheader("DSCR Trajectories")
     all_scenarios = df_r["scenario"].unique().tolist()
@@ -469,58 +465,74 @@ def page_credit(data: dict) -> None:
 
     st.divider()
 
-    # Rating migration heatmap (year × scenario) — already clipped to 2025–2050
+    # Rating migration heatmap — clipped to 2025–2050 per user request
     st.subheader("Rating Migration Heatmap")
-    df_heatmap = df_r[df_r["scenario"].isin(selected_scenarios)]
+    HEATMAP_YEAR_MIN, HEATMAP_YEAR_MAX = 2025, 2050
+    df_heatmap = df_r[
+        df_r["scenario"].isin(selected_scenarios)
+        & (df_r["year"] >= HEATMAP_YEAR_MIN)
+        & (df_r["year"] <= HEATMAP_YEAR_MAX)
+    ].copy()
     pivot = df_heatmap.pivot(index="year", columns="scenario", values="rating")
     pivot.columns = [label(c) for c in pivot.columns]
     pivot = pivot.sort_index()
 
-    # Explicit string arrays force a categorical (discrete) axis — passing
-    # numeric years lets Plotly auto-range continuously from 0.
     years_str = [str(int(y)) for y in pivot.index]
-    scenarios_list = list(pivot.columns)
+    scenarios_list_hm = list(pivot.columns)
+    n_years = len(years_str)
+    n_scens = len(scenarios_list_hm)
 
     rating_num = {r: i for i, r in enumerate(RATING_ORDER)}
     pivot_num = pivot.map(lambda x: rating_num.get(x, 9) if pd.notna(x) else 9)
 
-    # Build colorscale; collapse duplicate stops so plotly accepts it
     colorscale = [
         [i / max(1, len(RATING_ORDER) - 1), RATING_COLORS[r]]
         for i, r in enumerate(RATING_ORDER)
     ]
 
-    fig3 = go.Figure(
-        data=go.Heatmap(
-            z=pivot_num.T.values,
-            x=years_str,
-            y=scenarios_list,
-            colorscale=colorscale,
-            zmin=0,
-            zmax=len(RATING_ORDER) - 1,
-            showscale=False,
-            hovertemplate="Year: %{x}<br>Scenario: %{y}<br>Rating: %{customdata}<extra></extra>",
-            customdata=pivot.T.values,
-        )
-    )
-    # Add rating text annotations on each cell
+    # Use integer x/y positions — Plotly distributes cells evenly.
+    # Tick labels are applied separately via tickvals/ticktext.
+    # customdata[row, col] = [year_str, scenario_name, rating_str] for hover.
+    customdata_3d = np.empty((n_scens, n_years, 3), dtype=object)
     annotations = []
-    for r_idx, scen_name in enumerate(scenarios_list):
-        for c_idx, year_label in enumerate(years_str):
+    for r_idx, scen_name in enumerate(scenarios_list_hm):
+        for c_idx, year_s in enumerate(years_str):
             text_val = pivot.iloc[c_idx, r_idx]
+            rating_s = text_val if pd.notna(text_val) else ""
+            customdata_3d[r_idx, c_idx] = [year_s, scen_name, rating_s]
             annotations.append(dict(
-                x=year_label,
-                y=scen_name,
-                text=text_val if pd.notna(text_val) else "",
+                x=c_idx, y=r_idx,
+                text=rating_s,
                 showarrow=False,
                 font=dict(size=8, color="white"),
             ))
+
+    fig3 = go.Figure(data=go.Heatmap(
+        z=pivot_num.T.values,        # shape: (n_scens, n_years)
+        colorscale=colorscale,
+        zmin=0,
+        zmax=len(RATING_ORDER) - 1,
+        showscale=False,
+        customdata=customdata_3d,
+        hovertemplate="Year: %{customdata[0]}<br>Scenario: %{customdata[1]}<br>Rating: %{customdata[2]}<extra></extra>",
+    ))
     fig3.update_layout(
-        height=max(200, len(scenarios_list) * 40 + 60),
+        height=max(200, n_scens * 40 + 60),
         margin=dict(l=0, r=0, t=10, b=10),
         annotations=annotations,
-        xaxis=dict(type="category", title="Year"),
-        yaxis=dict(type="category", title="Scenario"),
+        xaxis=dict(
+            tickmode="array",
+            tickvals=list(range(n_years)),
+            ticktext=years_str,
+            tickangle=45,
+            title="Year",
+        ),
+        yaxis=dict(
+            tickmode="array",
+            tickvals=list(range(n_scens)),
+            ticktext=scenarios_list_hm,
+            title="Scenario",
+        ),
     )
     st.plotly_chart(fig3, width="stretch")
 
