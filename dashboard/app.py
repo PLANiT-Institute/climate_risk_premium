@@ -19,7 +19,7 @@ _REPO = Path(__file__).parent.parent
 if str(_REPO) not in sys.path:
     sys.path.insert(0, str(_REPO))
 
-from dashboard.pipeline import run_pipeline
+from dashboard.pipeline import run_pipeline, ALL_PHYSICAL_CHANNELS
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -683,116 +683,196 @@ def page_risk_decomposition(data: dict) -> None:
 
 
 def page_physical_risk(data: dict) -> None:
-    """Show wildfire outage trajectories for all physical scenarios side by side."""
+    """Physical risk page with selectable hazard types, impact channels and view modes."""
     from src.risk.physical import build_physical_adjustments
 
-    st.header("Physical Risk — Wildfire")
-    st.caption("Wildfire outage rates across all physical scenarios")
+    st.header("Physical Risk")
+    st.caption("Wildfire, drought and heat/SST impacts across all physical scenarios")
 
-    # Load all 4 physical scenarios directly (no user selector)
+    # ── Channel definitions ──────────────────────────────────────────────────
     PHYSICAL_SCENARIOS = [
-        ("baseline",          "Baseline (SSP1-2.6)",    "#22c55e"),
-        ("moderate_physical", "Moderate (SSP2-4.5)",    "#f59e0b"),
-        ("high_physical",     "High (SSP5-8.5)",        "#ef4444"),
+        ("baseline",          "Baseline (SSP1-2.6)",       "#22c55e"),
+        ("moderate_physical", "Moderate (SSP2-4.5)",       "#f59e0b"),
+        ("high_physical",     "High (SSP5-8.5)",           "#ef4444"),
         ("severe_drought",    "Severe Drought (SSP5-8.5)", "#7c3aed"),
     ]
 
-    # Use start_year and n_years consistent with the pipeline
+    # channel_key → (label, array_attr, y-axis label, line style)
+    ALL_CHANNELS = {
+        "Wildfire — Plant outage":        ("outage_rates",              "Outage rate (%/yr)",     "solid"),
+        "Wildfire — Transmission outage": ("transmission_outage_rates", "Outage rate (%/yr)",     "dash"),
+        "Drought — Capacity derate":      ("capacity_derates",          "Capacity derate (%/yr)", "dot"),
+        "Heat/SST — Efficiency loss":     ("efficiency_losses",         "Efficiency loss (%/yr)", "dashdot"),
+    }
+
+    HAZARD_GROUPS = {
+        "Wildfire":  ["Wildfire — Plant outage", "Wildfire — Transmission outage"],
+        "Drought":   ["Drought — Capacity derate"],
+        "Heat/SST":  ["Heat/SST — Efficiency loss"],
+    }
+
+    # ── User controls (top of page) ──────────────────────────────────────────
+    ctrl_col1, ctrl_col2, ctrl_col3 = st.columns([2, 2, 2])
+
+    with ctrl_col1:
+        sel_hazards = st.multiselect(
+            "Hazard types",
+            options=list(HAZARD_GROUPS.keys()),
+            default=list(HAZARD_GROUPS.keys()),
+        )
+    with ctrl_col2:
+        all_sel_channels = [ch for h in sel_hazards for ch in HAZARD_GROUPS[h]]
+        sel_channels = st.multiselect(
+            "Impact channels",
+            options=all_sel_channels,
+            default=all_sel_channels,
+        )
+    with ctrl_col3:
+        view_mode = st.radio(
+            "View",
+            ["Compare scenarios", "Compare channels", "Combined CF impact"],
+            horizontal=True,
+        )
+
+    if not sel_channels:
+        st.info("Select at least one impact channel above.")
+        return
+
+    # ── Build adjustments ────────────────────────────────────────────────────
     plant = data["plant"]
-    start_year = 2025
-    n_years = plant["operating_years"]
+    start_year, n_years = 2025, plant["operating_years"]
     anchor_years = [2025, 2030, 2050, 2100]
 
-    scenarios_data = {}
-    for sc_name, _label, _color in PHYSICAL_SCENARIOS:
-        adj = build_physical_adjustments(
-            start_year=start_year,
-            n_years=n_years,
-            physical_scenario=sc_name,
+    scenarios_data: dict = {}
+    for sc_name, _, _ in PHYSICAL_SCENARIOS:
+        scenarios_data[sc_name] = build_physical_adjustments(
+            start_year=start_year, n_years=n_years, physical_scenario=sc_name,
         )
-        scenarios_data[sc_name] = adj
+    years = scenarios_data["high_physical"].years
 
-    ref_adj = scenarios_data["high_physical"]
-    years = ref_adj.years
+    def v(sc_name: str, ch: str, yr: int | None = None):
+        arr = getattr(scenarios_data[sc_name], ALL_CHANNELS[ch][0]) * 100
+        if yr is not None:
+            return float(np.interp(yr, years, arr))
+        return arr
 
-    def rate_at(adj, field: str, yr: int) -> float:
-        arr = getattr(adj, field)
-        return float(np.interp(yr, years, arr))
-
-    # ── Key metrics (high_physical at 2050) ─────────────────────────────────
+    # ── Summary metrics ──────────────────────────────────────────────────────
     hp = scenarios_data["high_physical"]
-    p50  = rate_at(hp, "outage_rates", 2050)
-    t50  = rate_at(hp, "transmission_outage_rates", 2050)
-    comb50 = 1 - (1 - p50) * (1 - t50)
-
-    c1, c2, c3, c4 = st.columns(4)
-    c1.metric("Base frequency", "0.30 events/yr", help="6 events / 20-year window (NASA FIRMS)")
-    c2.metric("Plant outage 2050 (high)", f"{p50 * 100:.4f}%")
-    c3.metric("Transmission outage 2050 (high)", f"{t50 * 100:.4f}%")
-    c4.metric("Combined outage 2050 (high)", f"{comb50 * 100:.4f}%",
-              help="1 − (1 − plant) × (1 − transmission)")
+    m_cols = st.columns(len(sel_channels))
+    for i, ch in enumerate(sel_channels):
+        arr_attr, _, _ = ALL_CHANNELS[ch]
+        val = float(np.interp(2050, years, getattr(hp, arr_attr) * 100))
+        m_cols[i].metric(f"{ch} @ 2050 (high)", f"{val:.4f}%")
 
     st.divider()
 
-    # ── Outage trajectories — all scenarios ─────────────────────────────────
-    col_l, col_r = st.columns(2)
+    # ── Charts ───────────────────────────────────────────────────────────────
+    if view_mode == "Compare scenarios":
+        # One chart per selected channel; all 4 scenarios overlaid
+        n_charts = len(sel_channels)
+        cols = st.columns(min(n_charts, 2))
+        for i, ch in enumerate(sel_channels):
+            _, y_label, _ = ALL_CHANNELS[ch]
+            fig = go.Figure()
+            for sc_name, sc_label, color in PHYSICAL_SCENARIOS:
+                fig.add_trace(go.Scatter(
+                    x=years, y=v(sc_name, ch),
+                    name=sc_label, line=dict(color=color, width=2),
+                ))
+            fig.update_layout(
+                title=ch, height=320,
+                margin=dict(l=0, r=0, t=30, b=10),
+                yaxis_title=y_label,
+                legend=dict(orientation="h", y=-0.35),
+            )
+            cols[i % 2].plotly_chart(fig, width="stretch")
 
-    with col_l:
-        st.subheader("Plant Outage Rate — All Scenarios")
-        fig_p = go.Figure()
-        for sc_name, sc_label, color in PHYSICAL_SCENARIOS:
-            adj = scenarios_data[sc_name]
-            fig_p.add_trace(go.Scatter(
-                x=years, y=adj.outage_rates * 100,
-                name=sc_label, line=dict(color=color, width=2),
-            ))
-        fig_p.update_layout(
-            height=320, margin=dict(l=0, r=0, t=10, b=10),
-            yaxis_title="Outage rate (%/yr)",
-            legend=dict(orientation="h", y=-0.3),
-        )
-        st.plotly_chart(fig_p, width="stretch")
+    elif view_mode == "Compare channels":
+        # One chart per physical scenario; all selected channels overlaid
+        dash_map = {ch: ALL_CHANNELS[ch][2] for ch in sel_channels}
+        channel_colors = ["#0ea5e9", "#f59e0b", "#10b981", "#ef4444"]
+        cols = st.columns(2)
+        for i, (sc_name, sc_label, _) in enumerate(PHYSICAL_SCENARIOS):
+            fig = go.Figure()
+            for j, ch in enumerate(sel_channels):
+                _, y_label, dash = ALL_CHANNELS[ch]
+                fig.add_trace(go.Scatter(
+                    x=years, y=v(sc_name, ch),
+                    name=ch, line=dict(color=channel_colors[j % 4], width=2, dash=dash),
+                ))
+            fig.update_layout(
+                title=sc_label, height=300,
+                margin=dict(l=0, r=0, t=30, b=10),
+                yaxis_title="Impact (%/yr)",
+                legend=dict(orientation="h", y=-0.40, font_size=10),
+            )
+            cols[i % 2].plotly_chart(fig, width="stretch")
 
-    with col_r:
-        st.subheader("Transmission Outage Rate — All Scenarios")
-        fig_t = go.Figure()
-        for sc_name, sc_label, color in PHYSICAL_SCENARIOS:
-            adj = scenarios_data[sc_name]
-            fig_t.add_trace(go.Scatter(
-                x=years, y=adj.transmission_outage_rates * 100,
-                name=sc_label, line=dict(color=color, width=2, dash="dash"),
-            ))
-        fig_t.update_layout(
-            height=320, margin=dict(l=0, r=0, t=10, b=10),
-            yaxis_title="Outage rate (%/yr)",
-            legend=dict(orientation="h", y=-0.3),
-        )
-        st.plotly_chart(fig_t, width="stretch")
+    else:  # Combined CF impact
+        # Stack CF-reducing channels (outage + derate) and show efficiency separately
+        cf_channels = [ch for ch in sel_channels
+                       if "outage" in ch.lower() or "derate" in ch.lower()]
+        eff_channels = [ch for ch in sel_channels if "efficiency" in ch.lower()]
+
+        col_l, col_r = st.columns(2)
+        with col_l:
+            st.subheader("Capacity Factor Impact (stacked)")
+            if cf_channels:
+                fig = go.Figure()
+                for sc_name, sc_label, color in PHYSICAL_SCENARIOS:
+                    combined = np.zeros(len(years))
+                    for ch in cf_channels:
+                        combined += v(sc_name, ch)
+                    fig.add_trace(go.Scatter(
+                        x=years, y=combined,
+                        name=sc_label, line=dict(color=color, width=2),
+                        fill="tozeroy" if sc_name == "baseline" else None,
+                    ))
+                fig.update_layout(
+                    height=340, margin=dict(l=0, r=0, t=10, b=10),
+                    yaxis_title="Total CF reduction (%/yr)",
+                    legend=dict(orientation="h", y=-0.3),
+                )
+                st.plotly_chart(fig, width="stretch")
+                st.caption("Outage + capacity derate summed (independent effects additive for small values)")
+            else:
+                st.info("No CF-reducing channels selected.")
+
+        with col_r:
+            st.subheader("Heat Rate Efficiency Loss")
+            if eff_channels:
+                fig = go.Figure()
+                for sc_name, sc_label, color in PHYSICAL_SCENARIOS:
+                    arr = sum(v(sc_name, ch) for ch in eff_channels)
+                    fig.add_trace(go.Scatter(
+                        x=years, y=arr if isinstance(arr, np.ndarray) else np.array([arr]),
+                        name=sc_label, line=dict(color=color, width=2, dash="dot"),
+                    ))
+                fig.update_layout(
+                    height=340, margin=dict(l=0, r=0, t=10, b=10),
+                    yaxis_title="Efficiency loss (%/yr)",
+                    legend=dict(orientation="h", y=-0.3),
+                )
+                st.plotly_chart(fig, width="stretch")
+            else:
+                st.info("No efficiency channels selected.")
 
     st.divider()
 
-    # ── Anchor-year summary table ────────────────────────────────────────────
-    st.subheader("Outage Rates at Key Years")
+    # ── Key-year summary table ────────────────────────────────────────────────
+    st.subheader("Impact at Key Years")
     table_rows = []
     for sc_name, sc_label, _ in PHYSICAL_SCENARIOS:
-        adj = scenarios_data[sc_name]
         for yr in anchor_years:
-            p = rate_at(adj, "outage_rates", yr)
-            t = rate_at(adj, "transmission_outage_rates", yr)
-            table_rows.append({
-                "Scenario": sc_label,
-                "Year": yr,
-                "Plant (%/yr)": round(p * 100, 5),
-                "Transmission (%/yr)": round(t * 100, 5),
-                "Combined (%/yr)": round((1 - (1 - p) * (1 - t)) * 100, 5),
-                "Plant hrs/yr": round(p * 8760, 3),
-            })
-    df_table = pd.DataFrame(table_rows)
-    st.dataframe(df_table.set_index(["Scenario", "Year"]), width="stretch")
+            row: dict = {"Scenario": sc_label, "Year": yr}
+            for ch in sel_channels:
+                row[ch] = round(v(sc_name, ch, yr), 5)
+            table_rows.append(row)
+    st.dataframe(pd.DataFrame(table_rows).set_index(["Scenario", "Year"]), width="stretch")
 
     st.divider()
 
-    # ── Scenario descriptions ────────────────────────────────────────────────
+    # ── Scenario definitions ─────────────────────────────────────────────────
     st.subheader("Scenario Definitions")
     meta = data.get("physical_meta", [])
     if meta:
@@ -964,10 +1044,27 @@ def main() -> None:
             label_visibility="collapsed",
         )
         st.divider()
-        st.caption("Transition + Wildfire physical risk · v2.1")
+
+        # ── Risk inclusions ──────────────────────────────────────────────────
+        st.caption("**Risk inclusions**")
+        st.caption("Physical risk channels in financial model:")
+        ch_wildfire = st.checkbox("Wildfire outage",     value=True, key="ch_wildfire")
+        ch_drought  = st.checkbox("Drought derate",      value=True, key="ch_drought")
+        ch_heat     = st.checkbox("Heat/SST efficiency", value=True, key="ch_heat")
+
+        active_channels: tuple[str, ...] = tuple(
+            ch for ch, on in [
+                ("wildfire_outage",  ch_wildfire),
+                ("drought_derate",   ch_drought),
+                ("water_constraint", True),   # tied to drought; always follows drought
+                ("efficiency_loss",  ch_heat),
+            ] if on
+        )
+        st.divider()
+        st.caption(f"v2.2 · {len(active_channels)} physical channels active")
 
     with st.spinner("Running pipeline…"):
-        data = run_pipeline()
+        data = run_pipeline(active_physical_channels=active_channels)
 
     pages = {
         "Overview": page_overview,

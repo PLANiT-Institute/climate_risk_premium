@@ -1,24 +1,30 @@
-"""Cash-flow engine — transition risk and optional wildfire physical risk.
+"""Cash-flow engine — transition risk and optional physical risk overlay.
 
 Computes year-by-year free cash flows for a power plant under a transition
-policy scenario, with an optional wildfire physical risk overlay.
+policy scenario, with an optional physical risk overlay.
 
 Key assumptions
 ---------------
 - Capacity factor is first reduced by the dispatch penalty (transition), then
-  further multiplied by (1 − wildfire_outage_rate) when wildfire_adj is given.
-- Fuel costs are scaled by (1 + efficiency_loss) when wildfire_adj is given,
-  reflecting thermal efficiency degradation from smoke/particulate fouling.
+  further multiplied by the active physical-risk CF factors.
+- Active physical channels (controlled by ``active_physical_channels``):
+    ``"wildfire_outage"``  — CF × (1 − outage_rate)
+    ``"drought_derate"``   — CF × (1 − capacity_derate)
+    ``"water_constraint"`` — CF capped at water_constrained_capacity
+    ``"efficiency_loss"``  — fuel_cost × (1 + efficiency_loss)
 - Carbon costs (K-ETS) are computed from ``YearlyTransitionAdjustments``.
 - Debt service uses a level-annuity schedule (standard project finance).
 - Depreciation is straight-line over ``useful_life`` years.
 - Free Cash Flow = NOPAT + Depreciation.
+
+Pass ``active_physical_channels=frozenset()`` (or ``None`` for
+``yearly_physical_adj``) to run transition-risk only.
 """
 from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
-from typing import Dict, Any, List, TYPE_CHECKING
+from typing import Dict, Any, FrozenSet, List, Optional, TYPE_CHECKING
 
 import numpy as np
 import numpy_financial as npf
@@ -96,13 +102,9 @@ def compute_cashflows(
     yearly_transition_adj: "YearlyTransitionAdjustments",
     yearly_physical_adj: "YearlyPhysicalAdjustments | None" = None,
     start_year: int = 2025,
+    active_physical_channels: Optional[FrozenSet[str]] = None,
 ) -> CashFlowTimeSeries:
     """Compute annual cash flows over the plant's operating life.
-
-    When ``yearly_physical_adj`` is provided the capacity factor for each year
-    is further reduced by ``(1 − outage_rate)`` and fuel costs are scaled by
-    ``(1 + efficiency_loss)`` to reflect wildfire-driven unavailability and
-    thermal efficiency degradation from smoke/particulate fouling.
 
     Args:
         plant_params: Flat dict from ``load_plant_params()``.
@@ -113,6 +115,11 @@ def compute_cashflows(
             transition-risk only.
         start_year: First calendar year of operations (unused here; years
             come from ``yearly_transition_adj.years``).
+        active_physical_channels: Which physical channels to apply.  ``None``
+            means all channels active.  Pass ``frozenset()`` to disable all.
+            Valid channel names:
+            ``"wildfire_outage"``, ``"drought_derate"``,
+            ``"water_constraint"``, ``"efficiency_loss"``.
 
     Returns:
         ``CashFlowTimeSeries`` spanning the scenario's retirement horizon.
@@ -139,23 +146,32 @@ def compute_cashflows(
     cf_series = np.array(
         [yearly_transition_adj.get_cf_for_year(int(y)) for y in years]
     )
-    if yearly_physical_adj is not None:
+
+    # Resolve which physical channels are active.
+    # None → all channels; frozenset() → none; explicit set → named channels only.
+    _ALL_CHANNELS = frozenset(
+        {"wildfire_outage", "drought_derate", "water_constraint", "efficiency_loss"}
+    )
+    _active = _ALL_CHANNELS if active_physical_channels is None else active_physical_channels
+
+    phys_adj_list = None
+    if yearly_physical_adj is not None and _active:
         phys_adj_list = [
             yearly_physical_adj.get_adjustment_for_year(int(y)) for y in years
         ]
-        # Wildfire outage reduces available generation hours
-        cf_series = cf_series * np.array(
-            [1.0 - a.outage_rate for a in phys_adj_list]
-        )
-        # Drought/temperature capacity derate (zero until activated)
-        cf_series = cf_series * np.array(
-            [1.0 - a.capacity_derate for a in phys_adj_list]
-        )
-        # Water availability hard cap (1.0 until activated)
-        cf_series = np.minimum(
-            cf_series,
-            np.array([a.water_constrained_capacity for a in phys_adj_list]),
-        )
+        if "wildfire_outage" in _active:
+            cf_series = cf_series * np.array(
+                [1.0 - a.outage_rate for a in phys_adj_list]
+            )
+        if "drought_derate" in _active:
+            cf_series = cf_series * np.array(
+                [1.0 - a.capacity_derate for a in phys_adj_list]
+            )
+        if "water_constraint" in _active:
+            cf_series = np.minimum(
+                cf_series,
+                np.array([a.water_constrained_capacity for a in phys_adj_list]),
+            )
 
     # --- Generation (MWh/year) ---
     annual_mwh = capacity_mw * 8760 * cf_series
@@ -164,8 +180,7 @@ def compute_cashflows(
     revenue = annual_mwh * price
 
     # --- Operating costs ---
-    # Efficiency loss raises effective heat rate (smoke fouling, thermal stress)
-    if yearly_physical_adj is not None:
+    if phys_adj_list is not None and "efficiency_loss" in _active:
         eff_loss = np.array([a.efficiency_loss for a in phys_adj_list])
         fuel_costs = annual_mwh * heat_rate * (1.0 + eff_loss) * fuel_price
     else:

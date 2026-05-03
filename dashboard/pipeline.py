@@ -131,14 +131,27 @@ def _build_blended_physical(
     )
 
 
+# All recognised physical channel names (used for validation + defaults)
+ALL_PHYSICAL_CHANNELS: tuple[str, ...] = (
+    "wildfire_outage",
+    "drought_derate",
+    "water_constraint",
+    "efficiency_loss",
+)
+
+
 @st.cache_data
-def run_pipeline() -> dict:
+def run_pipeline(
+    active_physical_channels: tuple[str, ...] = ALL_PHYSICAL_CHANNELS,
+) -> dict:
     """Run all climate scenarios and return results as plain Python dicts/lists.
 
-    Climate scenarios are defined in ``data/scenarios/climate_scenarios.csv``.
-    Each row is a (climate_scenario, transition_scenario, physical_scenario, weight)
-    combination.  Multiple rows with the same climate_scenario name produce a
-    probability-weighted blend of physical scenarios.
+    Args:
+        active_physical_channels: Tuple of channel names to include in the
+            cashflow calculation.  Default is all channels.  Pass ``()`` to
+            disable all physical risk.  Valid names:
+            ``"wildfire_outage"``, ``"drought_derate"``,
+            ``"water_constraint"``, ``"efficiency_loss"``.
 
     Returns
     -------
@@ -149,6 +162,7 @@ def run_pipeline() -> dict:
       ratings             — list of year-by-year rating dicts
       physical_meta       — list of physical scenario dicts from data/physical/scenarios.csv
       climate_scenario_meta — list of climate scenario definition rows
+      active_physical_channels — tuple of active channel names (echoed back)
     """
     plant       = load_plant_params()
     assumptions = load_model_assumptions()
@@ -225,6 +239,7 @@ def run_pipeline() -> dict:
             plant_params=plant,
             yearly_transition_adj=yearly_adj,
             yearly_physical_adj=physical_adj,
+            active_physical_channels=frozenset(active_physical_channels),
         )
         metrics = calculate_metrics(cf_ts, plant)
 
@@ -402,10 +417,11 @@ def run_pipeline() -> dict:
     }
 
     return {
-        "plant":                  plant_out,
-        "scenarios":              scenario_comparison,
-        "cashflows":              cashflows,
-        "ratings":                yearly_ratings,
-        "physical_meta":          physical_meta,
-        "climate_scenario_meta":  climate_rows_all,
+        "plant":                    plant_out,
+        "scenarios":                scenario_comparison,
+        "cashflows":                cashflows,
+        "ratings":                  yearly_ratings,
+        "physical_meta":            physical_meta,
+        "climate_scenario_meta":    climate_rows_all,
+        "active_physical_channels": active_physical_channels,
     }
