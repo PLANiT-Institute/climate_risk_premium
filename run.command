@@ -13,8 +13,8 @@ PORT=8888
 lsof -ti tcp:$PORT | xargs kill -9 2>/dev/null
 sleep 0.3
 
-# Start a local HTTP server (required for loading JSX modules)
-python3 -m http.server $PORT --bind 127.0.0.1 &
+# Start no-cache HTTP server (prevents browser from serving stale JS)
+python3 dashboard/carbonlens/serve.py $PORT &
 SERVER_PID=$!
 sleep 0.4
 

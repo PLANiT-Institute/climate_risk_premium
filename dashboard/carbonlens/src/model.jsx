@@ -180,9 +180,10 @@ function computeScenario(plant, transition, physical, opts = {}) {
     const taxableIncome  = Math.max(0, ebit - interestExpense);
     const tax            = taxableIncome * plant.tax_rate;
     const netIncome      = ebit - interestExpense - tax;
-    // FCF = NOPAT + Depreciation  (maintenance capex = 0)
-    const nopat          = ebit * (1 - plant.tax_rate);
-    const fcf            = nopat + depreciationUSD;
+    // Levered FCF = Net income + Depreciation = EBITDA - interest - tax
+    // Negative in early high-debt years (debt service > EBITDA), smoothly
+    // improves as principal amortises, equals ~EBITDA post-payoff. No cliff.
+    const fcf            = netIncome + depreciationUSD;
 
     const cfads = ebitda - tax;
     const dscr  = debtService > 0 ? cfads / debtService : NaN;
