@@ -1,9 +1,14 @@
 /* Scenario builder — form + carbon-price curve editor */
-function ScreenBuilder({ model, onCommit }) {
+function ScreenBuilder({ model, onCommit, customScenarios = [], onDeleteCustom, onGoToScenarios }) {
+  const CP_YEARS = MODEL_ASSUMPTIONS.carbon_price_years;  // [2025, 2030, 2040, 2050]
+  const CP_FIRST = CP_YEARS[0];
+  const CP_LAST  = CP_YEARS[CP_YEARS.length - 1];
+  const CP_SPAN  = CP_LAST - CP_FIRST;
+
   const [name, setName] = uS("Custom Scenario");
   const [dispatch, setDispatch] = uS(0.10);
   const [retire, setRetire] = uS(35);
-  const [cp, setCp] = uS([15, 50, 120, 220]); // 2025, 30, 40, 50
+  const [cp, setCp] = uS([15, 50, 120, 220]);
   const [physical, setPhysical] = uS("moderate_physical");
   const [base, setBase] = uS("moderate_transition");
 
@@ -22,8 +27,7 @@ function ScreenBuilder({ model, onCommit }) {
   const innerW = W - padding.left - padding.right;
   const innerH = H - padding.top - padding.bottom;
   const yMax = Math.max(...cp, 100) * 1.2;
-  const xs = [2025, 2030, 2040, 2050];
-  const sx = (x) => padding.left + (x - 2025) / 25 * innerW;
+  const sx = (x) => padding.left + (x - CP_FIRST) / CP_SPAN * innerW;
   const sy = (y) => padding.top + innerH - y / yMax * innerH;
   const fromY = (py) => Math.max(0, Math.round((1 - (py - padding.top) / innerH) * yMax));
 
@@ -44,8 +48,15 @@ function ScreenBuilder({ model, onCommit }) {
   }, [drag, cp]);
 
   const yTicks = niceTicks(0, yMax, 4);
+  const path = CP_YEARS.map((x, i) => (i === 0 ? "M" : "L") + sx(x) + " " + sy(cp[i])).join(" ");
 
-  const path = xs.map((x, i) => (i === 0 ? "M" : "L") + sx(x) + " " + sy(cp[i])).join(" ");
+  const handleSave = () => {
+    if (onCommit) onCommit({ name, dispatch, retire, cp, physical });
+  };
+
+  const handleReset = () => {
+    setName("Custom Scenario"); setDispatch(0.10); setRetire(35); setCp([15, 50, 120, 220]);
+  };
 
   return (
     <div className="page" style={{ padding: 14 }}>
@@ -79,10 +90,10 @@ function ScreenBuilder({ model, onCommit }) {
             <div className="divider" />
             <div className="label-mono">Carbon price anchors ($/tCO₂)</div>
             <div className="grid-4">
-              {[2025,2030,2040,2050].map((y,i) => (
+              {CP_YEARS.map((y, i) => (
                 <Field key={y} label={y.toString()} value={cp[i]} unit="$/t">
                   <input className="input" type="number" value={cp[i]} step={5}
-                    onChange={e => { const v = parseFloat(e.target.value)||0; const next = [...cp]; next[i] = v; setCp(next); }} />
+                    onChange={e => { const v = parseFloat(e.target.value) || 0; const next = [...cp]; next[i] = v; setCp(next); }} />
                 </Field>
               ))}
             </div>
@@ -91,7 +102,7 @@ function ScreenBuilder({ model, onCommit }) {
 
         <Panel title="Carbon-Price Curve · Drag the Handles" sub="live preview below">
           <svg ref={editorRef} width="100%" height={H} viewBox={`0 0 ${W} ${H}`} style={{ background: "var(--bg-inset)", borderRadius: 4 }}>
-            {yTicks.map((t,i) => (
+            {yTicks.map((t, i) => (
               <g key={i}>
                 <line x1={padding.left} x2={W - padding.right} y1={sy(t)} y2={sy(t)}
                   stroke="var(--grid)" strokeDasharray="2 3" />
@@ -99,14 +110,14 @@ function ScreenBuilder({ model, onCommit }) {
                   fontFamily="var(--font-mono)" fontSize="10" fill="var(--tx-3)">${t}</text>
               </g>
             ))}
-            {xs.map((x,i) => (
+            {CP_YEARS.map((x, i) => (
               <text key={i} x={sx(x)} y={H - 12} textAnchor="middle"
                 fontFamily="var(--font-mono)" fontSize="10" fill="var(--tx-3)">{x}</text>
             ))}
-            <path d={path + " L" + sx(2050) + " " + sy(0) + " L" + sx(2025) + " " + sy(0) + " Z"}
+            <path d={path + " L" + sx(CP_LAST) + " " + sy(0) + " L" + sx(CP_FIRST) + " " + sy(0) + " Z"}
               fill="var(--accent)" opacity="0.12" />
             <path d={path} fill="none" stroke="var(--accent)" strokeWidth="2.5" />
-            {xs.map((x, i) => (
+            {CP_YEARS.map((x, i) => (
               <g key={i} className="curve-handle" onMouseDown={() => setDrag(i)}>
                 <circle cx={sx(x)} cy={sy(cp[i])} r="14" fill="transparent" />
                 <circle cx={sx(x)} cy={sy(cp[i])} r="6" fill="var(--accent)" stroke="var(--bg-1)" strokeWidth="2" />
@@ -120,31 +131,70 @@ function ScreenBuilder({ model, onCommit }) {
 
       <Panel title="Live Preview · Custom Scenario" sub="re-runs as you edit">
         <div className="grid-4">
-          <KPI accent label="NPV" value={"$" + fmtNum(previewScenario.npv_million,{digits:0})} unit="M" />
+          <KPI accent label="NPV" value={"$" + fmtNum(previewScenario.npv_million, { digits: 0 })} unit="M" />
           <KPI label="Rating" value={<Rating value={previewScenario.overall_rating} />} />
-          <KPI label="CRP" value={fmtNum(previewScenario.crp_bps,{digits:0})} unit="bps" />
+          <KPI label="CRP" value={fmtNum(previewScenario.crp_bps, { digits: 0 })} unit="bps" />
           <KPI label="Avg DSCR" value={previewScenario.avg_dscr.toFixed(2)} unit="×" />
         </div>
         <div className="divider" />
         <LineChart
-          data={previewScenario.rows.filter(r => r.year <= 2050).map(r => ({
-            x: r.year, ebitda: r.ebitda/1e6, fcf: r.free_cash_flow/1e6,
-            carbon: r.carbon_cost/1e6,
-          }))}
+          data={previewScenario.rows
+            .filter(r => r.year <= MODEL_ASSUMPTIONS.ebitda_chart_end_year)
+            .map(r => ({ x: r.year, ebitda: r.ebitda / 1e6, fcf: r.free_cash_flow / 1e6, carbon: r.carbon_cost / 1e6 }))}
           series={[
-            { key: "ebitda", label: "EBITDA", color: "var(--info)", width: 2.5 },
-            { key: "fcf", label: "Free Cash Flow", color: "#a78bfa", dash: "5 4" },
-            { key: "carbon", label: "Carbon cost", color: "var(--neg)" },
+            { key: "ebitda",  label: "EBITDA",         color: "var(--info)",  width: 2.5 },
+            { key: "fcf",     label: "Free Cash Flow",  color: "#a78bfa",      dash: "5 4" },
+            { key: "carbon",  label: "Carbon cost",     color: "var(--neg)" },
           ]}
           height={260} yFormat={v => "$" + v.toFixed(0) + "M"} xFormat={v => v.toString()}
           refLines={[{ y: 0, color: "var(--tx-3)", dash: "3 3" }]}
-          xMin={2025} xMax={2050}
+          xMin={MODEL_ASSUMPTIONS.start_year} xMax={MODEL_ASSUMPTIONS.ebitda_chart_end_year}
         />
         <div style={{ display: "flex", gap: 8, marginTop: 12, justifyContent: "flex-end" }}>
-          <button className="btn ghost" onClick={() => { setName("Custom Scenario"); setDispatch(0.10); setRetire(35); setCp([15,50,120,220]); }}>Reset</button>
-          <button className="btn primary" onClick={() => onCommit && onCommit({ name, dispatch, retire, cp, physical })}>Save scenario</button>
+          <button className="btn ghost" onClick={handleReset}>Reset</button>
+          <button className="btn primary" onClick={handleSave}>Save &amp; go to Scenarios ▸</button>
         </div>
       </Panel>
+
+      {/* Saved custom scenarios */}
+      {customScenarios.length > 0 && (
+        <Panel title="Saved Custom Scenarios" sub={`${customScenarios.length} scenario${customScenarios.length > 1 ? "s" : ""} added to the workbench`}
+          actions={<button className="btn sm ghost" onClick={onGoToScenarios}>View in Scenarios ▸</button>}>
+          <table className="tbl">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th className="num">Dispatch</th>
+                <th className="num">Life</th>
+                <th className="num">Physical</th>
+                <th className="num">CP 2025</th>
+                <th className="num">CP 2050</th>
+                <th />
+              </tr>
+            </thead>
+            <tbody>
+              {customScenarios.map(cs => (
+                <tr key={cs.id}>
+                  <td>
+                    <span style={{ display: "inline-block", width: 10, height: 10, background: cs.color,
+                      borderRadius: 2, marginRight: 8, verticalAlign: "middle" }} />
+                    <strong>{cs.name}</strong>
+                  </td>
+                  <td className="num">{(cs.dispatch * 100).toFixed(0)}%</td>
+                  <td className="num">{cs.retire} yrs</td>
+                  <td className="num muted">{cs.physical}</td>
+                  <td className="num">${cs.cp[0]}</td>
+                  <td className="num">${cs.cp[3]}</td>
+                  <td style={{ textAlign: "right" }}>
+                    <button className="btn sm ghost" style={{ color: "var(--neg)" }}
+                      onClick={() => onDeleteCustom && onDeleteCustom(cs.id)}>Remove</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </Panel>
+      )}
     </div>
   );
 }

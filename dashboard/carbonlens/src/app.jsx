@@ -11,6 +11,9 @@ const SCREENS = [
   { id: "assumptions", label: "Assumptions",     icon: "M5 4h14v4H5zM5 10h14v4H5zM5 16h14v4H5z" },
 ];
 
+// Colour palette cycled across custom scenarios — distinct from all preset colours
+const _CUSTOM_PALETTE = ["#f97316","#14b8a6","#e879f9","#a3e635","#fb923c","#22d3ee","#f43f5e","#84cc16"];
+
 function App() {
   const [model, setModel] = uS(() => buildModel(DEFAULT_PLANT));
   const [screen, setScreen] = uS("overview");
@@ -18,6 +21,9 @@ function App() {
   const [inspector, setInspector] = uS(null);
   const [theme, setTheme] = uS(localStorage.getItem("ksl_theme") || "dark");
   const [accent, setAccent] = uS(localStorage.getItem("ksl_accent") || "amber");
+
+  // Custom scenarios added from the Builder screen
+  const [customScenarios, setCustomScenarios] = uS([]);
 
   uE(() => {
     document.documentElement.setAttribute("data-theme", theme);
@@ -42,8 +48,37 @@ function App() {
   };
   const resetAll = () => setPending({});
 
+  // Augmented model: base scenarios + any saved custom scenarios
+  const augmentedModel = uM(() => {
+    if (!customScenarios.length) return model;
+    const extras = customScenarios.map(cs => {
+      const pdef = model.physicalDefs.find(p => p.id === cs.physical) || model.physicalDefs[0];
+      const tr = { id: cs.id, name: cs.name, dispatch: cs.dispatch, retire: cs.retire, cp: cs.cp };
+      const r = computeScenario(model.plant, tr, pdef);
+      return {
+        id: cs.id, name: cs.name, desc: "Custom (builder)",
+        transition_id: cs.id, physical_id: cs.physical,
+        transition_name: cs.name, physical_name: pdef?.name ?? "—",
+        dispatch_pct: cs.dispatch * 100, retirement_years: cs.retire,
+        carbon_prices: cs.cp, _custom: true,
+        ...r,
+      };
+    });
+    return { ...model, scenarios: [...model.scenarios, ...extras] };
+  }, [model, customScenarios]);
+
   const onCommitScenario = (custom) => {
-    alert("Custom scenario saved: " + custom.name + "\n(Demo — would append to scenarios list.)");
+    const id = "custom_" + Date.now();
+    const color = _CUSTOM_PALETTE[customScenarios.length % _CUSTOM_PALETTE.length];
+    // Register color so scenarioColor(id) works in every screen without changes
+    SCENARIO_COLORS[id] = color;
+    setCustomScenarios(prev => [...prev, { ...custom, id, color }]);
+    setScreen("scenarios"); // jump straight to the results
+  };
+
+  const onDeleteCustom = (id) => {
+    delete SCENARIO_COLORS[id];
+    setCustomScenarios(prev => prev.filter(c => c.id !== id));
   };
 
   return (
@@ -119,14 +154,16 @@ function App() {
           </header>
 
           <main className="screen">
-            {screen === "overview"    && <ScreenOverview model={model} onEdit={onEdit} />}
-            {screen === "scenarios"   && <ScreenScenarios model={model} />}
-            {screen === "cashflows"   && <ScreenCashflows model={model} />}
-            {screen === "credit"      && <ScreenCredit model={model} />}
-            {screen === "physical"    && <ScreenPhysical model={model} />}
-            {screen === "decomp"      && <ScreenDecomp model={model} />}
-            {screen === "pipeline"    && <ScreenPipeline model={model} />}
-            {screen === "builder"     && <ScreenBuilder model={model} onCommit={onCommitScenario} />}
+            {screen === "overview"    && <ScreenOverview model={augmentedModel} onEdit={onEdit} />}
+            {screen === "scenarios"   && <ScreenScenarios model={augmentedModel} />}
+            {screen === "cashflows"   && <ScreenCashflows model={augmentedModel} />}
+            {screen === "credit"      && <ScreenCredit model={augmentedModel} />}
+            {screen === "physical"    && <ScreenPhysical model={augmentedModel} />}
+            {screen === "decomp"      && <ScreenDecomp model={augmentedModel} />}
+            {screen === "pipeline"    && <ScreenPipeline model={augmentedModel} />}
+            {screen === "builder"     && <ScreenBuilder model={model} onCommit={onCommitScenario}
+                                           customScenarios={customScenarios} onDeleteCustom={onDeleteCustom}
+                                           onGoToScenarios={() => setScreen("scenarios")} />}
             {screen === "assumptions" && <ScreenAssumptions plant={model.plant} pending={pending} onEdit={onEdit} onApplyAll={applyAll} onResetAll={resetAll} />}
           </main>
         </div>
