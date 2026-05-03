@@ -143,12 +143,13 @@ function computeScenario(plant, transition, physical, opts = {}) {
   const startYear = plant.start_year;
   const years = transition.retire;
   const out = [];
-  const debt = plant.total_capex_million * plant.debt_fraction;
-  const annualPrincipal = debt / plant.debt_tenor_years;
-  const annualInterestStart = debt * plant.debt_interest_rate; // straight-line approx
-  const depreciation = plant.total_capex_million / plant.depreciation_years;
 
-  let outstandingDebt = debt;
+  // All monetary values in raw USD throughout — no mixed-unit conversions.
+  const debtUSD        = plant.total_capex_million * 1e6 * plant.debt_fraction;
+  const principalUSD   = debtUSD / plant.debt_tenor_years;   // annual principal payment
+  const depreciationUSD = plant.total_capex_million * 1e6 / plant.depreciation_years;
+
+  let outstandingDebtUSD = debtUSD;
   let cumulativeEbitda = 0;
   let consecutiveLossYears = 0;
 
@@ -160,25 +161,31 @@ function computeScenario(plant, transition, physical, opts = {}) {
 
     const cf = Math.max(0, plant.capacity_factor * (1 - transition.dispatch) * (1 - cfRedFromPhysical));
     const mwh = plant.capacity_mw * cf * 8760;
-    const heatRatePenalty = 1 + effLoss; // higher heat rate → more fuel
-    const revenue = mwh * plant.power_price_per_mwh; // USD
-    const fuel = mwh * plant.fuel_cost_per_mwh * heatRatePenalty;
-    const fixedOpex = plant.capacity_mw * 1000 * plant.fixed_opex_per_kw;
+    const heatRatePenalty = 1 + effLoss;
+    const revenue     = mwh * plant.power_price_per_mwh;
+    const fuel        = mwh * plant.fuel_cost_per_mwh * heatRatePenalty;
+    const fixedOpex   = plant.capacity_mw * 1000 * plant.fixed_opex_per_kw;
     const variableOpex = mwh * plant.variable_opex_per_mwh;
-    const cp = carbonPrice(transition.cp, year);
-    const carbonCost = mwh * plant.emissions_tco2_per_mwh * cp;
-    const totalCosts = fuel + fixedOpex + variableOpex + carbonCost;
-    const ebitda = revenue - totalCosts; // USD
-    const interestExpense = i < plant.debt_tenor_years ? outstandingDebt * plant.debt_interest_rate : 0;
-    const principalPmt = i < plant.debt_tenor_years ? annualPrincipal : 0;
-    const debtService = interestExpense + principalPmt * 1e6; // (principal in $M, convert)
-    const ebit = ebitda - depreciation * 1e6;
-    const taxableIncome = Math.max(0, ebit - interestExpense);
-    const tax = taxableIncome * plant.tax_rate;
-    const netIncome = ebit - interestExpense - tax;
-    const cfads = ebitda - tax; // simple CFADS proxy
-    const dscr = debtService > 0 ? cfads / debtService : NaN;
-    const fcf = netIncome + depreciation * 1e6;
+    const cp          = carbonPrice(transition.cp, year);
+    const carbonCost  = mwh * plant.emissions_tco2_per_mwh * cp;
+    const totalCosts  = fuel + fixedOpex + variableOpex + carbonCost;
+    const ebitda      = revenue - totalCosts;
+
+    const inDebtPeriod   = i < plant.debt_tenor_years;
+    const interestExpense = inDebtPeriod ? outstandingDebtUSD * plant.debt_interest_rate : 0;
+    const principalPmt    = inDebtPeriod ? principalUSD : 0;
+    const debtService     = interestExpense + principalPmt;
+
+    const ebit           = ebitda - depreciationUSD;
+    const taxableIncome  = Math.max(0, ebit - interestExpense);
+    const tax            = taxableIncome * plant.tax_rate;
+    const netIncome      = ebit - interestExpense - tax;
+    // FCF = NOPAT + Depreciation  (maintenance capex = 0)
+    const nopat          = ebit * (1 - plant.tax_rate);
+    const fcf            = nopat + depreciationUSD;
+
+    const cfads = ebitda - tax;
+    const dscr  = debtService > 0 ? cfads / debtService : NaN;
 
     if (ebitda < 0) consecutiveLossYears++;
     else consecutiveLossYears = 0;
@@ -187,7 +194,7 @@ function computeScenario(plant, transition, physical, opts = {}) {
     out.push({
       year, capacity_factor: cf, mwh, revenue, fuel, fixed_opex: fixedOpex,
       variable_opex: variableOpex, carbon_cost: carbonCost, total_costs: totalCosts,
-      ebitda, depreciation: depreciation * 1e6, ebit, interest_expense: interestExpense,
+      ebitda, depreciation: depreciationUSD, ebit, interest_expense: interestExpense,
       tax, net_income: netIncome, free_cash_flow: fcf, dscr, debt_service: debtService,
       cumulative_ebitda: cumulativeEbitda,
       consecutive_loss_years: consecutiveLossYears,
@@ -196,7 +203,7 @@ function computeScenario(plant, transition, physical, opts = {}) {
       capacity_derate: phyAdj.derate,
       efficiency_loss: phyAdj.efficiency,
     });
-    if (i < plant.debt_tenor_years) outstandingDebt -= annualPrincipal * 1e6;
+    if (inDebtPeriod) outstandingDebtUSD -= principalUSD;
   }
 
   // NPV
@@ -220,7 +227,7 @@ function computeScenario(plant, transition, physical, opts = {}) {
     for (let i = 0; i < Math.min(plant.debt_tenor_years, out.length); i++) {
       pv += (out[i].ebitda - out[i].tax) / Math.pow(1 + plant.discount_rate, i + 1);
     }
-    return debt > 0 ? pv / (debt * 1e6) : 0;
+    return debtUSD > 0 ? pv / debtUSD : 0;
   })();
   const totalCarbonCost = out.reduce((a, r) => a + r.carbon_cost, 0);
   const totalLossYears = out.filter(r => r.ebitda < 0).length;

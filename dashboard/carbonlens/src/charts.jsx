@@ -77,13 +77,17 @@ function LineChart({
 
   const onMove = (e) => {
     const rect = svgRef.current.getBoundingClientRect();
-    const px = e.clientX - rect.left;
-    if (px < padding.left || px > width - padding.right) { setHoverX(null); hide(); return; }
-    const xVal = xLo + (px - padding.left) / innerW * (xHi - xLo);
+    // Scale CSS pixels → viewBox coordinates (SVG renders at 100% width but viewBox is fixed)
+    const scaleX = width / rect.width;
+    const svgX = (e.clientX - rect.left) * scaleX;
+    const cssX = e.clientX - rect.left;
+    const cssY = e.clientY - rect.top;
+    if (svgX < padding.left || svgX > width - padding.right) { setHoverX(null); hide(); return; }
+    const xVal = xLo + (svgX - padding.left) / innerW * (xHi - xLo);
     let nearest = data[0], minD = Infinity;
     data.forEach(d => { const dd = Math.abs(d.x - xVal); if (dd < minD) { minD = dd; nearest = d; }});
     setHoverX(nearest.x);
-    show(e.clientX - rect.left, e.clientY - rect.top, (
+    show(cssX, cssY, (
       <div>
         <div style={{ color: "var(--tx-3)", marginBottom: 4 }}>{xFormat(nearest.x)}</div>
         {series.map(s => (
