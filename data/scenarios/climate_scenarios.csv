@@ -1,0 +1,11 @@
+climate_scenario,transition_scenario,physical_scenario,physical_weight,description
+no_risk_baseline,no_carbon_baseline,baseline,1.0,Counterfactual: no carbon pricing + minimal physical risk
+conservative,baseline,baseline,1.0,Conservative: K-ETS inertia + low warming trajectory
+moderate,moderate_transition,moderate_physical,1.0,Moderate: K-ETS tightening + mid-range warming
+korea_ndc,korea_ndc,moderate_physical,1.0,Korea NDC policy + moderate physical risk
+net_zero_high,net_zero_2050,high_physical,1.0,Net Zero 2050 + worst-case warming
+aggressive_severe,aggressive_transition,severe_drought,1.0,Aggressive decarbonization + severe drought
+delayed_moderate,delayed_transition,moderate_physical,1.0,Delayed policy action + moderate warming
+high_ambition_high,high_ambition,high_physical,1.0,1.5C aligned + worst-case physical risk
+blended_ndc,korea_ndc,moderate_physical,0.60,Korea NDC blended physical (60 % moderate + 40 % high)
+blended_ndc,korea_ndc,high_physical,0.40,Korea NDC blended physical (60 % moderate + 40 % high)

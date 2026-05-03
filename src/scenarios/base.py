@@ -1,7 +1,9 @@
-"""Scenario definitions for transition risk modelling.
+"""Transition risk scenario dataclass.
 
-Only transition risk scenarios are implemented here.  Physical risk scenarios
-will be added in a future step once the transition pipeline is validated.
+Scenario definitions live entirely in ``data/transition/scenarios.csv`` —
+no scenario parameters are hardcoded here.  Use
+:func:`src.data.loaders.load_transition_scenarios` to read the CSV and
+:meth:`TransitionScenario.from_policy_row` to build instances.
 """
 from __future__ import annotations
 
@@ -14,7 +16,8 @@ class TransitionScenario:
     """A single climate-transition policy scenario.
 
     Attributes:
-        name: Unique scenario identifier (must match ``policy.csv`` column).
+        name: Unique scenario identifier (matches ``scenario`` column in
+            ``data/transition/scenarios.csv``).
         dispatch_penalty: Fraction by which the capacity factor is reduced
             due to dispatch merit-order effects from competing clean capacity
             (e.g. 0.10 → 10 % lower dispatch).
@@ -24,7 +27,7 @@ class TransitionScenario:
         carbon_prices: Map from calendar year to carbon price (USD/tCO₂).
             Intermediate years are linearly interpolated by
             ``YearlyTransitionAdjustments``.
-        carbon_scenario: Label from policy.csv (informational).
+        carbon_scenario: Label from ``data/transition/scenarios.csv`` (informational).
         description: Human-readable description.
     """
 
@@ -37,7 +40,7 @@ class TransitionScenario:
 
     @classmethod
     def from_policy_row(cls, row: Dict) -> "TransitionScenario":
-        """Build a TransitionScenario from a policy.csv row dict.
+        """Build a TransitionScenario from a ``data/transition/scenarios.csv`` row dict.
 
         Expected keys: ``scenario``, ``dispatch_penalty``, ``retirement_years``,
         ``carbon_price_2025``, ``carbon_price_2030``, ``carbon_price_2040``,

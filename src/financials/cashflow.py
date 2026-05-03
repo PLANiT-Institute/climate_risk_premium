@@ -1,16 +1,18 @@
-"""Cash-flow engine — transition risk only.
+"""Cash-flow engine — transition risk and optional wildfire physical risk.
 
 Computes year-by-year free cash flows for a power plant under a transition
-policy scenario.  Physical risk channels are not included in this version;
-they will be layered in as a separate step.
+policy scenario, with an optional wildfire physical risk overlay.
 
 Key assumptions
 ---------------
-- Capacity factor is reduced by the dispatch penalty from the policy scenario.
+- Capacity factor is first reduced by the dispatch penalty (transition), then
+  further multiplied by (1 − wildfire_outage_rate) when wildfire_adj is given.
+- Fuel costs are scaled by (1 + efficiency_loss) when wildfire_adj is given,
+  reflecting thermal efficiency degradation from smoke/particulate fouling.
 - Carbon costs (K-ETS) are computed from ``YearlyTransitionAdjustments``.
 - Debt service uses a level-annuity schedule (standard project finance).
 - Depreciation is straight-line over ``useful_life`` years.
-- Free Cash Flow = NOPAT + Depreciation (no physical capex loss here).
+- Free Cash Flow = NOPAT + Depreciation.
 """
 from __future__ import annotations
 
@@ -24,6 +26,7 @@ import numpy_financial as npf
 logger = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
+    from src.risk.physical import YearlyPhysicalAdjustments
     from src.risk.transition import YearlyTransitionAdjustments
 
 
@@ -91,14 +94,23 @@ class CashFlowTimeSeries:
 def compute_cashflows(
     plant_params: Dict[str, Any],
     yearly_transition_adj: "YearlyTransitionAdjustments",
+    yearly_physical_adj: "YearlyPhysicalAdjustments | None" = None,
     start_year: int = 2025,
 ) -> CashFlowTimeSeries:
     """Compute annual cash flows over the plant's operating life.
+
+    When ``yearly_physical_adj`` is provided the capacity factor for each year
+    is further reduced by ``(1 − outage_rate)`` and fuel costs are scaled by
+    ``(1 + efficiency_loss)`` to reflect wildfire-driven unavailability and
+    thermal efficiency degradation from smoke/particulate fouling.
 
     Args:
         plant_params: Flat dict from ``load_plant_params()``.
         yearly_transition_adj: Per-year CFs and carbon costs from
             ``build_yearly_transition_adjustments()``.
+        yearly_physical_adj: Optional per-year physical risk adjustments from
+            ``build_physical_adjustments()``.  Pass ``None`` to run
+            transition-risk only.
         start_year: First calendar year of operations (unused here; years
             come from ``yearly_transition_adj.years``).
 
@@ -123,10 +135,27 @@ def compute_cashflows(
     years = yearly_transition_adj.years.copy()
     n_years = len(years)
 
-    # --- Capacity factors from transition scenario ---
+    # --- Capacity factors: transition × physical overlay ---
     cf_series = np.array(
         [yearly_transition_adj.get_cf_for_year(int(y)) for y in years]
     )
+    if yearly_physical_adj is not None:
+        phys_adj_list = [
+            yearly_physical_adj.get_adjustment_for_year(int(y)) for y in years
+        ]
+        # Wildfire outage reduces available generation hours
+        cf_series = cf_series * np.array(
+            [1.0 - a.outage_rate for a in phys_adj_list]
+        )
+        # Drought/temperature capacity derate (zero until activated)
+        cf_series = cf_series * np.array(
+            [1.0 - a.capacity_derate for a in phys_adj_list]
+        )
+        # Water availability hard cap (1.0 until activated)
+        cf_series = np.minimum(
+            cf_series,
+            np.array([a.water_constrained_capacity for a in phys_adj_list]),
+        )
 
     # --- Generation (MWh/year) ---
     annual_mwh = capacity_mw * 8760 * cf_series
@@ -135,7 +164,12 @@ def compute_cashflows(
     revenue = annual_mwh * price
 
     # --- Operating costs ---
-    fuel_costs = annual_mwh * heat_rate * fuel_price
+    # Efficiency loss raises effective heat rate (smoke fouling, thermal stress)
+    if yearly_physical_adj is not None:
+        eff_loss = np.array([a.efficiency_loss for a in phys_adj_list])
+        fuel_costs = annual_mwh * heat_rate * (1.0 + eff_loss) * fuel_price
+    else:
+        fuel_costs = annual_mwh * heat_rate * fuel_price
     variable_opex = annual_mwh * variable_opex_per_mwh
     fixed_opex = np.full(n_years, capacity_mw * 1000 * fixed_opex_per_kw)
 
