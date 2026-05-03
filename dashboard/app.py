@@ -252,15 +252,18 @@ def page_cashflows(data: dict) -> None:
         index=0,
     )
 
+    # Clip year-axis charts to 2025–2050; summary metrics still use full life.
+    YEAR_MIN, YEAR_MAX = 2025, 2050
     rows = data["cashflows"][selected]
-    df = pd.DataFrame(rows)
+    df_full = pd.DataFrame(rows)
+    df = df_full[(df_full["year"] >= YEAR_MIN) & (df_full["year"] <= YEAR_MAX)].copy()
 
-    # Summary metrics
+    # Summary metrics (over the full operating life, not the clipped window)
     c1, c2, c3, c4 = st.columns(4)
-    c1.metric("Total Revenue", f"${df['revenue'].sum() / 1e9:.2f}B")
-    c2.metric("Total Carbon Cost", f"${df['carbon_costs'].sum() / 1e9:.2f}B")
-    c3.metric("Avg EBITDA/yr", f"${df['ebitda'].mean() / 1e6:.0f}M")
-    c4.metric("Avg DSCR", f"{df['dscr'].mean():.2f}x")
+    c1.metric("Total Revenue", f"${df_full['revenue'].sum() / 1e9:.2f}B")
+    c2.metric("Total Carbon Cost", f"${df_full['carbon_costs'].sum() / 1e9:.2f}B")
+    c3.metric("Avg EBITDA/yr", f"${df_full['ebitda'].mean() / 1e6:.0f}M")
+    c4.metric("Avg DSCR", f"{df_full['dscr'].mean():.2f}x")
 
     st.divider()
 
@@ -354,12 +357,13 @@ def page_cashflows(data: dict) -> None:
         )
         st.plotly_chart(fig4, width="stretch")
 
-    # Multi-scenario overlay
+    # Multi-scenario overlay (clipped to 2025–2050)
     st.divider()
     st.subheader("Multi-Scenario EBITDA Comparison")
     all_dfs = []
     for sname, rows in data["cashflows"].items():
         tmp = pd.DataFrame(rows)
+        tmp = tmp[(tmp["year"] >= YEAR_MIN) & (tmp["year"] <= YEAR_MAX)]
         tmp["scenario_label"] = label(sname)
         all_dfs.append(tmp)
     all_cf = pd.concat(all_dfs)
@@ -385,6 +389,11 @@ def page_credit(data: dict) -> None:
     scenarios_list = data["scenarios"]
     debt_payoff_year = data["plant"]["debt_payoff_year"]
     df_r = pd.DataFrame(ratings)
+
+    # Clip the full year-by-year frame to 2025–2050 once, so every chart
+    # in this page (DSCR, spread, heatmap) shares the same window.
+    YEAR_MIN, YEAR_MAX = 2025, 2050
+    df_r = df_r[(df_r["year"] >= YEAR_MIN) & (df_r["year"] <= YEAR_MAX)].copy()
 
     # DSCR trajectories
     st.subheader("DSCR Trajectories")
@@ -460,14 +469,9 @@ def page_credit(data: dict) -> None:
 
     st.divider()
 
-    # Rating migration heatmap (year × scenario) — 2025 to 2050 (or data max)
+    # Rating migration heatmap (year × scenario) — already clipped to 2025–2050
     st.subheader("Rating Migration Heatmap")
-    heatmap_year_max = min(2050, int(df_r["year"].max()))
-    df_heatmap = df_r[
-        df_r["scenario"].isin(selected_scenarios)
-        & (df_r["year"] >= 2025)
-        & (df_r["year"] <= heatmap_year_max)
-    ]
+    df_heatmap = df_r[df_r["scenario"].isin(selected_scenarios)]
     pivot = df_heatmap.pivot(index="year", columns="scenario", values="rating")
     pivot.columns = [label(c) for c in pivot.columns]
     pivot = pivot.sort_index()
@@ -614,15 +618,17 @@ def page_risk_decomposition(data: dict) -> None:
 
     st.divider()
 
-    # --- Carbon cost time series ---
+    # --- Carbon cost time series (clipped to 2025–2050) ---
     st.subheader("Annual Carbon Cost by Scenario")
+    YEAR_MIN, YEAR_MAX = 2025, 2050
     all_cf = []
     for sname, rows in cashflows.items():
         if sname == "no_carbon_baseline":
             continue
         for r in rows:
-            all_cf.append({"year": r["year"], "scenario": label(sname),
-                           "carbon_costs": r["carbon_costs"] / 1e6})
+            if YEAR_MIN <= r["year"] <= YEAR_MAX:
+                all_cf.append({"year": r["year"], "scenario": label(sname),
+                               "carbon_costs": r["carbon_costs"] / 1e6})
     df_cc = pd.DataFrame(all_cf)
     fig3 = px.line(
         df_cc, x="year", y="carbon_costs", color="scenario",
