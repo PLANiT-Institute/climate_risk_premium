@@ -6,12 +6,17 @@ raw CSV rows.
 Directory layout
 ----------------
 data/
-  plant_parameters.csv       — plant design and financial parameters
-  model_assumptions.csv      — cross-cutting model assumptions
-  rating_thresholds.csv      — KIS credit rating metric thresholds
-  rating_weights.csv         — KIS rating component weights
-  rating_spreads.csv         — rating → credit spread mapping
-  credit_rating_grid.csv     — compact rating grid (reference)
+  plant/
+    plant_parameters.csv     — plant design and financial parameters
+
+  assumptions/
+    model_assumptions.csv    — cross-cutting model assumptions
+
+  credit/
+    rating_thresholds.csv    — KIS credit rating metric thresholds
+    rating_weights.csv       — KIS rating component weights
+    rating_spreads.csv       — rating → credit spread mapping
+    credit_rating_grid.csv   — compact rating grid (reference)
 
   transition/
     scenarios.csv            — transition policy scenarios (dispatch, carbon)
@@ -35,11 +40,14 @@ from typing import Any, Dict, List
 
 logger = logging.getLogger(__name__)
 
-_ROOT     = Path(__file__).parent.parent.parent
-_DATA_DIR = _ROOT / "data"
-_TRANS_DIR = _DATA_DIR / "transition"
-_PHYS_DIR  = _DATA_DIR / "physical"
-_SCEN_DIR  = _DATA_DIR / "scenarios"
+_ROOT        = Path(__file__).parent.parent.parent
+_DATA_DIR    = _ROOT / "data"
+_PLANT_DIR   = _DATA_DIR / "plant"
+_ASSUMP_DIR  = _DATA_DIR / "assumptions"
+_CREDIT_DIR  = _DATA_DIR / "credit"
+_TRANS_DIR   = _DATA_DIR / "transition"
+_PHYS_DIR    = _DATA_DIR / "physical"
+_SCEN_DIR    = _DATA_DIR / "scenarios"
 
 
 # ---------------------------------------------------------------------------
@@ -47,12 +55,12 @@ _SCEN_DIR  = _DATA_DIR / "scenarios"
 # ---------------------------------------------------------------------------
 
 def load_plant_params(csv_path: str | Path | None = None) -> Dict[str, Any]:
-    """Load plant design and financial parameters from ``data/plant_parameters.csv``.
+    """Load plant design and financial parameters from ``data/plant/plant_parameters.csv``.
 
     Returns a flat dict keyed by ``param_name``.  Values are cast to float
     where possible; strings are kept as-is (e.g. ``plant_name``).
     """
-    path = Path(csv_path) if csv_path else _DATA_DIR / "plant_parameters.csv"
+    path = Path(csv_path) if csv_path else _PLANT_DIR / "plant_parameters.csv"
     if not path.exists():
         raise FileNotFoundError(f"plant_parameters.csv not found at {path}")
 
@@ -70,12 +78,12 @@ def load_plant_params(csv_path: str | Path | None = None) -> Dict[str, Any]:
 
 
 def load_model_assumptions(csv_path: str | Path | None = None) -> Dict[str, Any]:
-    """Load cross-cutting model assumptions from ``data/model_assumptions.csv``.
+    """Load cross-cutting model assumptions from ``data/assumptions/model_assumptions.csv``.
 
     Values are cast to float where possible; strings are kept as-is
     (e.g. ``counterfactual_rating = "A"``).
     """
-    path = Path(csv_path) if csv_path else _DATA_DIR / "model_assumptions.csv"
+    path = Path(csv_path) if csv_path else _ASSUMP_DIR / "model_assumptions.csv"
     if not path.exists():
         raise FileNotFoundError(f"model_assumptions.csv not found at {path}")
 
@@ -154,13 +162,13 @@ def load_transition_scenario_by_name(
 # ---------------------------------------------------------------------------
 
 def load_rating_thresholds(csv_path: str | Path | None = None) -> Dict[str, Dict[str, float]]:
-    """Load KIS credit rating metric thresholds from ``data/rating_thresholds.csv``.
+    """Load KIS credit rating metric thresholds from ``data/credit/rating_thresholds.csv``.
 
     Returns ``{metric: {rating_name: threshold}}``.  For ``direction = "higher"``
     the threshold is the *minimum* to achieve that rating; for ``"lower"`` it
     is the *maximum*.
     """
-    path = Path(csv_path) if csv_path else _DATA_DIR / "rating_thresholds.csv"
+    path = Path(csv_path) if csv_path else _CREDIT_DIR / "rating_thresholds.csv"
     if not path.exists():
         raise FileNotFoundError(f"rating_thresholds.csv not found at {path}")
 
@@ -176,11 +184,11 @@ def load_rating_thresholds(csv_path: str | Path | None = None) -> Dict[str, Dict
 
 
 def load_rating_weights(csv_path: str | Path | None = None) -> Dict[str, float]:
-    """Load KIS rating component weights from ``data/rating_weights.csv``.
+    """Load KIS rating component weights from ``data/credit/rating_weights.csv``.
 
     Returns ``{component_name: weight}``.
     """
-    path = Path(csv_path) if csv_path else _DATA_DIR / "rating_weights.csv"
+    path = Path(csv_path) if csv_path else _CREDIT_DIR / "rating_weights.csv"
     if not path.exists():
         raise FileNotFoundError(f"rating_weights.csv not found at {path}")
 
@@ -193,11 +201,11 @@ def load_rating_weights(csv_path: str | Path | None = None) -> Dict[str, float]:
 
 
 def load_rating_spreads(csv_path: str | Path | None = None) -> Dict[str, float]:
-    """Load rating → credit spread mapping from ``data/rating_spreads.csv``.
+    """Load rating → credit spread mapping from ``data/credit/rating_spreads.csv``.
 
     Returns ``{rating_name: spread_bps}``.
     """
-    path = Path(csv_path) if csv_path else _DATA_DIR / "rating_spreads.csv"
+    path = Path(csv_path) if csv_path else _CREDIT_DIR / "rating_spreads.csv"
     if not path.exists():
         raise FileNotFoundError(f"rating_spreads.csv not found at {path}")
 
