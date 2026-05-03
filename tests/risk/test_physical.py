@@ -361,6 +361,17 @@ class TestDroughtChannel:
         adj = build_physical_adjustments(start_year=2024, n_years=1, physical_scenario="high_physical")
         np.testing.assert_allclose(float(adj.capacity_derates[0]), _DROUGHT_BASE, rtol=1e-6)
 
+    def test_severe_drought_derate_greater_than_high(self):
+        """severe_drought applies drought_severe_multiplier (2.4) → derate must exceed high_physical."""
+        adj_severe = build_physical_adjustments(start_year=2025, n_years=76, physical_scenario="severe_drought")
+        adj_h      = build_physical_adjustments(start_year=2025, n_years=76, physical_scenario="high_physical")
+        # severe_drought derate = high_physical derate × 2.4 at all years
+        np.testing.assert_allclose(
+            adj_severe.capacity_derates / adj_h.capacity_derates,
+            2.4,
+            rtol=1e-6,
+        )
+
     def test_capacity_derate_2100_scale_ratios(self, adj_baseline, adj_moderate, adj_high):
         """
         At 2100 drought factor (SSP5-8.5) = 2.0:

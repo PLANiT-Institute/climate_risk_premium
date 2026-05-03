@@ -3,7 +3,7 @@ plant_name,Samcheok Blue Power,name,Official project name
 capacity_mw,2100,MW,Total capacity (2 units x 1050MW)
 capacity_factor,0.60,decimal,Base load capacity factor
 efficiency,0.39,decimal,Supercritical efficiency (3.412/8.8)
-fuel_cost_per_mwh,45.0,USD/MWh,Approximate coal cost
+fuel_cost_per_mwh,50.512,USD/MWh,Derived: heat_rate_mmbtu_mwh × fuel_price_per_mmbtu = 8.8 × 5.74
 variable_opex,5.0,USD/MWh,Variable O&M
 fixed_opex_per_kw,35.0,USD/kW-yr,Fixed O&M
 variable_opex_per_mwh,4.5,USD/MWh,Variable O&M per MWh (alternative)

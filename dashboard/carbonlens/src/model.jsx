@@ -26,8 +26,7 @@ const DEFAULT_PLANT = {
   discount_rate: 0.08,
   emissions_tco2_per_mwh: 0.82,
   power_price_per_mwh: 80,
-  fuel_cost_per_mwh: 50.512,  // heat_rate(8.8 MMBtu/MWh) × fuel_price($5.74/MMBtu)
-  heat_rate_mmbtu_per_mwh: 8.8,
+  heat_rate_mmbtu_per_mwh: 8.8,  // fuel_cost_per_mwh is derived: heat_rate × fuel_price
   fuel_price_per_mmbtu: 5.74,
   fixed_opex_per_kw: 35,
   variable_opex_per_mwh: 4.5,
@@ -123,10 +122,22 @@ const EFFICIENCY_PARAMS = {
 };
 
 // data/physical/literature_data.csv — HEATWAVE rows
+// year_baseline / year_future come from the `year` column of those CSV rows.
 const HEATWAVE_PARAMS = {
-  days_baseline:    5.0,    // d/yr — days_baseline (2024)
-  days_future:     17.4,    // d/yr — days_future   (2100, SSP5-8.5, WWA 2025)
+  days_baseline:    5.0,    // d/yr — days_baseline (year 2024)
+  days_future:     17.4,    // d/yr — days_future   (year 2100, SSP5-8.5, WWA 2025)
   efficiency_loss:  4.0,    // % per event day — efficiency_loss
+  year_baseline:   2024,    // `year` column for days_baseline row
+  year_future:     2100,    // `year` column for days_future row
+};
+
+// data/assumptions/model_assumptions.csv
+const MODEL_ASSUMPTIONS = {
+  base_rate:                0.0675,  // base_rate — base interest / cost-of-debt rate
+  baseline_equity_rate:     0.12,    // baseline_equity_rate
+  equity_premium_per_notch: 0.005,   // equity_premium_per_notch (per rating notch)
+  counterfactual_rating:    "A",     // counterfactual_rating
+  start_year:               2025,    // start_year
 };
 
 // ---------------------------------------------------------------------------
@@ -178,7 +189,7 @@ function physicalAdjustment(phys, year) {
 
   // --- Heatwave acute (literature_data.csv HEATWAVE rows) ---
   const H     = HEATWAVE_PARAMS;
-  const hwT   = Math.max(0, Math.min(1, (year - 2024) / (2100 - 2024)));
+  const hwT   = Math.max(0, Math.min(1, (year - H.year_baseline) / (H.year_future - H.year_baseline)));
   const hwDays = H.days_baseline + (H.days_future - H.days_baseline) * hwT * scale;
   const hwEff  = (hwDays / 365) * (H.efficiency_loss / 100);
 
@@ -193,29 +204,34 @@ function ratingFromMetrics(avgEbitda, dscr, debtToEquity, ebitdaToInterest, capa
   if (consecutiveLossYears >= 8) return "D";
   if (avgEbitda <= 0) return "C";
 
-  // Score buckets (0..100, higher = better)
+  // Score buckets (0..100, higher = better).
+  // Thresholds sourced from data/credit/rating_thresholds.csv.
   let score = 60;
-  // DSCR (28% weight)
+  // DSCR — thresholds: AAA≥2.5, AA≥2.0, A≥1.6, BBB≥1.3, BB≥1.1, B≥1.0, CCC≥0.8, CC≥0.5
   if (dscr >= 2.5) score += 18;
-  else if (dscr >= 1.8) score += 12;
-  else if (dscr >= 1.4) score += 6;
-  else if (dscr >= 1.2) score -= 0;
-  else if (dscr >= 1.0) score -= 8;
-  else if (dscr >= 0.5) score -= 22;
-  else score -= 35;
+  else if (dscr >= 2.0) score += 12;
+  else if (dscr >= 1.6) score += 6;
+  else if (dscr >= 1.3) score -= 0;
+  else if (dscr >= 1.1) score -= 6;
+  else if (dscr >= 1.0) score -= 10;
+  else if (dscr >= 0.8) score -= 20;
+  else if (dscr >= 0.5) score -= 28;
+  else score -= 38;
 
-  // EBITDA / interest (12%)
+  // EBITDA / interest — thresholds: AAA≥12, AA≥6, A≥4, BBB≥2, BB≥1, B≥0.5, CCC≥0
   if (ebitdaToInterest >= 12) score += 6;
   else if (ebitdaToInterest >= 6) score += 3;
   else if (ebitdaToInterest >= 4) score += 0;
   else if (ebitdaToInterest >= 2) score -= 4;
-  else score -= 10;
+  else if (ebitdaToInterest >= 1) score -= 7;
+  else score -= 12;
 
-  // Debt / equity (20%)
+  // Debt / equity — thresholds: AAA≤80, AA≤150, A≤250, BBB≤300, BB≤400
   if (debtToEquity <= 80) score += 6;
   else if (debtToEquity <= 150) score += 3;
   else if (debtToEquity <= 250) score += 0;
-  else if (debtToEquity <= 400) score -= 5;
+  else if (debtToEquity <= 300) score -= 3;
+  else if (debtToEquity <= 400) score -= 6;
   else score -= 12;
 
   // Scale (15%) — fixed 2100MW = AAA tier
@@ -256,10 +272,12 @@ function computeScenario(plant, transition, physical, opts = {}) {
     const effLoss = phyAdj.efficiency;
 
     const cf = Math.max(0, plant.capacity_factor * (1 - transition.dispatch) * (1 - cfRedFromPhysical));
-    const mwh = plant.capacity_mw * cf * 8760;
+    const mwh = plant.capacity_mw * cf * PHYSICAL_ASSUMPTIONS.hours_per_year;
     const heatRatePenalty = 1 + effLoss;
     const revenue     = mwh * plant.power_price_per_mwh;
-    const fuel        = mwh * plant.fuel_cost_per_mwh * heatRatePenalty;
+    // Fuel cost derived from components — matches Python cashflow.py exactly.
+    const fuelCostPerMwh = plant.heat_rate_mmbtu_per_mwh * plant.fuel_price_per_mmbtu;
+    const fuel        = mwh * fuelCostPerMwh * heatRatePenalty;
     const fixedOpex   = plant.capacity_mw * 1000 * plant.fixed_opex_per_kw;
     const variableOpex = mwh * plant.variable_opex_per_mwh;
     const cp          = carbonPrice(transition.cp, year);
@@ -338,13 +356,16 @@ function computeScenario(plant, transition, physical, opts = {}) {
   );
   const spreadBps = RATING_SPREADS[overallRating];
 
-  // CRP vs counterfactual A
-  const counterfactualSpread = RATING_SPREADS["A"];
-  const baseEquity = 0.12;
-  const equityNotchPenalty = 0.005 * Math.max(0, RATING_ORDER.indexOf(overallRating) - RATING_ORDER.indexOf("A"));
-  const waccBaseline = (plant.debt_fraction * (0.0675 + counterfactualSpread / 1e4) +
+  // CRP vs counterfactual — all parameters from data/assumptions/model_assumptions.csv
+  const M = MODEL_ASSUMPTIONS;
+  const counterfactualRating  = M.counterfactual_rating;
+  const counterfactualSpread  = RATING_SPREADS[counterfactualRating];
+  const baseEquity            = M.baseline_equity_rate;
+  const equityNotchPenalty    = M.equity_premium_per_notch
+    * Math.max(0, RATING_ORDER.indexOf(overallRating) - RATING_ORDER.indexOf(counterfactualRating));
+  const waccBaseline = (plant.debt_fraction * (M.base_rate + counterfactualSpread / 1e4) +
                        plant.equity_fraction * baseEquity) * 100;
-  const waccAdjusted = (plant.debt_fraction * (0.0675 + spreadBps / 1e4) +
+  const waccAdjusted = (plant.debt_fraction * (M.base_rate + spreadBps / 1e4) +
                        plant.equity_fraction * (baseEquity + equityNotchPenalty)) * 100;
   const crpBps = (waccAdjusted - waccBaseline) * 100;
 
@@ -361,7 +382,7 @@ function computeScenario(plant, transition, physical, opts = {}) {
     return {
       year: r.year, rating, dscr: r.dscr, ebitda: r.ebitda,
       spread_bps: RATING_SPREADS[rating],
-      cost_of_debt: 0.0675 + RATING_SPREADS[rating] / 1e4,
+      cost_of_debt: MODEL_ASSUMPTIONS.base_rate + RATING_SPREADS[rating] / 1e4,
     };
   });
 
@@ -464,7 +485,7 @@ function niceTicks(min, max, count = 5) {
 Object.assign(window, {
   RATING_ORDER, RATING_SPREADS,
   DEFAULT_PLANT, DEFAULT_TRANSITIONS, DEFAULT_PHYSICAL, DEFAULT_CLIMATE_SCENARIOS,
-  CLIMADA, PHYSICAL_ASSUMPTIONS, EFFICIENCY_PARAMS, HEATWAVE_PARAMS,
+  CLIMADA, PHYSICAL_ASSUMPTIONS, MODEL_ASSUMPTIONS, EFFICIENCY_PARAMS, HEATWAVE_PARAMS,
   WF_CLIMATE_FACTORS, TC_CLIMATE_FACTORS, DR_CLIMATE_FACTORS, TEMP_CHANGE_SSP585,
   carbonPrice, physicalAdjustment, _linInterp, ratingFromMetrics,
   computeScenario, runModel, defaultModel, buildModel,

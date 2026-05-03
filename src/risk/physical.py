@@ -68,7 +68,10 @@ Algorithm (drought, capacity_derate channel)
 1.  drought_factor(year) = np.interp(year, anchor_years, factors)
         (category DROUGHT, from literature_data.csv; SSP5-8.5 full scale)
 2.  drought_factor_scaled = 1 + (drought_factor − 1) × wildfire_scale
-3.  capacity_derate(year) = drought_base × drought_factor_scaled(year)
+3.  drought_scenario_mult = drought_severe_multiplier   if scenario == "severe_drought"
+                          = 1.0                         otherwise
+        (drought_severe_multiplier from model_assumptions.csv; default 2.4)
+4.  capacity_derate(year) = drought_base × drought_factor_scaled(year) × drought_scenario_mult
         (drought_base = 0.5 % from model_assumptions.csv)
 
 Samcheok Blue Power uses seawater cooling, so drought impact is lower than for
@@ -419,13 +422,17 @@ def build_physical_adjustments(
     # =========================================================================
     # DROUGHT channel — capacity derate
     # =========================================================================
-    drought_base = assumptions["drought_capacity_derate_base"]
+    drought_base           = assumptions["drought_capacity_derate_base"]
+    drought_severe_mult    = assumptions["drought_severe_multiplier"]
+    # Severe drought scenario emphasises drought above SSP5-8.5 baseline.
+    # Other scenarios: multiplier = 1.0 (no amplification beyond standard scale).
+    drought_scenario_mult  = drought_severe_mult if physical_scenario == "severe_drought" else 1.0
 
     anchor_yrs_dr, anchor_vals_dr = _anchors("DROUGHT", "climate_factor")
     dr_factors = np.interp(years, anchor_yrs_dr, anchor_vals_dr)
     dr_scaled  = 1.0 + (dr_factors - 1.0) * wildfire_scale
 
-    capacity_derates = drought_base * dr_scaled
+    capacity_derates = drought_base * dr_scaled * drought_scenario_mult
 
     # =========================================================================
     # HEAT / SST channel — efficiency loss (two components)
