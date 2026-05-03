@@ -668,15 +668,18 @@ def page_risk_decomposition(data: dict) -> None:
         s = next((x for x in scenarios if x["scenario"] == sname), {})
         onset.append({
             "Scenario": label(sname),
-            "EBITDA turns negative": first_neg if first_neg else "Never",
+            "EBITDA turns negative": str(first_neg) if first_neg is not None else "Never",
+            "_sort": first_neg if first_neg is not None else 9999,
             "Dispatch penalty": f"{s.get('dispatch_penalty_pct', 0):.0f}%",
             "NPV ($M)": f"{s.get('npv_million', 0):.0f}",
             "Carbon cost ($M)": f"{s.get('total_carbon_cost_million', 0):.0f}",
             "CRP (bps)": f"{s.get('crp_bps', 0):.0f}",
             "Rating": s.get("overall_rating", "—"),
         })
-    onset.sort(key=lambda x: x["EBITDA turns negative"] if isinstance(x["EBITDA turns negative"], int) else 9999)
-    st.dataframe(pd.DataFrame(onset).set_index("Scenario"), width="stretch")
+    onset.sort(key=lambda x: x["_sort"])
+    display_cols = ["Scenario", "EBITDA turns negative", "Dispatch penalty",
+                    "NPV ($M)", "Carbon cost ($M)", "CRP (bps)", "Rating"]
+    st.dataframe(pd.DataFrame(onset)[display_cols].set_index("Scenario"), width="stretch")
 
 
 def page_physical_risk(data: dict) -> None:
