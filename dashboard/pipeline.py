@@ -19,6 +19,7 @@ if str(_REPO) not in sys.path:
 
 from src.data.loaders import (
     load_model_assumptions,
+    load_physical_scenarios,
     load_plant_params,
     load_policy_scenarios,
     load_rating_spreads,
@@ -33,6 +34,7 @@ from src.risk.credit_rating import (
     get_counterfactual_baseline_rating,
 )
 from src.risk.financing import calculate_financing_with_counterfactual
+from src.risk.physical import YearlyPhysicalAdjustments, build_physical_adjustments
 from src.risk.transition import build_yearly_transition_adjustments
 from src.scenarios.base import TransitionScenario
 
@@ -45,16 +47,33 @@ def _float(v: Any) -> float:
 
 
 @st.cache_data
-def run_pipeline() -> dict:
-    """Run all scenarios and return results as plain Python dicts/lists.
+def run_pipeline(
+    risk_mode: str = "all",
+    physical_scenario: str = "high_physical",
+    outage_hours_override: dict | None = None,
+) -> dict:
+    """Run all transition scenarios and return results as plain Python dicts/lists.
+
+    Args:
+        risk_mode: Which risks to include.  One of:
+            ``"all"``        — transition + wildfire physical risk
+            ``"transition"`` — transition risk only (no physical)
+            ``"wildfire"``   — wildfire physical risk only (no transition policy)
+        physical_scenario: Physical risk scenario to use when risk_mode includes
+            wildfire.  One of the entries in ``physical_scenarios.csv``
+            (baseline / moderate_physical / high_physical / severe_drought).
+        outage_hours_override: Optional ``{"plant": h, "transmission": h}``
+            overriding default restoration durations from the assumptions CSV.
 
     Returns
     -------
     dict with keys:
-      plant      — plant parameters (dict)
-      scenarios  — list of scenario summary dicts
-      cashflows  — dict {scenario_name: [row_dict, ...]}
-      ratings    — list of year-by-year rating dicts
+      plant           — plant parameters (dict)
+      scenarios       — list of scenario summary dicts
+      cashflows       — dict {scenario_name: [row_dict, ...]}
+      ratings         — list of year-by-year rating dicts
+      physical        — YearlyPhysicalAdjustments or None
+      physical_meta   — list of physical scenario dicts from physical_scenarios.csv
     """
     plant = load_plant_params()
     policy_rows = load_policy_scenarios()
@@ -89,6 +108,18 @@ def run_pipeline() -> dict:
         "equity_fraction": equity_fraction,
     }
 
+    # --- Physical risk (built once, shared across all transition scenarios) ---
+    physical_meta = load_physical_scenarios()
+    max_retirement = max(int(r["retirement_years"]) for r in policy_rows)
+    physical_adj: YearlyPhysicalAdjustments | None = None
+    if risk_mode in ("all", "wildfire"):
+        physical_adj = build_physical_adjustments(
+            start_year=start_year,
+            n_years=max_retirement,
+            physical_scenario=physical_scenario,
+            outage_hours_override=outage_hours_override,
+        )
+
     scenario_comparison: list[dict] = []
     cashflows: dict[str, list[dict]] = {}
     yearly_ratings: list[dict] = []
@@ -101,7 +132,31 @@ def run_pipeline() -> dict:
             base_capacity_factor=base_cf,
             emissions_tco2_per_mwh=emissions,
         )
-        cf_ts = compute_cashflows(plant_params=plant, yearly_transition_adj=yearly_adj)
+
+        # For "wildfire" mode, suppress the transition policy effects by
+        # zeroing the dispatch penalty and carbon price
+        if risk_mode == "wildfire":
+            from src.risk.transition import build_yearly_transition_adjustments as _byta
+            from src.scenarios.base import TransitionScenario as _TS
+            neutral = _TS(
+                name=scenario.name,
+                dispatch_penalty=0.0,
+                retirement_years=scenario.retirement_years,
+                carbon_prices={y: 0.0 for y in scenario.carbon_prices},
+                carbon_scenario="none",
+                description="wildfire-only (transition suppressed)",
+            )
+            yearly_adj = _byta(
+                scenario=neutral,
+                base_capacity_factor=base_cf,
+                emissions_tco2_per_mwh=emissions,
+            )
+
+        cf_ts = compute_cashflows(
+            plant_params=plant,
+            yearly_transition_adj=yearly_adj,
+            yearly_physical_adj=physical_adj,
+        )
         metrics = calculate_metrics(cf_ts, plant)
 
         avg_ebitda = _float(cf_ts.ebitda.mean())
@@ -275,9 +330,25 @@ def run_pipeline() -> dict:
         "rating_spreads": {k: int(v) for k, v in spreads.items()},
     }
 
+    # Serialise physical adjustments for the dashboard physical risk page
+    physical_out: dict | None = None
+    if physical_adj is not None:
+        physical_out = {
+            "scenario": physical_adj.scenario_name,
+            "years": physical_adj.years.tolist(),
+            "plant_outage_rate": physical_adj.outage_rates.tolist(),
+            "transmission_outage_rate": physical_adj.transmission_outage_rates.tolist(),
+            "capacity_derate": physical_adj.capacity_derates.tolist(),
+            "efficiency_loss": physical_adj.efficiency_losses.tolist(),
+            "water_constrained_capacity": physical_adj.water_constraints.tolist(),
+            "asset_capex_loss_rate": physical_adj.asset_capex_loss_rates.tolist(),
+        }
+
     return {
         "plant": plant_out,
         "scenarios": scenario_comparison,
         "cashflows": cashflows,
         "ratings": yearly_ratings,
+        "physical": physical_out,
+        "physical_meta": physical_meta,
     }

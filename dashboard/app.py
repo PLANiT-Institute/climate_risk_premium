@@ -677,6 +677,154 @@ def page_risk_decomposition(data: dict) -> None:
     st.dataframe(pd.DataFrame(onset).set_index("Scenario"), width="stretch")
 
 
+def page_physical_risk(data: dict) -> None:
+    """Show wildfire outage trajectories for all physical scenarios side by side."""
+    from src.risk.physical import build_physical_adjustments
+
+    st.header("Physical Risk — Wildfire")
+    st.caption("Wildfire outage rates across all physical scenarios")
+
+    # Load all 4 physical scenarios directly (no user selector)
+    PHYSICAL_SCENARIOS = [
+        ("baseline",          "Baseline (SSP1-2.6)",    "#22c55e"),
+        ("moderate_physical", "Moderate (SSP2-4.5)",    "#f59e0b"),
+        ("high_physical",     "High (SSP5-8.5)",        "#ef4444"),
+        ("severe_drought",    "Severe Drought (SSP5-8.5)", "#7c3aed"),
+    ]
+
+    # Use start_year and n_years consistent with the pipeline
+    plant = data["plant"]
+    start_year = 2025
+    n_years = plant["operating_years"]
+    anchor_years = [2025, 2030, 2050, 2100]
+
+    scenarios_data = {}
+    for sc_name, _label, _color in PHYSICAL_SCENARIOS:
+        adj = build_physical_adjustments(
+            start_year=start_year,
+            n_years=n_years,
+            physical_scenario=sc_name,
+        )
+        scenarios_data[sc_name] = adj
+
+    ref_adj = scenarios_data["high_physical"]
+    years = ref_adj.years
+
+    def rate_at(adj, field: str, yr: int) -> float:
+        arr = getattr(adj, field)
+        return float(np.interp(yr, years, arr))
+
+    # ── Key metrics (high_physical at 2050) ─────────────────────────────────
+    hp = scenarios_data["high_physical"]
+    p50  = rate_at(hp, "outage_rates", 2050)
+    t50  = rate_at(hp, "transmission_outage_rates", 2050)
+    comb50 = 1 - (1 - p50) * (1 - t50)
+
+    c1, c2, c3, c4 = st.columns(4)
+    c1.metric("Base frequency", "0.30 events/yr", help="6 events / 20-year window (NASA FIRMS)")
+    c2.metric("Plant outage 2050 (high)", f"{p50 * 100:.4f}%")
+    c3.metric("Transmission outage 2050 (high)", f"{t50 * 100:.4f}%")
+    c4.metric("Combined outage 2050 (high)", f"{comb50 * 100:.4f}%",
+              help="1 − (1 − plant) × (1 − transmission)")
+
+    st.divider()
+
+    # ── Outage trajectories — all scenarios ─────────────────────────────────
+    col_l, col_r = st.columns(2)
+
+    with col_l:
+        st.subheader("Plant Outage Rate — All Scenarios")
+        fig_p = go.Figure()
+        for sc_name, sc_label, color in PHYSICAL_SCENARIOS:
+            adj = scenarios_data[sc_name]
+            fig_p.add_trace(go.Scatter(
+                x=years, y=adj.outage_rates * 100,
+                name=sc_label, line=dict(color=color, width=2),
+            ))
+        fig_p.update_layout(
+            height=320, margin=dict(l=0, r=0, t=10, b=10),
+            yaxis_title="Outage rate (%/yr)",
+            legend=dict(orientation="h", y=-0.3),
+        )
+        st.plotly_chart(fig_p, width="stretch")
+
+    with col_r:
+        st.subheader("Transmission Outage Rate — All Scenarios")
+        fig_t = go.Figure()
+        for sc_name, sc_label, color in PHYSICAL_SCENARIOS:
+            adj = scenarios_data[sc_name]
+            fig_t.add_trace(go.Scatter(
+                x=years, y=adj.transmission_outage_rates * 100,
+                name=sc_label, line=dict(color=color, width=2, dash="dash"),
+            ))
+        fig_t.update_layout(
+            height=320, margin=dict(l=0, r=0, t=10, b=10),
+            yaxis_title="Outage rate (%/yr)",
+            legend=dict(orientation="h", y=-0.3),
+        )
+        st.plotly_chart(fig_t, width="stretch")
+
+    st.divider()
+
+    # ── Anchor-year summary table ────────────────────────────────────────────
+    st.subheader("Outage Rates at Key Years")
+    table_rows = []
+    for sc_name, sc_label, _ in PHYSICAL_SCENARIOS:
+        adj = scenarios_data[sc_name]
+        for yr in anchor_years:
+            p = rate_at(adj, "outage_rates", yr)
+            t = rate_at(adj, "transmission_outage_rates", yr)
+            table_rows.append({
+                "Scenario": sc_label,
+                "Year": yr,
+                "Plant (%/yr)": round(p * 100, 5),
+                "Transmission (%/yr)": round(t * 100, 5),
+                "Combined (%/yr)": round((1 - (1 - p) * (1 - t)) * 100, 5),
+                "Plant hrs/yr": round(p * 8760, 3),
+            })
+    df_table = pd.DataFrame(table_rows)
+    st.dataframe(df_table.set_index(["Scenario", "Year"]), width="stretch")
+
+    st.divider()
+
+    # ── Scenario descriptions ────────────────────────────────────────────────
+    st.subheader("Scenario Definitions")
+    meta = data.get("physical_meta", [])
+    if meta:
+        df_meta = pd.DataFrame(meta)
+        df_meta.columns = [c.title() for c in df_meta.columns]
+        st.dataframe(df_meta.set_index("Scenario"), width="stretch")
+
+    st.divider()
+
+    # ── Data sources ─────────────────────────────────────────────────────────
+    with st.expander("Data sources & methodology"):
+        st.markdown("""
+**Hazard frequency** — NASA FIRMS MODIS active fire detections at Samcheok
+(37.44 °N, 129.17 °E), queried via CLIMADA.  6 wildfire events over 20 years
+(2001–2020) → 0.30 events/year.  Source: `data/physical_risk/climada_data.csv`.
+
+**Outage probabilities and durations** — from `data/physical_risk/model_assumptions.csv`.
+Edit that file to change default values (no code change required).
+
+**Climate amplification factors** — from WWA (2025) analysis of South Korean
+wildfire likelihood.  Wildfire is ~2× more likely under current 1.3 °C warming,
+and ~4× more likely under end-of-century RCP 8.5.
+Anchor values stored in `data/physical_risk/literature_data.csv` (WILDFIRE category).
+
+**SSP wildfire scaling** relative to RCP 8.5 full intensity:
+| Scenario | SSP | Scale |
+|----------|-----|-------|
+| baseline | SSP1-2.6 | 30 % |
+| moderate_physical | SSP2-4.5 | 60 % |
+| high_physical | SSP5-8.5 | 100 % |
+| severe_drought | SSP5-8.5 | 100 % |
+
+Temperature/drought efficiency-loss and capacity-derate channels are not yet
+activated — they will be added in a future release.
+""")
+
+
 def page_model_pipeline(data: dict) -> None:
     st.header("Model Pipeline")
     st.caption("End-to-end data flow from input parameters to Climate Risk Premium")
@@ -796,6 +944,7 @@ def main() -> None:
         st.title("🌏 CRP Dashboard")
         st.caption("Samcheok Blue Power\n2,100 MW Supercritical Coal")
         st.divider()
+
         page = st.radio(
             "Navigation",
             [
@@ -803,22 +952,27 @@ def main() -> None:
                 "Scenarios",
                 "Cashflows",
                 "Credit Rating",
+                "Physical Risk",
                 "Risk Decomposition",
                 "Model Pipeline",
             ],
             label_visibility="collapsed",
         )
         st.divider()
-        st.caption("Transition risk model · v2.0\nPhysical risk: pending")
+        st.caption("Transition + Wildfire physical risk · v2.1")
 
     with st.spinner("Running pipeline…"):
-        data = run_pipeline()
+        data = run_pipeline(
+            risk_mode="all",
+            physical_scenario="high_physical",
+        )
 
     pages = {
         "Overview": page_overview,
         "Scenarios": page_scenarios,
         "Cashflows": page_cashflows,
         "Credit Rating": page_credit,
+        "Physical Risk": page_physical_risk,
         "Risk Decomposition": page_risk_decomposition,
         "Model Pipeline": page_model_pipeline,
     }

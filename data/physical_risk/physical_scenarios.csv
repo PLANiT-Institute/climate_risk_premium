@@ -1,0 +1,5 @@
+scenario,ssp,description
+baseline,ssp126,Baseline — low physical risk acceleration (SSP1-2.6)
+moderate_physical,ssp245,Moderate physical risk — mid-range warming (SSP2-4.5)
+high_physical,ssp585,High physical risk — worst-case warming (SSP5-8.5 / RCP8.5)
+severe_drought,ssp585,High physical risk with severe drought emphasis (SSP5-8.5)
