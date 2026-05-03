@@ -318,17 +318,19 @@ def assess_credit_rating(metrics: RatingMetrics) -> RatingAssessment:
     if metrics.dscr < 0:
         rounded_score = Rating.D.value
         rationale = f"Overall D: DSCR negative ({metrics.dscr:.3f})"
-    elif metrics.dscr < 1.0:
+    elif metrics.dscr < _THRESHOLDS["dscr"]["B"]:  # B threshold from rating_thresholds.csv
         rounded_score = min(10, rounded_score + 1)
         overall_rating = Rating(rounded_score)
+        _dscr_b = _THRESHOLDS["dscr"]["B"]
         rationale = (
             f"Overall {overall_rating}: Weighted average downgraded 1 notch "
-            f"(DSCR={metrics.dscr:.3f} < 1.0)"
+            f"(DSCR={metrics.dscr:.3f} < {_dscr_b})"
         )
     else:
+        _dscr_b = _THRESHOLDS["dscr"]["B"]
         rationale = (
             f"Overall {Rating(rounded_score)}: Weighted average "
-            f"(DSCR={metrics.dscr:.3f} ≥ 1.0, no override)"
+            f"(DSCR={metrics.dscr:.3f} ≥ {_dscr_b}, no override)"
         )
     overall_rating = Rating(rounded_score)
 
@@ -418,7 +420,11 @@ def calculate_rating_metrics_from_financials(
         estimated_debt_service = estimated_principal * annuity_factor
         calculated_dscr = ebitda / estimated_debt_service if estimated_debt_service > 0 else 0.0
     else:
-        calculated_dscr = ebitda_to_interest if ebitda_to_interest < 100 else 2.0
+        # Sentinel check: if coverage ratio is at the "infinity" sentinel,
+        # use the configured fallback DSCR rather than the sentinel value itself
+        _sentinel = float(_ASSUMPTIONS["coverage_infinity_sentinel"])
+        _fallback = float(_ASSUMPTIONS["ebitda_coverage_fallback_dscr"])
+        calculated_dscr = ebitda_to_interest if ebitda_to_interest < _sentinel else _fallback
 
     return RatingMetrics(
         capacity_mw=capacity_mw,

@@ -12,3 +12,7 @@ estimated_debt_rate,0.05,decimal,Fallback interest rate used to estimate debt se
 estimated_debt_tenor,20,years,Fallback debt tenor used to estimate debt service when actual tenor is unknown
 counterfactual_rating,A,rating,Counterfactual baseline credit rating assumed in the absence of climate transition risk
 policy_industry_rating,AA,rating,Fixed sector/policy risk rating for private power generation under KIS methodology
+coverage_infinity_sentinel,99,times,Sentinel value substituted for EBITDA/Interest when interest expense is zero (division by zero guard)
+dscr_post_debt_fallback,1.5,ratio,Fallback DSCR used in year-by-year rating when actual DSCR is undefined (post-debt-maturity years)
+ebitda_coverage_fallback_dscr,2.0,ratio,Fallback DSCR estimate when no debt service info is available and coverage ratio exceeds sentinel
+carbon_price_years,2025-2030-2040-2050,years,Anchor years for carbon price interpolation; matches column names in data/transition/scenarios.csv

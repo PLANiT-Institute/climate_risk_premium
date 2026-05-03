@@ -66,17 +66,17 @@ const DEFAULT_CLIMATE_SCENARIOS = [
 ];
 
 function carbonPrice(cp, year) {
-  // cp = [2025, 2030, 2040, 2050]
-  const xs = [2025, 2030, 2040, 2050];
+  // cp = array of prices at MODEL_ASSUMPTIONS.carbon_price_years anchor points
+  const xs = MODEL_ASSUMPTIONS.carbon_price_years;
   if (year <= xs[0]) return cp[0];
-  if (year >= xs[3]) return cp[3];
-  for (let i = 0; i < 3; i++) {
+  if (year >= xs[xs.length - 1]) return cp[xs.length - 1];
+  for (let i = 0; i < xs.length - 1; i++) {
     if (year >= xs[i] && year <= xs[i+1]) {
       const t = (year - xs[i]) / (xs[i+1] - xs[i]);
       return cp[i] + t * (cp[i+1] - cp[i]);
     }
   }
-  return cp[3];
+  return cp[xs.length - 1];
 }
 
 // ---------------------------------------------------------------------------
@@ -133,11 +133,14 @@ const HEATWAVE_PARAMS = {
 
 // data/assumptions/model_assumptions.csv
 const MODEL_ASSUMPTIONS = {
-  base_rate:                0.0675,  // base_rate — base interest / cost-of-debt rate
-  baseline_equity_rate:     0.12,    // baseline_equity_rate
-  equity_premium_per_notch: 0.005,   // equity_premium_per_notch (per rating notch)
-  counterfactual_rating:    "A",     // counterfactual_rating
-  start_year:               2025,    // start_year
+  base_rate:                   0.0675,            // base_rate
+  baseline_equity_rate:        0.12,              // baseline_equity_rate
+  equity_premium_per_notch:    0.005,             // equity_premium_per_notch (per rating notch)
+  counterfactual_rating:       "A",               // counterfactual_rating
+  start_year:                  2025,              // start_year
+  coverage_infinity_sentinel:  99,               // coverage_infinity_sentinel — EBITDA/Interest when interest≈0
+  dscr_post_debt_fallback:     1.5,              // dscr_post_debt_fallback — used for post-maturity years
+  carbon_price_years:          [2025, 2030, 2040, 2050], // matches columns in data/transition/scenarios.csv
 };
 
 // ---------------------------------------------------------------------------
@@ -348,7 +351,7 @@ function computeScenario(plant, transition, physical, opts = {}) {
   const totalLossYears = out.filter(r => r.ebitda < 0).length;
   const avgInterest = out.reduce((a, r) => a + r.interest_expense, 0) / out.length;
   const debtToEquity = (plant.debt_fraction / plant.equity_fraction) * 100;
-  const ebitdaToInterest = avgInterest > 0 ? avgEbitda / avgInterest : 99;
+  const ebitdaToInterest = avgInterest > 0 ? avgEbitda / avgInterest : MODEL_ASSUMPTIONS.coverage_infinity_sentinel;
 
   const overallRating = ratingFromMetrics(
     avgEbitda, avgDscr, debtToEquity, ebitdaToInterest, plant.capacity_mw,
@@ -374,8 +377,8 @@ function computeScenario(plant, transition, physical, opts = {}) {
     const ebitdaTrailing = out.slice(Math.max(0, i - 2), i + 1)
       .reduce((a, x) => a + x.ebitda, 0) / Math.min(3, i + 1);
     const consec = r.consecutive_loss_years;
-    const dscrLocal = isFinite(r.dscr) ? r.dscr : 1.5;
-    const interestLocal = r.interest_expense > 0 ? ebitdaTrailing / r.interest_expense : 99;
+    const dscrLocal = isFinite(r.dscr) ? r.dscr : MODEL_ASSUMPTIONS.dscr_post_debt_fallback;
+    const interestLocal = r.interest_expense > 0 ? ebitdaTrailing / r.interest_expense : MODEL_ASSUMPTIONS.coverage_infinity_sentinel;
     const rating = ratingFromMetrics(
       ebitdaTrailing, dscrLocal, debtToEquity, interestLocal, plant.capacity_mw, consec, r.cumulative_ebitda / 1e6
     );
