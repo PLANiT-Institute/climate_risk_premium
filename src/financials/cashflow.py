@@ -8,7 +8,10 @@ Key assumptions
 - Capacity factor is first reduced by the dispatch penalty (transition), then
   further multiplied by the active physical-risk CF factors.
 - Active physical channels (controlled by ``active_physical_channels``):
-    ``"wildfire_outage"``  — CF × (1 − outage_rate)
+    ``"wildfire_outage"``  — CF × (1 − outage_rate)           [wildfire only]
+    ``"tc_outage"``        — CF × (1 − tc_outage_rate)        [TC only]
+    When both are active the combined independent rate is used instead:
+      CF × (1 − combined_outage_rate)
     ``"drought_derate"``   — CF × (1 − capacity_derate)
     ``"water_constraint"`` — CF capped at water_constrained_capacity
     ``"efficiency_loss"``  — fuel_cost × (1 + efficiency_loss)
@@ -118,7 +121,7 @@ def compute_cashflows(
         active_physical_channels: Which physical channels to apply.  ``None``
             means all channels active.  Pass ``frozenset()`` to disable all.
             Valid channel names:
-            ``"wildfire_outage"``, ``"drought_derate"``,
+            ``"wildfire_outage"``, ``"tc_outage"``, ``"drought_derate"``,
             ``"water_constraint"``, ``"efficiency_loss"``.
 
     Returns:
@@ -150,7 +153,7 @@ def compute_cashflows(
     # Resolve which physical channels are active.
     # None → all channels; frozenset() → none; explicit set → named channels only.
     _ALL_CHANNELS = frozenset(
-        {"wildfire_outage", "drought_derate", "water_constraint", "efficiency_loss"}
+        {"wildfire_outage", "tc_outage", "drought_derate", "water_constraint", "efficiency_loss"}
     )
     _active = _ALL_CHANNELS if active_physical_channels is None else active_physical_channels
 
@@ -159,9 +162,22 @@ def compute_cashflows(
         phys_adj_list = [
             yearly_physical_adj.get_adjustment_for_year(int(y)) for y in years
         ]
-        if "wildfire_outage" in _active:
+        # Outage channels: when both wildfire and TC are active, use the pre-computed
+        # combined independent rate rather than applying them sequentially (same
+        # result for these small rates but is numerically exact).
+        _wf = "wildfire_outage" in _active
+        _tc = "tc_outage" in _active
+        if _wf and _tc:
+            cf_series = cf_series * np.array(
+                [1.0 - a.combined_outage_rate for a in phys_adj_list]
+            )
+        elif _wf:
             cf_series = cf_series * np.array(
                 [1.0 - a.outage_rate for a in phys_adj_list]
+            )
+        elif _tc:
+            cf_series = cf_series * np.array(
+                [1.0 - a.tc_outage_rate for a in phys_adj_list]
             )
         if "drought_derate" in _active:
             cf_series = cf_series * np.array(

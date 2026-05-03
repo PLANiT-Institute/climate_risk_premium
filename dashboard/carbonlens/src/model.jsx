@@ -80,17 +80,111 @@ function carbonPrice(cp, year) {
   return cp[3];
 }
 
+// ---------------------------------------------------------------------------
+// Physical risk assumptions — mirrors data/physical/ CSV files exactly.
+// Every value here must trace to a specific row in one of the four CSVs.
+// Update these objects when the CSVs change; do not scatter numbers elsewhere.
+// ---------------------------------------------------------------------------
+
+// data/physical/climada_data.csv — CLIMADA event counts
+const CLIMADA = {
+  wildfire_events:       6,    // events_at_location  (NASA FIRMS MODIS)
+  wildfire_years:       20,    // years_covered
+  tc_damaging_events:    5,    // events_at_location  (IBTrACS > 30 m/s)
+  tc_damaging_years:    40,    // years_covered
+};
+
+// data/physical/model_assumptions.csv
+const PHYSICAL_ASSUMPTIONS = {
+  outage_prob_wildfire:          0.10,   // outage_prob_wildfire
+  outage_prob_tc:                0.30,   // outage_prob_tc
+  outage_duration_wildfire:      168,    // hours — outage_duration_wildfire
+  outage_duration_tc:            168,    // hours — outage_duration_tc
+  hours_per_year:               8760,   // hours_per_year
+  drought_capacity_derate_base:  0.005,  // drought_capacity_derate_base
+  drought_severe_multiplier:     2.4,    // implicit in severe_drought scenario row
+};
+
+// data/physical/literature_data.csv — climate factor anchors [year, factor]
+// category WILDFIRE, parameter climate_factor
+const WF_CLIMATE_FACTORS  = [[2024,1.0],[2030,2.0],[2050,2.0],[2100,4.0]];
+// category TC, parameter climate_factor  (Knutson et al. 2020)
+const TC_CLIMATE_FACTORS  = [[2024,1.0],[2030,1.05],[2050,1.10],[2100,1.10]];
+// category DROUGHT, parameter climate_factor  (IPCC AR6 WG1)
+const DR_CLIMATE_FACTORS  = [[2024,1.0],[2030,1.12],[2050,1.45],[2100,2.0]];
+// category HEAT, parameter korea_temp_change_ssp585  (Kim et al. 2016)
+const TEMP_CHANGE_SSP585  = [[2024,0.0],[2030,1.0],[2050,1.75],[2100,4.73]];
+
+// data/physical/literature_data.csv — EFFICIENCY rows (all years)
+const EFFICIENCY_PARAMS = {
+  ambient_derate_model:  0.08,    // %/°C — ambient_derate_model
+  cooling_water_derate:  0.133,   // %/°C — cooling_water_derate
+  sst_air_ratio:         0.80,    // dimensionless — sst_air_ratio
+};
+
+// data/physical/literature_data.csv — HEATWAVE rows
+const HEATWAVE_PARAMS = {
+  days_baseline:    5.0,    // d/yr — days_baseline (2024)
+  days_future:     17.4,    // d/yr — days_future   (2100, SSP5-8.5, WWA 2025)
+  efficiency_loss:  4.0,    // % per event day — efficiency_loss
+};
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+function _linInterp(x, anchors) {
+  // Piecewise linear; clamps to first/last value outside anchor range.
+  if (x <= anchors[0][0]) return anchors[0][1];
+  const last = anchors[anchors.length - 1];
+  if (x >= last[0]) return last[1];
+  for (let i = 0; i < anchors.length - 1; i++) {
+    const [x0, y0] = anchors[i], [x1, y1] = anchors[i + 1];
+    if (x >= x0 && x <= x1) return y0 + (y1 - y0) * (x - x0) / (x1 - x0);
+  }
+  return last[1];
+}
+
 function physicalAdjustment(phys, year) {
-  // SSP-style scaling — increases roughly with year, scaled by `wildfire`
-  const t = Math.max(0, year - 2025) / 75; // 0..1 by 2100
   const scale = phys ? phys.wildfire : 0;
-  // Sigmoid for nonlinear acceleration
-  const sig = 1 / (1 + Math.exp(-(t * 6 - 2.5)));
-  const outage = scale * sig * 0.012;          // up to ~1.2% by 2100 at SSP585
-  const tx = scale * sig * 0.006;
-  const derate = scale * sig * 0.018 * (phys && phys.id === "severe_drought" ? 2.4 : 1);
-  const efficiency = scale * sig * 0.005;
-  return { outage, tx, derate, efficiency };
+  const A = PHYSICAL_ASSUMPTIONS;
+
+  // --- Wildfire (climada_data.csv: 6 events / 20 yr = 0.30/yr) ---
+  const wfFreq   = CLIMADA.wildfire_events / CLIMADA.wildfire_years;
+  const wfBase   = wfFreq * A.outage_prob_wildfire * (A.outage_duration_wildfire / A.hours_per_year);
+  const wfBaseTx = wfFreq * A.outage_prob_tc       * (A.outage_duration_tc       / A.hours_per_year);
+  const wfScl    = 1 + (_linInterp(year, WF_CLIMATE_FACTORS) - 1) * scale;
+  const outage   = wfBase   * wfScl;
+  const tx       = wfBaseTx * wfScl;
+
+  // --- Tropical cyclone (climada_data.csv: 5 damaging / 40 yr = 0.125/yr) ---
+  const tcFreq   = CLIMADA.tc_damaging_events / CLIMADA.tc_damaging_years;
+  const tcBase   = tcFreq * A.outage_prob_tc * (A.outage_duration_wildfire / A.hours_per_year);
+  const tcBaseTx = tcFreq * A.outage_prob_tc * (A.outage_duration_tc       / A.hours_per_year);
+  const tcScl    = 1 + (_linInterp(year, TC_CLIMATE_FACTORS) - 1) * scale;
+  const tc_outage  = tcBase   * tcScl;
+  const tc_tx      = tcBaseTx * tcScl;
+
+  // --- Drought derate (model_assumptions.csv: base 0.5 %, ×2.4 for severe drought) ---
+  const drScl   = 1 + (_linInterp(year, DR_CLIMATE_FACTORS) - 1) * scale;
+  const sevMult = (phys && phys.id === "severe_drought") ? A.drought_severe_multiplier : 1;
+  const derate  = A.drought_capacity_derate_base * drScl * sevMult;
+
+  // --- Chronic heat + SST (literature_data.csv EFFICIENCY rows) ---
+  const E = EFFICIENCY_PARAMS;
+  const effPerC    = (E.ambient_derate_model + E.sst_air_ratio * E.cooling_water_derate) / 100;
+  const deltaT     = _linInterp(year, TEMP_CHANGE_SSP585) * scale;
+  const chronicEff = deltaT * effPerC;
+
+  // --- Heatwave acute (literature_data.csv HEATWAVE rows) ---
+  const H     = HEATWAVE_PARAMS;
+  const hwT   = Math.max(0, Math.min(1, (year - 2024) / (2100 - 2024)));
+  const hwDays = H.days_baseline + (H.days_future - H.days_baseline) * hwT * scale;
+  const hwEff  = (hwDays / 365) * (H.efficiency_loss / 100);
+
+  const efficiency = chronicEff + hwEff;
+
+  return { outage, tx, tc_outage, tc_tx, derate, efficiency, chronicEff, hwEff };
 }
 
 function ratingFromMetrics(avgEbitda, dscr, debtToEquity, ebitdaToInterest, capacityMw, consecutiveLossYears, cumulativeEbitdaMillion) {
@@ -156,7 +250,9 @@ function computeScenario(plant, transition, physical, opts = {}) {
   for (let i = 0; i < years; i++) {
     const year = startYear + i;
     const phyAdj = physicalAdjustment(physical, year);
-    const cfRedFromPhysical = phyAdj.outage + phyAdj.tx + phyAdj.derate;
+    // Combined CF reduction: wildfire + TC (independent) + drought derate.
+    // Independent formula: 1−(1−wf_plant)(1−tc_plant)·… ≈ sum for small rates.
+    const cfRedFromPhysical = phyAdj.outage + phyAdj.tc_outage + phyAdj.tx + phyAdj.tc_tx + phyAdj.derate;
     const effLoss = phyAdj.efficiency;
 
     const cf = Math.max(0, plant.capacity_factor * (1 - transition.dispatch) * (1 - cfRedFromPhysical));
@@ -368,7 +464,9 @@ function niceTicks(min, max, count = 5) {
 Object.assign(window, {
   RATING_ORDER, RATING_SPREADS,
   DEFAULT_PLANT, DEFAULT_TRANSITIONS, DEFAULT_PHYSICAL, DEFAULT_CLIMATE_SCENARIOS,
-  carbonPrice, physicalAdjustment, ratingFromMetrics,
+  CLIMADA, PHYSICAL_ASSUMPTIONS, EFFICIENCY_PARAMS, HEATWAVE_PARAMS,
+  WF_CLIMATE_FACTORS, TC_CLIMATE_FACTORS, DR_CLIMATE_FACTORS, TEMP_CHANGE_SSP585,
+  carbonPrice, physicalAdjustment, _linInterp, ratingFromMetrics,
   computeScenario, runModel, defaultModel, buildModel,
   fmtNum, fmtPct, niceTicks,
 });

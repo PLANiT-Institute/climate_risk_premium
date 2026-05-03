@@ -86,8 +86,14 @@ def _build_blended_physical(
 
     blended_outage    = None
     blended_tx        = None
+    blended_tc        = None
+    blended_tc_tx     = None
+    blended_combined  = None
+    blended_combined_tx = None
     blended_derate    = None
     blended_eff       = None
+    blended_chronic   = None
+    blended_heatwave  = None
     blended_water     = None
     blended_capex     = None
     ref_years         = None
@@ -104,20 +110,32 @@ def _build_blended_physical(
             physical_scenario=row["physical_scenario"],
         )
         if blended_outage is None:
-            ref_years      = adj.years
-            blended_outage = adj.outage_rates * w
-            blended_tx     = adj.transmission_outage_rates * w
-            blended_derate = adj.capacity_derates * w
-            blended_eff    = adj.efficiency_losses * w
-            blended_water  = (1.0 - adj.water_constraints) * w   # blend the deficit
-            blended_capex  = adj.asset_capex_loss_rates * w
+            ref_years          = adj.years
+            blended_outage     = adj.outage_rates * w
+            blended_tx         = adj.transmission_outage_rates * w
+            blended_tc         = adj.tc_outage_rates * w
+            blended_tc_tx      = adj.tc_transmission_outage_rates * w
+            blended_combined   = adj.combined_outage_rates * w
+            blended_combined_tx= adj.combined_transmission_outage_rates * w
+            blended_derate     = adj.capacity_derates * w
+            blended_eff        = adj.efficiency_losses * w
+            blended_chronic    = adj.chronic_efficiency_losses * w
+            blended_heatwave   = adj.heatwave_efficiency_losses * w
+            blended_water      = (1.0 - adj.water_constraints) * w
+            blended_capex      = adj.asset_capex_loss_rates * w
         else:
-            blended_outage += adj.outage_rates * w
-            blended_tx     += adj.transmission_outage_rates * w
-            blended_derate += adj.capacity_derates * w
-            blended_eff    += adj.efficiency_losses * w
-            blended_water  += (1.0 - adj.water_constraints) * w
-            blended_capex  += adj.asset_capex_loss_rates * w
+            blended_outage     += adj.outage_rates * w
+            blended_tx         += adj.transmission_outage_rates * w
+            blended_tc         += adj.tc_outage_rates * w
+            blended_tc_tx      += adj.tc_transmission_outage_rates * w
+            blended_combined   += adj.combined_outage_rates * w
+            blended_combined_tx+= adj.combined_transmission_outage_rates * w
+            blended_derate     += adj.capacity_derates * w
+            blended_eff        += adj.efficiency_losses * w
+            blended_chronic    += adj.chronic_efficiency_losses * w
+            blended_heatwave   += adj.heatwave_efficiency_losses * w
+            blended_water      += (1.0 - adj.water_constraints) * w
+            blended_capex      += adj.asset_capex_loss_rates * w
 
     return YearlyPhysicalAdjustments(
         years=ref_years,
@@ -125,15 +143,22 @@ def _build_blended_physical(
         transmission_outage_rates=blended_tx,
         capacity_derates=blended_derate,
         efficiency_losses=blended_eff,
-        water_constraints=1.0 - blended_water,   # convert deficit back
+        water_constraints=1.0 - blended_water,
         asset_capex_loss_rates=blended_capex,
         scenario_name=scenario_label,
+        tc_outage_rates=blended_tc,
+        tc_transmission_outage_rates=blended_tc_tx,
+        combined_outage_rates=blended_combined,
+        combined_transmission_outage_rates=blended_combined_tx,
+        chronic_efficiency_losses=blended_chronic,
+        heatwave_efficiency_losses=blended_heatwave,
     )
 
 
 # All recognised physical channel names (used for validation + defaults)
 ALL_PHYSICAL_CHANNELS: tuple[str, ...] = (
     "wildfire_outage",
+    "tc_outage",
     "drought_derate",
     "water_constraint",
     "efficiency_loss",
@@ -150,7 +175,7 @@ def run_pipeline(
         active_physical_channels: Tuple of channel names to include in the
             cashflow calculation.  Default is all channels.  Pass ``()`` to
             disable all physical risk.  Valid names:
-            ``"wildfire_outage"``, ``"drought_derate"``,
+            ``"wildfire_outage"``, ``"tc_outage"``, ``"drought_derate"``,
             ``"water_constraint"``, ``"efficiency_loss"``.
 
     Returns
