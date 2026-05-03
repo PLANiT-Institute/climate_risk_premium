@@ -2,10 +2,23 @@
 
 Calls the src/ modules directly — no HTTP, no JSON serialization.
 Results are cached with @st.cache_data so the pipeline only runs once per session.
+
+Scenario structure
+------------------
+The pipeline is driven entirely by CSVs — no scenario definitions live in code:
+
+  data/scenarios/climate_scenarios.csv
+      climate_scenario, transition_scenario, physical_scenario, physical_weight
+      One row per (climate, transition, physical) triplet.
+      Multiple rows with the same climate_scenario blend physical scenarios by weight.
+
+  data/transition/scenarios.csv      — transition policy definitions
+  data/physical/scenarios.csv        — physical risk scenario definitions
 """
 from __future__ import annotations
 
 import sys
+from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
@@ -18,11 +31,12 @@ if str(_REPO) not in sys.path:
     sys.path.insert(0, str(_REPO))
 
 from src.data.loaders import (
+    load_climate_scenarios,
     load_model_assumptions,
     load_physical_scenarios,
     load_plant_params,
-    load_policy_scenarios,
     load_rating_spreads,
+    load_transition_scenarios,
 )
 from src.financials.cashflow import compute_cashflows
 from src.financials.metrics import calculate_debt_service, calculate_metrics
@@ -46,58 +60,104 @@ def _float(v: Any) -> float:
     return float(v)
 
 
-@st.cache_data
-def run_pipeline(
-    risk_mode: str = "all",
-    physical_scenario: str = "high_physical",
-    outage_hours_override: dict | None = None,
-) -> dict:
-    """Run all transition scenarios and return results as plain Python dicts/lists.
+def _build_blended_physical(
+    physical_rows: list[dict],
+    start_year: int,
+    n_years: int,
+) -> YearlyPhysicalAdjustments:
+    """Build a weight-blended YearlyPhysicalAdjustments from one or more physical scenarios.
 
-    Args:
-        risk_mode: Which risks to include.  One of:
-            ``"all"``        — transition + wildfire physical risk
-            ``"transition"`` — transition risk only (no physical)
-            ``"wildfire"``   — wildfire physical risk only (no transition policy)
-        physical_scenario: Physical risk scenario to use when risk_mode includes
-            wildfire.  One of the entries in ``physical_scenarios.csv``
-            (baseline / moderate_physical / high_physical / severe_drought).
-        outage_hours_override: Optional ``{"plant": h, "transmission": h}``
-            overriding default restoration durations from the assumptions CSV.
+    When a climate scenario has multiple physical scenario rows (weights < 1.0),
+    the outage and other arrays are linearly blended by normalised weight.
+    """
+    total_weight = sum(float(r["physical_weight"]) for r in physical_rows)
+
+    blended_outage    = None
+    blended_tx        = None
+    blended_derate    = None
+    blended_eff       = None
+    blended_water     = None
+    blended_capex     = None
+    ref_years         = None
+    scenario_label    = "+".join(
+        f"{r['physical_scenario']}×{r['physical_weight'] / total_weight:.2f}"
+        for r in physical_rows
+    )
+
+    for row in physical_rows:
+        w   = float(row["physical_weight"]) / total_weight
+        adj = build_physical_adjustments(
+            start_year=start_year,
+            n_years=n_years,
+            physical_scenario=row["physical_scenario"],
+        )
+        if blended_outage is None:
+            ref_years      = adj.years
+            blended_outage = adj.outage_rates * w
+            blended_tx     = adj.transmission_outage_rates * w
+            blended_derate = adj.capacity_derates * w
+            blended_eff    = adj.efficiency_losses * w
+            blended_water  = (1.0 - adj.water_constraints) * w   # blend the deficit
+            blended_capex  = adj.asset_capex_loss_rates * w
+        else:
+            blended_outage += adj.outage_rates * w
+            blended_tx     += adj.transmission_outage_rates * w
+            blended_derate += adj.capacity_derates * w
+            blended_eff    += adj.efficiency_losses * w
+            blended_water  += (1.0 - adj.water_constraints) * w
+            blended_capex  += adj.asset_capex_loss_rates * w
+
+    return YearlyPhysicalAdjustments(
+        years=ref_years,
+        outage_rates=blended_outage,
+        transmission_outage_rates=blended_tx,
+        capacity_derates=blended_derate,
+        efficiency_losses=blended_eff,
+        water_constraints=1.0 - blended_water,   # convert deficit back
+        asset_capex_loss_rates=blended_capex,
+        scenario_name=scenario_label,
+    )
+
+
+@st.cache_data
+def run_pipeline() -> dict:
+    """Run all climate scenarios and return results as plain Python dicts/lists.
+
+    Climate scenarios are defined in ``data/scenarios/climate_scenarios.csv``.
+    Each row is a (climate_scenario, transition_scenario, physical_scenario, weight)
+    combination.  Multiple rows with the same climate_scenario name produce a
+    probability-weighted blend of physical scenarios.
 
     Returns
     -------
     dict with keys:
-      plant           — plant parameters (dict)
-      scenarios       — list of scenario summary dicts
-      cashflows       — dict {scenario_name: [row_dict, ...]}
-      ratings         — list of year-by-year rating dicts
-      physical        — YearlyPhysicalAdjustments or None
-      physical_meta   — list of physical scenario dicts from physical_scenarios.csv
+      plant               — plant parameters (dict)
+      scenarios           — list of scenario summary dicts, keyed by climate_scenario
+      cashflows           — {climate_scenario: [row_dict, ...]}
+      ratings             — list of year-by-year rating dicts
+      physical_meta       — list of physical scenario dicts from data/physical/scenarios.csv
+      climate_scenario_meta — list of climate scenario definition rows
     """
-    plant = load_plant_params()
-    policy_rows = load_policy_scenarios()
+    plant       = load_plant_params()
     assumptions = load_model_assumptions()
-    spreads = load_rating_spreads()
+    spreads     = load_rating_spreads()
 
-    total_capex = float(plant["total_capex_million"]) * 1e6
-    debt_fraction = float(plant["debt_fraction"])
-    debt_interest = float(plant["debt_interest_rate"])
-    debt_tenor = int(plant["debt_tenor_years"])
+    total_capex        = float(plant["total_capex_million"]) * 1e6
+    debt_fraction      = float(plant["debt_fraction"])
+    debt_interest      = float(plant["debt_interest_rate"])
+    debt_tenor         = int(plant["debt_tenor_years"])
     depreciation_years = int(plant["depreciation_years"])
-    capacity_mw = float(plant["capacity_mw"])
-    base_cf = float(plant["capacity_factor"])
-    emissions = float(plant["emissions_tCO2_per_mwh"])
-    risk_free = float(plant["risk_free_rate"])
-    equity_fraction = float(plant["equity_fraction"])
-    start_year = int(assumptions["start_year"])
-    base_rate = float(assumptions["base_rate"])
-    cash_ratio = float(assumptions["cash_ratio"])
-    plant_name = str(plant["plant_name"])
+    capacity_mw        = float(plant["capacity_mw"])
+    base_cf            = float(plant["capacity_factor"])
+    emissions          = float(plant["emissions_tCO2_per_mwh"])
+    risk_free          = float(plant["risk_free_rate"])
+    equity_fraction    = float(plant["equity_fraction"])
+    start_year         = int(assumptions["start_year"])
+    base_rate          = float(assumptions["base_rate"])
+    cash_ratio         = float(assumptions["cash_ratio"])
+    plant_name         = str(plant["plant_name"])
 
-    # Rating scale ordered from best to worst (derived from Rating enum)
     rating_order = [r.name for r in sorted(Rating, key=lambda r: r.value)]
-
     counterfactual = get_counterfactual_baseline_rating()
     debt_struct = calculate_debt_service(total_capex, debt_fraction, debt_interest, debt_tenor)
     cumulative_principal = debt_struct.principal_schedule.cumsum()
@@ -108,24 +168,37 @@ def run_pipeline(
         "equity_fraction": equity_fraction,
     }
 
-    # --- Physical risk (built once, shared across all transition scenarios) ---
-    physical_meta = load_physical_scenarios()
-    max_retirement = max(int(r["retirement_years"]) for r in policy_rows)
-    physical_adj: YearlyPhysicalAdjustments | None = None
-    if risk_mode in ("all", "wildfire"):
-        physical_adj = build_physical_adjustments(
-            start_year=start_year,
-            n_years=max_retirement,
-            physical_scenario=physical_scenario,
-            outage_hours_override=outage_hours_override,
-        )
+    # --- Load scenario definitions from CSVs ---
+    physical_meta      = load_physical_scenarios()
+    climate_rows_all   = load_climate_scenarios()
+    transition_rows_by_name = {r["scenario"]: r for r in load_transition_scenarios()}
 
+    # Group climate scenario rows by climate_scenario name (for blending)
+    climate_groups: dict[str, list[dict]] = defaultdict(list)
+    for row in climate_rows_all:
+        climate_groups[row["climate_scenario"]].append(row)
+
+    # Max retirement horizon across all transition scenarios used
+    all_retirement_years = [
+        int(transition_rows_by_name[g[0]["transition_scenario"]]["retirement_years"])
+        for g in climate_groups.values()
+        if g[0]["transition_scenario"] in transition_rows_by_name
+    ]
+    max_retirement = max(all_retirement_years) if all_retirement_years else 40
+
+    # --- Run one cashflow per climate scenario ---
     scenario_comparison: list[dict] = []
     cashflows: dict[str, list[dict]] = {}
     yearly_ratings: list[dict] = []
 
-    for row in policy_rows:
-        scenario = TransitionScenario.from_policy_row(row)
+    for climate_name, group in climate_groups.items():
+        # All rows in a group share the same transition scenario
+        trans_name  = group[0]["transition_scenario"]
+        trans_row   = transition_rows_by_name.get(trans_name)
+        if trans_row is None:
+            continue   # skip if transition scenario not defined
+
+        scenario = TransitionScenario.from_policy_row(trans_row)
 
         yearly_adj = build_yearly_transition_adjustments(
             scenario=scenario,
@@ -133,35 +206,19 @@ def run_pipeline(
             emissions_tco2_per_mwh=emissions,
         )
 
-        # For "wildfire" mode, suppress the transition policy effects by
-        # zeroing the dispatch penalty and carbon price
-        if risk_mode == "wildfire":
-            from src.risk.transition import build_yearly_transition_adjustments as _byta
-            from src.scenarios.base import TransitionScenario as _TS
-            neutral = _TS(
-                name=scenario.name,
-                dispatch_penalty=0.0,
-                retirement_years=scenario.retirement_years,
-                carbon_prices={y: 0.0 for y in scenario.carbon_prices},
-                carbon_scenario="none",
-                description="wildfire-only (transition suppressed)",
-            )
-            yearly_adj = _byta(
-                scenario=neutral,
-                base_capacity_factor=base_cf,
-                emissions_tco2_per_mwh=emissions,
-            )
+        # Build blended physical adjustment for this climate scenario
+        physical_adj = _build_blended_physical(group, start_year, max_retirement)
 
-        cf_ts = compute_cashflows(
+        cf_ts   = compute_cashflows(
             plant_params=plant,
             yearly_transition_adj=yearly_adj,
             yearly_physical_adj=physical_adj,
         )
         metrics = calculate_metrics(cf_ts, plant)
 
-        avg_ebitda = _float(cf_ts.ebitda.mean())
+        avg_ebitda   = _float(cf_ts.ebitda.mean())
         avg_interest = _float(cf_ts.interest_expense.mean())
-        debt_mid = total_capex * debt_fraction * 0.5
+        debt_mid         = total_capex * debt_fraction * 0.5
         fixed_assets_avg = total_capex * 0.5
         total_equity_avg = max(0.0, fixed_assets_avg - debt_mid)
 
@@ -177,7 +234,7 @@ def run_pipeline(
             dscr=metrics.avg_dscr,
             consecutive_loss_years=int((cf_ts.ebitda < 0).sum()),
         )
-        assessment = assess_credit_rating(rating_metrics)
+        assessment     = assess_credit_rating(rating_metrics)
         scenario_rating = assessment.overall_rating
         crp_bps = calculate_crp_from_ratings(
             baseline_rating=counterfactual,
@@ -186,7 +243,6 @@ def run_pipeline(
             debt_fraction=debt_fraction,
         )
         notch_change = scenario_rating.value - counterfactual.value
-
         financing = calculate_financing_with_counterfactual(
             scenario_spread_bps=scenario_rating.to_spread_bps(),
             counterfactual_spread_bps=counterfactual.to_spread_bps(),
@@ -198,9 +254,14 @@ def run_pipeline(
         )
 
         rd = assessment.to_dict()
+        # Collect the first description; for blends, note the blend
+        description = group[0].get("description", climate_name)
+
         scenario_comparison.append({
-            "scenario": scenario.name,
-            "description": scenario.description,
+            "scenario": climate_name,
+            "transition_scenario": trans_name,
+            "physical_scenario": physical_adj.scenario_name,
+            "description": description,
             "dispatch_penalty_pct": scenario.dispatch_penalty * 100,
             "retirement_years": scenario.retirement_years,
             "carbon_price_2025": scenario.carbon_prices.get(2025, 0.0),
@@ -238,32 +299,31 @@ def run_pipeline(
             dscr_val = cf_ts.dscr[i]
             cf_rows.append({
                 "year": int(year),
-                "revenue": _float(cf_ts.revenue[i]),
-                "fuel_costs": _float(cf_ts.fuel_costs[i]),
-                "variable_opex": _float(cf_ts.variable_opex[i]),
-                "fixed_opex": _float(cf_ts.fixed_opex[i]),
-                "carbon_costs": _float(cf_ts.carbon_costs[i]),
-                "total_costs": _float(cf_ts.total_costs[i]),
-                "ebitda": _float(cf_ts.ebitda[i]),
-                "depreciation": _float(cf_ts.depreciation[i]),
-                "ebit": _float(cf_ts.ebit[i]),
+                "revenue":          _float(cf_ts.revenue[i]),
+                "fuel_costs":       _float(cf_ts.fuel_costs[i]),
+                "variable_opex":    _float(cf_ts.variable_opex[i]),
+                "fixed_opex":       _float(cf_ts.fixed_opex[i]),
+                "carbon_costs":     _float(cf_ts.carbon_costs[i]),
+                "total_costs":      _float(cf_ts.total_costs[i]),
+                "ebitda":           _float(cf_ts.ebitda[i]),
+                "depreciation":     _float(cf_ts.depreciation[i]),
+                "ebit":             _float(cf_ts.ebit[i]),
                 "interest_expense": _float(cf_ts.interest_expense[i]),
-                "tax_expense": _float(cf_ts.tax_expense[i]),
-                "net_income": _float(cf_ts.net_income[i]),
-                "free_cash_flow": _float(cf_ts.free_cash_flow[i]),
-                "capacity_factor": _float(cf_ts.capacity_factor[i]),
-                # None for post-debt years so charts don't draw a false zero line
+                "tax_expense":      _float(cf_ts.tax_expense[i]),
+                "net_income":       _float(cf_ts.net_income[i]),
+                "free_cash_flow":   _float(cf_ts.free_cash_flow[i]),
+                "capacity_factor":  _float(cf_ts.capacity_factor[i]),
                 "dscr": (
                     None if (dscr_val is None or np.isnan(dscr_val)) else float(dscr_val)
                 ),
             })
-        cashflows[scenario.name] = cf_rows
+        cashflows[climate_name] = cf_rows
 
         # Year-by-year credit ratings
         for i, year in enumerate(cf_ts.years):
             raw_dscr = cf_ts.dscr[i]
-            dscr_i = float(raw_dscr) if (raw_dscr is not None and not np.isnan(raw_dscr)) else None
-            ebitda_i = _float(cf_ts.ebitda[i])
+            dscr_i   = float(raw_dscr) if (raw_dscr is not None and not np.isnan(raw_dscr)) else None
+            ebitda_i   = _float(cf_ts.ebitda[i])
             interest_i = _float(cf_ts.interest_expense[i])
 
             if i < debt_tenor:
@@ -283,16 +343,14 @@ def run_pipeline(
                 fixed_assets=total_assets_i if total_assets_i > 0 else total_capex,
                 interest_expense=interest_i,
                 total_debt=debt_out,
-                # Cash buffer: fraction of EBITDA loaded from model_assumptions
                 cash_and_equivalents=max(0.0, ebitda_i * cash_ratio),
                 total_equity=total_equity_i,
                 total_assets=total_assets_i if total_assets_i > 0 else total_capex,
                 dscr=dscr_i,
             )
             yr_assessment = assess_credit_rating(rm)
-            rating_str = yr_assessment.overall_rating.name
+            rating_str    = yr_assessment.overall_rating.name
 
-            # Post-debt DSCR is None (no debt service → metric N/A)
             if dscr_i is not None:
                 if dscr_i < 0:
                     rating_str = "D"
@@ -302,53 +360,38 @@ def run_pipeline(
 
             spread = spreads.get(rating_str, spreads.get("CCC", 900))
             yearly_ratings.append({
-                "scenario": scenario.name,
-                "year": int(year),
-                "dscr": round(dscr_i, 3) if dscr_i is not None else None,
-                "rating": rating_str,
-                "spread_bps": spread,
-                "cost_of_debt": round(base_rate + spread / 10000, 6),
-                "ebitda": round(ebitda_i / 1e6, 2),
+                "scenario":      climate_name,
+                "year":          int(year),
+                "dscr":          round(dscr_i, 3) if dscr_i is not None else None,
+                "rating":        rating_str,
+                "spread_bps":    spread,
+                "cost_of_debt":  round(base_rate + spread / 10000, 6),
+                "ebitda":        round(ebitda_i / 1e6, 2),
             })
 
     plant_out = {
-        "name": plant_name,
-        "capacity_mw": float(plant["capacity_mw"]),
-        "capacity_factor": float(plant["capacity_factor"]),
-        "total_capex_million": float(plant["total_capex_million"]),
-        "debt_fraction": float(plant["debt_fraction"]),
-        "equity_fraction": float(plant["equity_fraction"]),
-        "operating_years": int(plant["operating_years"]),
-        "useful_life": int(plant["useful_life"]),
-        "discount_rate": float(plant["discount_rate"]),
-        "debt_tenor_years": debt_tenor,
-        "debt_payoff_year": start_year + debt_tenor - 1,
+        "name":                   plant_name,
+        "capacity_mw":            float(plant["capacity_mw"]),
+        "capacity_factor":        float(plant["capacity_factor"]),
+        "total_capex_million":    float(plant["total_capex_million"]),
+        "debt_fraction":          float(plant["debt_fraction"]),
+        "equity_fraction":        float(plant["equity_fraction"]),
+        "operating_years":        int(plant["operating_years"]),
+        "useful_life":            int(plant["useful_life"]),
+        "discount_rate":          float(plant["discount_rate"]),
+        "debt_tenor_years":       debt_tenor,
+        "debt_payoff_year":       start_year + debt_tenor - 1,
         "emissions_tco2_per_mwh": float(plant["emissions_tCO2_per_mwh"]),
-        "heat_rate_mmbtu_per_mwh": float(plant["heat_rate_mmbtu_mwh"]),
-        "power_price_usd_per_mwh": float(plant["power_price_per_mwh"]),
-        # Pass rating spread map to UI so it can render without hardcoding
-        "rating_spreads": {k: int(v) for k, v in spreads.items()},
+        "heat_rate_mmbtu_per_mwh":float(plant["heat_rate_mmbtu_mwh"]),
+        "power_price_usd_per_mwh":float(plant["power_price_per_mwh"]),
+        "rating_spreads":         {k: int(v) for k, v in spreads.items()},
     }
 
-    # Serialise physical adjustments for the dashboard physical risk page
-    physical_out: dict | None = None
-    if physical_adj is not None:
-        physical_out = {
-            "scenario": physical_adj.scenario_name,
-            "years": physical_adj.years.tolist(),
-            "plant_outage_rate": physical_adj.outage_rates.tolist(),
-            "transmission_outage_rate": physical_adj.transmission_outage_rates.tolist(),
-            "capacity_derate": physical_adj.capacity_derates.tolist(),
-            "efficiency_loss": physical_adj.efficiency_losses.tolist(),
-            "water_constrained_capacity": physical_adj.water_constraints.tolist(),
-            "asset_capex_loss_rate": physical_adj.asset_capex_loss_rates.tolist(),
-        }
-
     return {
-        "plant": plant_out,
-        "scenarios": scenario_comparison,
-        "cashflows": cashflows,
-        "ratings": yearly_ratings,
-        "physical": physical_out,
-        "physical_meta": physical_meta,
+        "plant":                  plant_out,
+        "scenarios":              scenario_comparison,
+        "cashflows":              cashflows,
+        "ratings":                yearly_ratings,
+        "physical_meta":          physical_meta,
+        "climate_scenario_meta":  climate_rows_all,
     }

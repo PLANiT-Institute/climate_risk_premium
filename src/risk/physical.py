@@ -1,33 +1,27 @@
 """Wildfire physical risk module.
 
 Computes year-by-year physical risk adjustments for a coal power plant by
-reading the pre-computed anchor data in ``data/raw/physical_risk/`` and
-linearly interpolating to every operating year.
+reading CSV inputs from ``data/physical/`` and linearly interpolating to
+every operating year.
 
 Currently only the wildfire channel is active.  The data structure is designed
 to hold all hazard channels (TC, flood, temperature, SLR) so they can be
 activated later without changing the interface.
 
-Data sources
-------------
-- ``climada_data.csv``         — CLIMADA event counts (NASA FIRMS, IBTrACS, ISIMIP)
-- ``literature_data.csv``      — Verified climate factors and efficiency coefficients
-- ``model_assumptions.csv``    — Outage probabilities and durations (industry assumptions)
-- ``physical_risk_output.csv`` — Pre-computed anchor outputs at 2024/2030/2050/2100
+Data sources (all in ``data/physical/``)
+-----------------------------------------
+- ``climada_data.csv``       — CLIMADA event counts (NASA FIRMS, IBTrACS, ISIMIP)
+- ``literature_data.csv``    — Verified climate factors (WWA 2025)
+- ``model_assumptions.csv``  — Outage probabilities and durations
+- ``scenarios.csv``          — Physical scenario definitions incl. ``wildfire_scale``
 
-Physical scenario → SSP mapping (from archive/src/pipeline/runner.py)
-----------------------------------------------------------------------
-  baseline         → ssp126   (low physical risk acceleration)
-  moderate_physical → ssp245  (mid-range; currently uses RCP8.5 data as proxy)
-  high_physical    → ssp585   (worst-case; RCP8.5 full data)
-  severe_drought   → ssp585   (same climate pathway, drought emphasis)
-
-The RCP8.5 output anchors are used for high_physical / severe_drought.
-For baseline and moderate_physical the wildfire climate factor trajectory
-is scaled down because lower SSP pathways produce smaller fire-weather
-intensification.  Scaling factors follow WWA (2025) analysis:
-  ssp126 scale = 0.30  (30 % of RCP8.5 intensification)
-  ssp245 scale = 0.60
+Physical scenario → SSP mapping and wildfire scale
+---------------------------------------------------
+Defined in ``data/physical/scenarios.csv`` (no hardcoded values in code):
+  baseline         → ssp126, wildfire_scale = 0.30
+  moderate_physical → ssp245, wildfire_scale = 0.60
+  high_physical    → ssp585, wildfire_scale = 1.00
+  severe_drought   → ssp585, wildfire_scale = 1.00
 
 Algorithm (wildfire, outage_rate channel)
 -----------------------------------------
@@ -39,14 +33,14 @@ Algorithm (wildfire, outage_rate channel)
         (from model_assumptions.csv)
 3.  wildfire_factor(year) = np.interp(year, anchor_years, factors)
         (category WILDFIRE, from literature_data.csv)
-4.  projected_wildfire_outage(year) = base_outage_rate × wildfire_factor(year)
-        × ssp_scale (scenario-dependent)
+4.  projected_wildfire_outage(year)
+        = base_outage_rate × [1 + (wildfire_factor(year) − 1) × wildfire_scale]
 
 Transmission outage follows the same formula using outage_prob_tc and
 outage_duration_tc as a conservative proxy until TC data is activated.
 
-Efficiency loss tracks the wildfire outage trajectory scaled by the
-ratio from the physical_risk_output.csv anchor data.
+Efficiency loss is zero for the wildfire-only implementation; that channel
+belongs to the temperature hazard (not yet activated).
 """
 from __future__ import annotations
 
@@ -60,19 +54,10 @@ from src.data.loaders import (
     load_physical_hazard_data,
     load_physical_literature_data,
     load_physical_model_assumptions,
+    load_physical_scenarios,
 )
 
 logger = logging.getLogger(__name__)
-
-# ---------------------------------------------------------------------------
-# SSP scale factors for wildfire intensity relative to RCP8.5
-# Based on WWA (2025) analysis of South Korean wildfire likelihood
-# ---------------------------------------------------------------------------
-_SSP_WILDFIRE_SCALE: Dict[str, float] = {
-    "ssp126": 0.30,
-    "ssp245": 0.60,
-    "ssp585": 1.00,
-}
 
 
 # ---------------------------------------------------------------------------
@@ -203,20 +188,24 @@ def build_physical_adjustments(
     """
     years = np.arange(start_year, start_year + n_years, dtype=float)
 
-    # --- Load inputs from archive CSVs ---
-    hazard_rows = load_physical_hazard_data()
+    # --- Load inputs from CSVs ---
+    hazard_rows    = load_physical_hazard_data()
     literature_rows = load_physical_literature_data()
-    assumptions = load_physical_model_assumptions()
+    assumptions    = load_physical_model_assumptions()
 
-    # --- SSP-based wildfire scale (scenario dimension) ---
-    _SSP_MAP = {
-        "baseline": "ssp126",
-        "moderate_physical": "ssp245",
-        "high_physical": "ssp585",
-        "severe_drought": "ssp585",
-    }
-    ssp = _SSP_MAP.get(physical_scenario, "ssp585")
-    wildfire_scale = _SSP_WILDFIRE_SCALE.get(ssp, 1.0)
+    # --- SSP & wildfire scale from data/physical/scenarios.csv (no hardcoded values) ---
+    phys_scenarios = load_physical_scenarios()
+    sc_row = next(
+        (r for r in phys_scenarios if r["scenario"] == physical_scenario), None
+    )
+    if sc_row is None:
+        available = [r["scenario"] for r in phys_scenarios]
+        raise ValueError(
+            f"Physical scenario '{physical_scenario}' not found in scenarios.csv. "
+            f"Available: {available}"
+        )
+    ssp            = sc_row["ssp"]
+    wildfire_scale = float(sc_row["wildfire_scale"])
 
     # --- CLIMADA: wildfire event counts ---
     wildfire_row = next(

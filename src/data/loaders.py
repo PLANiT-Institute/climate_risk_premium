@@ -1,7 +1,30 @@
-"""Data loaders for plant parameters and policy scenarios.
+"""Data loaders for all CSV inputs.
 
-All I/O lives here — callers get plain Python dicts / dataclass instances,
-never file handles or raw CSV rows.
+All I/O lives here — callers get plain Python dicts, never file handles or
+raw CSV rows.
+
+Directory layout
+----------------
+data/
+  plant_parameters.csv       — plant design and financial parameters
+  model_assumptions.csv      — cross-cutting model assumptions
+  rating_thresholds.csv      — KIS credit rating metric thresholds
+  rating_weights.csv         — KIS rating component weights
+  rating_spreads.csv         — rating → credit spread mapping
+  credit_rating_grid.csv     — compact rating grid (reference)
+
+  transition/
+    scenarios.csv            — transition policy scenarios (dispatch, carbon)
+
+  physical/
+    scenarios.csv            — physical risk scenarios (ssp, wildfire_scale)
+    climada_data.csv         — CLIMADA hazard event counts (NASA FIRMS)
+    literature_data.csv      — climate amplification factors (WWA 2025)
+    model_assumptions.csv    — outage probabilities and durations
+
+  scenarios/
+    climate_scenarios.csv    — combined climate scenarios
+                               (transition_scenario × physical_scenario × weight)
 """
 from __future__ import annotations
 
@@ -12,20 +35,22 @@ from typing import Any, Dict, List
 
 logger = logging.getLogger(__name__)
 
-# Repo root → data/raw/   (transition risk inputs)
-_DATA_DIR = Path(__file__).parent.parent.parent / "data" / "raw"
-# Repo root → data/physical_risk/   (physical risk inputs)
-_PHYS_DIR = Path(__file__).parent.parent.parent / "data" / "physical_risk"
+_ROOT     = Path(__file__).parent.parent.parent
+_DATA_DIR = _ROOT / "data"
+_TRANS_DIR = _DATA_DIR / "transition"
+_PHYS_DIR  = _DATA_DIR / "physical"
+_SCEN_DIR  = _DATA_DIR / "scenarios"
 
+
+# ---------------------------------------------------------------------------
+# Plant & model parameters
+# ---------------------------------------------------------------------------
 
 def load_plant_params(csv_path: str | Path | None = None) -> Dict[str, Any]:
-    """Load plant design and financial parameters from CSV.
+    """Load plant design and financial parameters from ``data/plant_parameters.csv``.
 
-    Returns a flat dict keyed by ``param_name``, values cast to float where
-    possible (strings kept as-is for non-numeric fields like filenames).
-
-    Args:
-        csv_path: Override path; defaults to ``data/raw/plant_parameters.csv``.
+    Returns a flat dict keyed by ``param_name``.  Values are cast to float
+    where possible; strings are kept as-is (e.g. ``plant_name``).
     """
     path = Path(csv_path) if csv_path else _DATA_DIR / "plant_parameters.csv"
     if not path.exists():
@@ -35,76 +60,20 @@ def load_plant_params(csv_path: str | Path | None = None) -> Dict[str, Any]:
     with open(path, newline="") as f:
         for row in csv.DictReader(f):
             name = row["param_name"].strip()
-            raw = row["value"].strip()
+            raw  = row["value"].strip()
             try:
                 params[name] = float(raw)
             except ValueError:
-                params[name] = raw  # keep as string (e.g. filenames)
-
+                params[name] = raw
     logger.info("Loaded %d plant parameters from %s", len(params), path)
     return params
 
 
-def load_policy_scenarios(csv_path: str | Path | None = None) -> List[Dict[str, Any]]:
-    """Load all transition policy scenarios from CSV.
-
-    Returns a list of dicts, one per scenario row.  Carbon prices are cast
-    to float; ``dispatch_penalty`` and ``retirement_years`` likewise.
-
-    Args:
-        csv_path: Override path; defaults to ``data/raw/policy.csv``.
-    """
-    path = Path(csv_path) if csv_path else _DATA_DIR / "policy.csv"
-    if not path.exists():
-        raise FileNotFoundError(f"policy.csv not found at {path}")
-
-    float_cols = {
-        "dispatch_penalty",
-        "retirement_years",
-        "carbon_price_2025",
-        "carbon_price_2030",
-        "carbon_price_2040",
-        "carbon_price_2050",
-    }
-
-    scenarios: List[Dict[str, Any]] = []
-    with open(path, newline="") as f:
-        for row in csv.DictReader(f):
-            record: Dict[str, Any] = {}
-            for k, v in row.items():
-                k = k.strip()
-                v = v.strip()
-                record[k] = float(v) if k in float_cols else v
-            scenarios.append(record)
-
-    logger.info("Loaded %d policy scenarios from %s", len(scenarios), path)
-    return scenarios
-
-
-def load_policy_scenario_by_name(
-    name: str,
-    csv_path: str | Path | None = None,
-) -> Dict[str, Any]:
-    """Return a single scenario row by its ``scenario`` column value.
-
-    Raises ``KeyError`` if the scenario name is not found.
-    """
-    rows = load_policy_scenarios(csv_path)
-    for row in rows:
-        if row["scenario"] == name:
-            return row
-    available = [r["scenario"] for r in rows]
-    raise KeyError(f"Scenario '{name}' not found.  Available: {available}")
-
-
 def load_model_assumptions(csv_path: str | Path | None = None) -> Dict[str, Any]:
-    """Load cross-cutting model assumptions from CSV.
+    """Load cross-cutting model assumptions from ``data/model_assumptions.csv``.
 
     Values are cast to float where possible; strings are kept as-is
     (e.g. ``counterfactual_rating = "A"``).
-
-    Args:
-        csv_path: Override path; defaults to ``data/raw/model_assumptions.csv``.
     """
     path = Path(csv_path) if csv_path else _DATA_DIR / "model_assumptions.csv"
     if not path.exists():
@@ -114,25 +83,82 @@ def load_model_assumptions(csv_path: str | Path | None = None) -> Dict[str, Any]
     with open(path, newline="") as f:
         for row in csv.DictReader(f):
             name = row["param_name"].strip()
-            raw = row["value"].strip()
+            raw  = row["value"].strip()
             try:
                 assumptions[name] = float(raw)
             except ValueError:
-                assumptions[name] = raw  # keep as string (e.g. rating names)
-
+                assumptions[name] = raw
     logger.info("Loaded %d model assumptions from %s", len(assumptions), path)
     return assumptions
 
 
+# ---------------------------------------------------------------------------
+# Transition risk
+# ---------------------------------------------------------------------------
+
+def load_transition_scenarios(csv_path: str | Path | None = None) -> List[Dict[str, Any]]:
+    """Load all transition policy scenarios from ``data/transition/scenarios.csv``.
+
+    Returns a list of dicts, one per row.  Numeric columns
+    (dispatch_penalty, retirement_years, carbon_price_*) are cast to float.
+    """
+    path = Path(csv_path) if csv_path else _TRANS_DIR / "scenarios.csv"
+    if not path.exists():
+        raise FileNotFoundError(f"transition scenarios not found at {path}")
+
+    float_cols = {
+        "dispatch_penalty",
+        "retirement_years",
+        "carbon_price_2025",
+        "carbon_price_2030",
+        "carbon_price_2040",
+        "carbon_price_2050",
+    }
+    scenarios: List[Dict[str, Any]] = []
+    with open(path, newline="") as f:
+        for row in csv.DictReader(f):
+            record: Dict[str, Any] = {}
+            for k, v in row.items():
+                k = k.strip()
+                v = v.strip()
+                record[k] = float(v) if k in float_cols else v
+            scenarios.append(record)
+    logger.info("Loaded %d transition scenarios from %s", len(scenarios), path)
+    return scenarios
+
+
+# Keep old name as alias so existing callers don't break immediately
+def load_policy_scenarios(csv_path: str | Path | None = None) -> List[Dict[str, Any]]:
+    """Deprecated alias for :func:`load_transition_scenarios`."""
+    return load_transition_scenarios(csv_path)
+
+
+def load_transition_scenario_by_name(
+    name: str,
+    csv_path: str | Path | None = None,
+) -> Dict[str, Any]:
+    """Return a single transition scenario row by its ``scenario`` column value.
+
+    Raises ``KeyError`` if the name is not found.
+    """
+    rows = load_transition_scenarios(csv_path)
+    for row in rows:
+        if row["scenario"] == name:
+            return row
+    available = [r["scenario"] for r in rows]
+    raise KeyError(f"Transition scenario '{name}' not found. Available: {available}")
+
+
+# ---------------------------------------------------------------------------
+# Credit rating
+# ---------------------------------------------------------------------------
+
 def load_rating_thresholds(csv_path: str | Path | None = None) -> Dict[str, Dict[str, float]]:
-    """Load credit rating threshold breakpoints from CSV.
+    """Load KIS credit rating metric thresholds from ``data/rating_thresholds.csv``.
 
-    Returns a nested dict ``{metric: {rating_name: threshold}}`` for all
-    metrics.  For ``direction = "higher"``, threshold is the *minimum* value
-    to achieve that rating.  For ``direction = "lower"``, it is the *maximum*.
-
-    Args:
-        csv_path: Override path; defaults to ``data/raw/rating_thresholds.csv``.
+    Returns ``{metric: {rating_name: threshold}}``.  For ``direction = "higher"``
+    the threshold is the *minimum* to achieve that rating; for ``"lower"`` it
+    is the *maximum*.
     """
     path = Path(csv_path) if csv_path else _DATA_DIR / "rating_thresholds.csv"
     if not path.exists():
@@ -141,22 +167,18 @@ def load_rating_thresholds(csv_path: str | Path | None = None) -> Dict[str, Dict
     thresholds: Dict[str, Dict[str, float]] = {}
     with open(path, newline="") as f:
         for row in csv.DictReader(f):
-            metric = row["metric"].strip()
-            rating = row["rating"].strip()
+            metric    = row["metric"].strip()
+            rating    = row["rating"].strip()
             threshold = float(row["threshold"])
             thresholds.setdefault(metric, {})[rating] = threshold
-
     logger.info("Loaded rating thresholds for %d metrics from %s", len(thresholds), path)
     return thresholds
 
 
 def load_rating_weights(csv_path: str | Path | None = None) -> Dict[str, float]:
-    """Load credit rating component weights from CSV.
+    """Load KIS rating component weights from ``data/rating_weights.csv``.
 
-    Returns ``{component_name: weight}`` for each rating component.
-
-    Args:
-        csv_path: Override path; defaults to ``data/raw/rating_weights.csv``.
+    Returns ``{component_name: weight}``.
     """
     path = Path(csv_path) if csv_path else _DATA_DIR / "rating_weights.csv"
     if not path.exists():
@@ -165,21 +187,15 @@ def load_rating_weights(csv_path: str | Path | None = None) -> Dict[str, float]:
     weights: Dict[str, float] = {}
     with open(path, newline="") as f:
         for row in csv.DictReader(f):
-            component = row["component"].strip()
-            weight = float(row["weight"])
-            weights[component] = weight
-
+            weights[row["component"].strip()] = float(row["weight"])
     logger.info("Loaded %d rating component weights from %s", len(weights), path)
     return weights
 
 
 def load_rating_spreads(csv_path: str | Path | None = None) -> Dict[str, float]:
-    """Load credit rating → credit spread mapping from CSV.
+    """Load rating → credit spread mapping from ``data/rating_spreads.csv``.
 
-    Returns ``{rating_name: spread_bps}`` for all rating categories.
-
-    Args:
-        csv_path: Override path; defaults to ``data/raw/rating_spreads.csv``.
+    Returns ``{rating_name: spread_bps}``.
     """
     path = Path(csv_path) if csv_path else _DATA_DIR / "rating_spreads.csv"
     if not path.exists():
@@ -188,24 +204,44 @@ def load_rating_spreads(csv_path: str | Path | None = None) -> Dict[str, float]:
     spreads: Dict[str, float] = {}
     with open(path, newline="") as f:
         for row in csv.DictReader(f):
-            rating = row["rating"].strip()
-            spread = float(row["spread_bps"])
-            spreads[rating] = spread
-
+            spreads[row["rating"].strip()] = float(row["spread_bps"])
     logger.info("Loaded %d rating spreads from %s", len(spreads), path)
     return spreads
 
 
+# ---------------------------------------------------------------------------
+# Physical risk
+# ---------------------------------------------------------------------------
+
+def load_physical_scenarios(csv_path: str | Path | None = None) -> List[Dict[str, Any]]:
+    """Load physical risk scenario definitions from ``data/physical/scenarios.csv``.
+
+    Returns a list of dicts with keys:
+      - ``scenario``      — unique identifier
+      - ``ssp``           — SSP pathway label
+      - ``wildfire_scale``— float in [0, 1]; fraction of RCP8.5 wildfire intensity
+      - ``description``   — human-readable label
+    """
+    path = Path(csv_path) if csv_path else _PHYS_DIR / "scenarios.csv"
+    if not path.exists():
+        raise FileNotFoundError(f"physical scenarios not found at {path}")
+
+    rows: List[Dict[str, Any]] = []
+    with open(path, newline="") as f:
+        for row in csv.DictReader(f):
+            record = {k.strip(): v.strip() for k, v in row.items()}
+            if "wildfire_scale" in record:
+                record["wildfire_scale"] = float(record["wildfire_scale"])
+            rows.append(record)
+    logger.info("Loaded %d physical scenarios from %s", len(rows), path)
+    return rows
+
+
 def load_physical_hazard_data(csv_path: str | Path | None = None) -> List[Dict[str, Any]]:
-    """Load CLIMADA hazard event counts from CSV.
+    """Load CLIMADA hazard event counts from ``data/physical/climada_data.csv``.
 
-    Returns a list of dicts, one per hazard row, with all columns preserved.
-    Numeric fields (events_at_location, years_covered, max_intensity) are cast
-    to float; others remain strings.
-
-    Args:
-        csv_path: Override path; defaults to
-            ``data/physical_risk/climada_data.csv``.
+    Numeric fields (events_at_location, years_covered, max_intensity) are
+    cast to float; others remain strings.
     """
     path = Path(csv_path) if csv_path else _PHYS_DIR / "climada_data.csv"
     if not path.exists():
@@ -224,20 +260,15 @@ def load_physical_hazard_data(csv_path: str | Path | None = None) -> List[Dict[s
                 except ValueError:
                     record[k] = v
             rows.append(record)
-
     logger.info("Loaded %d hazard rows from %s", len(rows), path)
     return rows
 
 
 def load_physical_literature_data(csv_path: str | Path | None = None) -> List[Dict[str, Any]]:
-    """Load verified literature values for physical risk parameters.
+    """Load climate amplification factors from ``data/physical/literature_data.csv``.
 
-    Returns a list of dicts, one per row, with the ``value`` field cast to
-    float and all other fields preserved as strings.
-
-    Args:
-        csv_path: Override path; defaults to
-            ``data/physical_risk/literature_data.csv``.
+    The ``value`` field is cast to float; ``year`` is cast to int (taking the
+    first component of hyphenated ranges like ``"2024-2030"``).
     """
     path = Path(csv_path) if csv_path else _PHYS_DIR / "literature_data.csv"
     if not path.exists():
@@ -257,97 +288,55 @@ def load_physical_literature_data(csv_path: str | Path | None = None) -> List[Di
                 except ValueError:
                     pass
             rows.append(record)
-
     logger.info("Loaded %d literature rows from %s", len(rows), path)
     return rows
 
 
 def load_physical_model_assumptions(csv_path: str | Path | None = None) -> Dict[str, float]:
-    """Load physical risk modelling assumptions (probabilities, durations, etc.).
+    """Load physical risk modelling assumptions from ``data/physical/model_assumptions.csv``.
 
-    Returns ``{parameter: value}`` with all values cast to float.
-
-    Args:
-        csv_path: Override path; defaults to
-            ``data/physical_risk/model_assumptions.csv``.
+    Returns ``{parameter: float}`` — outage probabilities, durations, etc.
     """
     path = Path(csv_path) if csv_path else _PHYS_DIR / "model_assumptions.csv"
     if not path.exists():
-        raise FileNotFoundError(f"physical risk model_assumptions.csv not found at {path}")
+        raise FileNotFoundError(f"physical model_assumptions.csv not found at {path}")
 
     assumptions: Dict[str, float] = {}
     with open(path, newline="") as f:
         for row in csv.DictReader(f):
             assumptions[row["parameter"].strip()] = float(row["value"])
-
     logger.info("Loaded %d physical risk assumptions from %s", len(assumptions), path)
     return assumptions
 
 
-def load_physical_risk_output(
-    csv_path: str | Path | None = None,
-    scenario: str = "RCP8.5",
-) -> List[Dict[str, Any]]:
-    """Load pre-computed physical risk anchor rows from CSV.
+# ---------------------------------------------------------------------------
+# Combined climate scenarios
+# ---------------------------------------------------------------------------
 
-    Returns a list of dicts (one per anchor year) for the requested scenario,
-    filtered and stripped of comment lines.  All numeric columns are cast to
-    float; the ``year`` and ``scenario`` fields are kept as-is.
+def load_climate_scenarios(csv_path: str | Path | None = None) -> List[Dict[str, Any]]:
+    """Load combined climate scenario definitions from ``data/scenarios/climate_scenarios.csv``.
 
-    Args:
-        csv_path: Override path; defaults to
-            ``data/physical_risk/physical_risk_output.csv``.
-        scenario: Scenario label to filter on (default ``"RCP8.5"``).
+    Each row defines one (climate_scenario, transition_scenario, physical_scenario)
+    combination.  Multiple rows with the same ``climate_scenario`` value indicate
+    a probability-weighted blend of physical scenarios: weights are normalised to
+    sum to 1.0 before use.
+
+    Returns a list of dicts with keys:
+      - ``climate_scenario``   — unique combined scenario name
+      - ``transition_scenario``— name matching a row in ``data/transition/scenarios.csv``
+      - ``physical_scenario``  — name matching a row in ``data/physical/scenarios.csv``
+      - ``physical_weight``    — float weight for this physical scenario in the blend
+      - ``description``        — human-readable label
     """
-    path = Path(csv_path) if csv_path else _PHYS_DIR / "physical_risk_output.csv"
+    path = Path(csv_path) if csv_path else _SCEN_DIR / "climate_scenarios.csv"
     if not path.exists():
-        raise FileNotFoundError(f"physical_risk_output.csv not found at {path}")
-
-    import io as _io
-    str_cols = {"scenario"}
-    rows: List[Dict[str, Any]] = []
-    with open(path, newline="") as f:
-        data_lines = [line for line in f if not line.startswith("#")]
-
-    for row in csv.DictReader(_io.StringIO("".join(data_lines))):
-        record: Dict[str, Any] = {}
-        for k, v in row.items():
-            k = k.strip()
-            v = v.strip()
-            if k in str_cols or k == "year":
-                record[k] = int(v) if k == "year" else v
-            else:
-                try:
-                    record[k] = float(v)
-                except ValueError:
-                    record[k] = v
-        if str(record.get("scenario", "")) == scenario:
-            rows.append(record)
-
-    logger.info(
-        "Loaded %d physical risk anchor rows (scenario=%s) from %s",
-        len(rows), scenario, path,
-    )
-    return rows
-
-
-def load_physical_scenarios(csv_path: str | Path | None = None) -> List[Dict[str, Any]]:
-    """Load physical risk scenario definitions from CSV.
-
-    Returns a list of dicts with keys ``scenario``, ``ssp``, ``description``.
-
-    Args:
-        csv_path: Override path; defaults to
-            ``data/raw/physical_scenarios.csv``.
-    """
-    path = Path(csv_path) if csv_path else _PHYS_DIR / "physical_scenarios.csv"
-    if not path.exists():
-        raise FileNotFoundError(f"physical_scenarios.csv not found at {path}")
+        raise FileNotFoundError(f"climate_scenarios.csv not found at {path}")
 
     rows: List[Dict[str, Any]] = []
     with open(path, newline="") as f:
         for row in csv.DictReader(f):
-            rows.append({k.strip(): v.strip() for k, v in row.items()})
-
-    logger.info("Loaded %d physical scenarios from %s", len(rows), path)
+            record = {k.strip(): v.strip() for k, v in row.items()}
+            record["physical_weight"] = float(record.get("physical_weight", 1.0))
+            rows.append(record)
+    logger.info("Loaded %d climate scenario rows from %s", len(rows), path)
     return rows

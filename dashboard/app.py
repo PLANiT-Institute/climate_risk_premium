@@ -802,15 +802,15 @@ def page_physical_risk(data: dict) -> None:
         st.markdown("""
 **Hazard frequency** — NASA FIRMS MODIS active fire detections at Samcheok
 (37.44 °N, 129.17 °E), queried via CLIMADA.  6 wildfire events over 20 years
-(2001–2020) → 0.30 events/year.  Source: `data/physical_risk/climada_data.csv`.
+(2001–2020) → 0.30 events/year.  Source: `data/physical/climada_data.csv`.
 
-**Outage probabilities and durations** — from `data/physical_risk/model_assumptions.csv`.
+**Outage probabilities and durations** — from `data/physical/model_assumptions.csv`.
 Edit that file to change default values (no code change required).
 
 **Climate amplification factors** — from WWA (2025) analysis of South Korean
 wildfire likelihood.  Wildfire is ~2× more likely under current 1.3 °C warming,
 and ~4× more likely under end-of-century RCP 8.5.
-Anchor values stored in `data/physical_risk/literature_data.csv` (WILDFIRE category).
+Anchor values stored in `data/physical/literature_data.csv` (WILDFIRE category).
 
 **SSP wildfire scaling** relative to RCP 8.5 full intensity:
 | Scenario | SSP | Scale |
@@ -851,7 +851,7 @@ def page_model_pipeline(data: dict) -> None:
     with tab2:
         st.subheader("Capacity Factor Adjustment")
         st.latex(r"CF_{eff}(t) = CF_{base} \times (1 - \text{dispatch\_penalty})")
-        st.caption("dispatch_penalty is fixed per scenario (from policy.csv)")
+        st.caption("dispatch_penalty is fixed per scenario (from data/transition/scenarios.csv)")
 
         st.subheader("K-ETS Carbon Price Trajectory")
         st.latex(r"P_{carbon}(t) = \text{linear\_interp}(P_{2025}, P_{2030}, P_{2040}, P_{2050})")
@@ -962,10 +962,7 @@ def main() -> None:
         st.caption("Transition + Wildfire physical risk · v2.1")
 
     with st.spinner("Running pipeline…"):
-        data = run_pipeline(
-            risk_mode="all",
-            physical_scenario="high_physical",
-        )
+        data = run_pipeline()
 
     pages = {
         "Overview": page_overview,
