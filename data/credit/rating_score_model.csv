@@ -1,0 +1,34 @@
+component,rating,threshold,score_delta,notes
+base_score,,,60,Starting score for the simplified JS scoring model (0–100 scale; higher = better)
+consecutive_loss_d,,,8,Consecutive negative-EBITDA years that force a D-rating override
+dscr,AAA,2.5,18,DSCR score delta — thresholds mirror data/credit/rating_thresholds.csv
+dscr,AA,2.0,12,
+dscr,A,1.6,6,
+dscr,BBB,1.3,0,
+dscr,BB,1.1,-6,
+dscr,B,1.0,-10,
+dscr,CCC,0.8,-20,
+dscr,CC,0.5,-28,
+dscr,D,,-38,Below CC threshold
+coverage,AAA,12,6,EBITDA/Interest score delta — thresholds mirror data/credit/rating_thresholds.csv
+coverage,AA,6,3,
+coverage,A,4,0,
+coverage,BBB,2,-4,
+coverage,BB,1,-7,
+coverage,B,,-12,Below BB threshold
+equity_leverage,AAA,80,6,Debt/Equity (%) score delta — thresholds mirror data/credit/rating_thresholds.csv
+equity_leverage,AA,150,3,
+equity_leverage,A,250,0,
+equity_leverage,BBB,300,-3,
+equity_leverage,BB,400,-6,
+equity_leverage,B,,-12,Above BB threshold
+scale_bonus,,2000,4,Capacity MW threshold for AAA-tier scale bonus (score +4 if capacity_mw >= threshold)
+cutoff,AAA,,92,Score-to-rating cutoff (inclusive lower bound)
+cutoff,AA,,82,
+cutoff,A,,72,
+cutoff,BBB,,62,
+cutoff,BB,,52,
+cutoff,B,,42,
+cutoff,CCC,,30,
+cutoff,CC,,18,
+cutoff,C,,0,Below CC cutoff → C rating

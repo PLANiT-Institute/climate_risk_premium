@@ -91,12 +91,12 @@ class Rating(Enum):
     @property
     def is_investment_grade(self) -> bool:
         """Check if rating is investment grade (BBB or better)."""
-        return self.value <= 4
+        return self.value <= Rating.BBB.value
 
     @property
     def is_distressed(self) -> bool:
         """Check if rating indicates financial distress (CCC or worse)."""
-        return self.value >= 7
+        return self.value >= Rating.CCC.value
 
 
 # ---------------------------------------------------------------------------
@@ -313,7 +313,7 @@ def assess_credit_rating(metrics: RatingMetrics) -> RatingAssessment:
     )
 
     rounded_score = round(weighted_score)
-    rounded_score = max(1, min(10, rounded_score))
+    rounded_score = max(Rating.AAA.value, min(Rating.D.value, rounded_score))
 
     if metrics.dscr < 0:
         rounded_score = Rating.D.value
@@ -385,21 +385,24 @@ def calculate_rating_metrics_from_financials(
 
     ebitda_to_fixed_assets = (ebitda / fixed_assets * 100) if fixed_assets > 0 else 0.0
 
+    _sentinel     = float(_ASSUMPTIONS["coverage_infinity_sentinel"])  # model_assumptions.csv
+    _dta_fallback = float(_ASSUMPTIONS["debt_to_assets_fallback"])     # model_assumptions.csv
+
     if interest_expense > 0:
         ebitda_to_interest = ebitda / interest_expense
     else:
-        ebitda_to_interest = 999.0 if ebitda >= 0 else -999.0
+        ebitda_to_interest = _sentinel if ebitda >= 0 else -_sentinel
 
     net_debt = total_debt - cash_and_equivalents
     if is_ebitda_negative:
-        net_debt_to_ebitda = 999.0 if net_debt > 0 else -999.0
+        net_debt_to_ebitda = _sentinel if net_debt > 0 else -_sentinel
     elif ebitda > 0:
         net_debt_to_ebitda = net_debt / ebitda
     else:
-        net_debt_to_ebitda = 999.0
+        net_debt_to_ebitda = _sentinel
 
-    debt_to_equity = (total_debt / total_equity * 100) if total_equity > 0 else 999.0
-    debt_to_assets = (total_debt / total_assets * 100) if total_assets > 0 else 100.0
+    debt_to_equity = (total_debt / total_equity * 100) if total_equity > 0 else _sentinel
+    debt_to_assets = (total_debt / total_assets * 100) if total_assets > 0 else _dta_fallback
 
     # DSCR — use provided value, or estimate from config-loaded fallback parameters
     if dscr is not None:

@@ -33,6 +33,7 @@ const DEFAULT_PLANT = {
   tax_rate: 0.25,
   inflation_rate: 0.02,
   start_year: 2025,
+  risk_free_rate: 0.035,  // risk_free_rate — Korea 10Y Treasury (plant_parameters.csv)
 };
 
 // Default transition scenarios — mirrors data/transition/scenarios.csv
@@ -102,6 +103,7 @@ const PHYSICAL_ASSUMPTIONS = {
   hours_per_year:               8760,   // hours_per_year
   drought_capacity_derate_base:  0.005,  // drought_capacity_derate_base
   drought_severe_multiplier:     2.4,    // implicit in severe_drought scenario row
+  days_per_year:                 365,    // days_per_year (= hours_per_year / 24)
 };
 
 // data/physical/literature_data.csv — climate factor anchors [year, factor]
@@ -138,9 +140,59 @@ const MODEL_ASSUMPTIONS = {
   equity_premium_per_notch:    0.005,             // equity_premium_per_notch (per rating notch)
   counterfactual_rating:       "A",               // counterfactual_rating
   start_year:                  2025,              // start_year
-  coverage_infinity_sentinel:  99,               // coverage_infinity_sentinel — EBITDA/Interest when interest≈0
-  dscr_post_debt_fallback:     1.5,              // dscr_post_debt_fallback — used for post-maturity years
+  end_year:                    2100,              // end_year
+  coverage_infinity_sentinel:  99,               // coverage_infinity_sentinel
+  dscr_post_debt_fallback:     1.5,              // dscr_post_debt_fallback
   carbon_price_years:          [2025, 2030, 2040, 2050], // matches columns in data/transition/scenarios.csv
+  ebitda_chart_end_year:       2050,             // ebitda_chart_end_year (display only)
+  physical_anchor_years:       [2025, 2030, 2050, 2100], // physical_anchor_years (snapshot table)
+  consecutive_loss_years_d:    8,                // consecutive_loss_years_d — D-rating override threshold
+  rating_base_score:           60,               // rating_base_score — starting score in JS scoring model
+};
+
+// data/credit/rating_score_model.csv — JS simplified scoring model
+// Maps metric → (threshold, score_delta) pairs; cutoffs map score → rating.
+const RATING_SCORE_MODEL = {
+  dscr: [
+    { threshold: 2.5, delta: +18 },
+    { threshold: 2.0, delta: +12 },
+    { threshold: 1.6, delta:  +6 },
+    { threshold: 1.3, delta:   0 },
+    { threshold: 1.1, delta:  -6 },
+    { threshold: 1.0, delta: -10 },
+    { threshold: 0.8, delta: -20 },
+    { threshold: 0.5, delta: -28 },
+    { threshold: -Infinity, delta: -38 },
+  ],
+  coverage: [
+    { threshold: 12, delta:  +6 },
+    { threshold:  6, delta:  +3 },
+    { threshold:  4, delta:   0 },
+    { threshold:  2, delta:  -4 },
+    { threshold:  1, delta:  -7 },
+    { threshold: -Infinity, delta: -12 },
+  ],
+  equity_leverage: [
+    { threshold:  80, delta:  +6 },  // lower is better — first matching (<=) wins
+    { threshold: 150, delta:  +3 },
+    { threshold: 250, delta:   0 },
+    { threshold: 300, delta:  -3 },
+    { threshold: 400, delta:  -6 },
+    { threshold: Infinity, delta: -12 },
+  ],
+  scale_threshold_mw: 2000,  // scale_bonus threshold
+  scale_bonus:           4,  // score bonus for >= scale_threshold_mw
+  cutoffs: [
+    { score: 92, rating: "AAA" },
+    { score: 82, rating: "AA"  },
+    { score: 72, rating: "A"   },
+    { score: 62, rating: "BBB" },
+    { score: 52, rating: "BB"  },
+    { score: 42, rating: "B"   },
+    { score: 30, rating: "CCC" },
+    { score: 18, rating: "CC"  },
+    { score:  0, rating: "C"   },
+  ],
 };
 
 // ---------------------------------------------------------------------------
@@ -194,7 +246,7 @@ function physicalAdjustment(phys, year) {
   const H     = HEATWAVE_PARAMS;
   const hwT   = Math.max(0, Math.min(1, (year - H.year_baseline) / (H.year_future - H.year_baseline)));
   const hwDays = H.days_baseline + (H.days_future - H.days_baseline) * hwT * scale;
-  const hwEff  = (hwDays / 365) * (H.efficiency_loss / 100);
+  const hwEff  = (hwDays / PHYSICAL_ASSUMPTIONS.days_per_year) * (H.efficiency_loss / 100);
 
   const efficiency = chronicEff + hwEff;
 
@@ -202,54 +254,34 @@ function physicalAdjustment(phys, year) {
 }
 
 function ratingFromMetrics(avgEbitda, dscr, debtToEquity, ebitdaToInterest, capacityMw, consecutiveLossYears, cumulativeEbitdaMillion) {
-  // Floor at D when cumulative EBITDA negative — matches Python
+  // Floor overrides — all thresholds from data/credit/rating_score_model.csv
+  const M = MODEL_ASSUMPTIONS;
+  const RS = RATING_SCORE_MODEL;
   if (cumulativeEbitdaMillion < 0) return "D";
-  if (consecutiveLossYears >= 8) return "D";
+  if (consecutiveLossYears >= M.consecutive_loss_years_d) return "D";
   if (avgEbitda <= 0) return "C";
 
-  // Score buckets (0..100, higher = better).
-  // Thresholds sourced from data/credit/rating_thresholds.csv.
-  let score = 60;
-  // DSCR — thresholds: AAA≥2.5, AA≥2.0, A≥1.6, BBB≥1.3, BB≥1.1, B≥1.0, CCC≥0.8, CC≥0.5
-  if (dscr >= 2.5) score += 18;
-  else if (dscr >= 2.0) score += 12;
-  else if (dscr >= 1.6) score += 6;
-  else if (dscr >= 1.3) score -= 0;
-  else if (dscr >= 1.1) score -= 6;
-  else if (dscr >= 1.0) score -= 10;
-  else if (dscr >= 0.8) score -= 20;
-  else if (dscr >= 0.5) score -= 28;
-  else score -= 38;
+  // Score buckets — base score and all deltas from RATING_SCORE_MODEL (rating_score_model.csv)
+  let score = M.rating_base_score;
 
-  // EBITDA / interest — thresholds: AAA≥12, AA≥6, A≥4, BBB≥2, BB≥1, B≥0.5, CCC≥0
-  if (ebitdaToInterest >= 12) score += 6;
-  else if (ebitdaToInterest >= 6) score += 3;
-  else if (ebitdaToInterest >= 4) score += 0;
-  else if (ebitdaToInterest >= 2) score -= 4;
-  else if (ebitdaToInterest >= 1) score -= 7;
-  else score -= 12;
+  // DSCR — use first matching threshold (descending order)
+  const dscrTier = RS.dscr.find(t => dscr >= t.threshold);
+  score += dscrTier ? dscrTier.delta : RS.dscr[RS.dscr.length - 1].delta;
 
-  // Debt / equity — thresholds: AAA≤80, AA≤150, A≤250, BBB≤300, BB≤400
-  if (debtToEquity <= 80) score += 6;
-  else if (debtToEquity <= 150) score += 3;
-  else if (debtToEquity <= 250) score += 0;
-  else if (debtToEquity <= 300) score -= 3;
-  else if (debtToEquity <= 400) score -= 6;
-  else score -= 12;
+  // EBITDA / interest — use first matching threshold (descending order)
+  const covTier = RS.coverage.find(t => ebitdaToInterest >= t.threshold);
+  score += covTier ? covTier.delta : RS.coverage[RS.coverage.length - 1].delta;
 
-  // Scale (15%) — fixed 2100MW = AAA tier
-  if (capacityMw >= 2000) score += 4;
+  // Debt / equity — use first matching threshold (ascending, <=)
+  const levTier = RS.equity_leverage.find(t => debtToEquity <= t.threshold);
+  score += levTier ? levTier.delta : RS.equity_leverage[RS.equity_leverage.length - 1].delta;
 
-  // Map score → rating
-  if (score >= 92) return "AAA";
-  if (score >= 82) return "AA";
-  if (score >= 72) return "A";
-  if (score >= 62) return "BBB";
-  if (score >= 52) return "BB";
-  if (score >= 42) return "B";
-  if (score >= 30) return "CCC";
-  if (score >= 18) return "CC";
-  return "C";
+  // Scale bonus
+  if (capacityMw >= RS.scale_threshold_mw) score += RS.scale_bonus;
+
+  // Map score → rating using cutoffs (descending; first match wins)
+  const cutoff = RS.cutoffs.find(c => score >= c.score);
+  return cutoff ? cutoff.rating : "C";
 }
 
 function computeScenario(plant, transition, physical, opts = {}) {

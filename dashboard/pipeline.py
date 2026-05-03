@@ -36,8 +36,12 @@ from src.data.loaders import (
     load_physical_scenarios,
     load_plant_params,
     load_rating_spreads,
+    load_rating_thresholds,
     load_transition_scenarios,
 )
+
+# Unit conversion constant — 1 basis point = 1/10 000 of a decimal rate
+_BPS_PER_DECIMAL: int = 10_000
 from src.financials.cashflow import compute_cashflows
 from src.financials.metrics import calculate_debt_service, calculate_metrics
 from src.risk.credit_rating import (
@@ -192,6 +196,7 @@ def run_pipeline(
     plant       = load_plant_params()
     assumptions = load_model_assumptions()
     spreads     = load_rating_spreads()
+    thresholds  = load_rating_thresholds()
 
     total_capex        = float(plant["total_capex_million"]) * 1e6
     debt_fraction      = float(plant["debt_fraction"])
@@ -235,7 +240,7 @@ def run_pipeline(
         for g in climate_groups.values()
         if g[0]["transition_scenario"] in transition_rows_by_name
     ]
-    max_retirement = max(all_retirement_years) if all_retirement_years else 40
+    max_retirement = max(all_retirement_years) if all_retirement_years else int(plant["operating_years"])
 
     # --- Run one cashflow per climate scenario ---
     scenario_comparison: list[dict] = []
@@ -270,8 +275,9 @@ def run_pipeline(
 
         avg_ebitda   = _float(cf_ts.ebitda.mean())
         avg_interest = _float(cf_ts.interest_expense.mean())
-        debt_mid         = total_capex * debt_fraction * 0.5
-        fixed_assets_avg = total_capex * 0.5
+        _midpoint        = float(assumptions["debt_midpoint_ratio"])  # model_assumptions.csv
+        debt_mid         = total_capex * debt_fraction * _midpoint
+        fixed_assets_avg = total_capex * _midpoint
         total_equity_avg = max(0.0, fixed_assets_avg - debt_mid)
 
         rating_metrics = calculate_rating_metrics_from_financials(
@@ -405,21 +411,22 @@ def run_pipeline(
             yr_assessment = assess_credit_rating(rm)
             rating_str    = yr_assessment.overall_rating.name
 
+            _dscr_b = float(thresholds["dscr"]["B"])  # rating_thresholds.csv
             if dscr_i is not None:
                 if dscr_i < 0:
                     rating_str = "D"
-                elif dscr_i < 1.0:
+                elif dscr_i < _dscr_b:
                     idx = rating_order.index(rating_str)
                     rating_str = rating_order[min(idx + 1, len(rating_order) - 1)]
 
-            spread = spreads.get(rating_str, spreads.get("CCC", 900))
+            spread = spreads.get(rating_str, spreads["CCC"])  # CCC spread from rating_spreads.csv
             yearly_ratings.append({
                 "scenario":      climate_name,
                 "year":          int(year),
                 "dscr":          round(dscr_i, 3) if dscr_i is not None else None,
                 "rating":        rating_str,
                 "spread_bps":    spread,
-                "cost_of_debt":  round(base_rate + spread / 10000, 6),
+                "cost_of_debt":  round(base_rate + spread / _BPS_PER_DECIMAL, 6),
                 "ebitda":        round(ebitda_i / 1e6, 2),
             })
 

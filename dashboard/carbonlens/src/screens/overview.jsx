@@ -5,7 +5,9 @@ function ScreenOverview({ model, onEdit }) {
   const noRisk = ss.find(s => s.id === "no_risk_baseline");
   const worst = ss.reduce((a, s) => s.npv_million < a.npv_million ? s : a, ss[0]);
   const maxCRP = ss.reduce((a, s) => s.crp_bps > a.crp_bps ? s : a, ss[0]);
-  const investmentGrade = ss.filter(s => ["AAA","AA","A","BBB"].includes(s.overall_rating)).length;
+  // Investment-grade = BBB or better; derive from RATING_ORDER rather than hardcoding the list
+  const _igCutoff = RATING_ORDER.indexOf("BBB");
+  const investmentGrade = ss.filter(s => RATING_ORDER.indexOf(s.overall_rating) <= _igCutoff).length;
 
   // KPI sparks: per-scenario NPV across all 8
   const npvSpark = ss.map(s => s.npv_million);
@@ -86,12 +88,12 @@ function ScreenOverview({ model, onEdit }) {
       </div>
 
       <Panel title="EBITDA Trajectory · All Scenarios"
-        sub="USD M / year · 2025 – 2050">
+        sub={`USD M / year · ${MODEL_ASSUMPTIONS.start_year} – ${MODEL_ASSUMPTIONS.ebitda_chart_end_year}`}>
         <LineChart
           data={ebitdaData}
           series={ebitdaSeries}
           height={280}
-          xMin={2025} xMax={2050}
+          xMin={MODEL_ASSUMPTIONS.start_year} xMax={MODEL_ASSUMPTIONS.ebitda_chart_end_year}
           xFormat={v => v.toString()}
           yFormat={v => "$" + v.toFixed(0) + "M"}
           refLines={[{ y: 0, label: "Break-even", color: "var(--tx-3)", dash: "3 3" }]}
@@ -124,8 +126,8 @@ function ScreenOverview({ model, onEdit }) {
             <Stat label="Investment-grade" value={`${investmentGrade} / ${ss.length}`} pos={investmentGrade > ss.length/2}/>
             <Stat label="Plant" value={model.plant.name} />
             <Stat label="Operating life" value={`${model.plant.operating_years} yrs`} />
-            <Stat label="Counterfactual rating" value={<Rating value="A" />} />
-            <Stat label="Risk-free rate" value="3.50%" />
+            <Stat label="Counterfactual rating" value={<Rating value={MODEL_ASSUMPTIONS.counterfactual_rating} />} />
+            <Stat label="Risk-free rate" value={(model.plant.risk_free_rate * 100).toFixed(2) + "%"} />
           </div>
         </Panel>
       </div>

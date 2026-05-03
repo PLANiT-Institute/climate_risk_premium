@@ -360,6 +360,17 @@ def build_physical_adjustments(
             raise ValueError(f"{category}/{param} not found in literature_data.csv")
         return float(row["value"])
 
+    # --- Helper: return the ``year`` column for a specific row ---
+    def _lit_year(category: str, param: str) -> int:
+        row = next(
+            (r for r in literature_rows
+             if r.get("category") == category and r.get("parameter") == param),
+            None,
+        )
+        if row is None:
+            raise ValueError(f"{category}/{param} not found in literature_data.csv")
+        return int(row["year"])
+
     # =========================================================================
     # WILDFIRE channel
     # =========================================================================
@@ -456,10 +467,18 @@ def build_physical_adjustments(
     hw_days_future = _lit_param("HEATWAVE", "days_future")      # 17.4 d/yr (2100, SSP5-8.5)
     hw_eff_pct     = _lit_param("HEATWAVE", "efficiency_loss")  # 4.0 % per event day
 
-    # Linear increase from 2024 baseline to 2100 SSP5-8.5, scaled by SSP intensity
-    hw_t        = np.clip((years - 2024) / (2100 - 2024), 0.0, 1.0)
+    # Year bounds read from the same CSV rows as the values — no magic literals
+    hw_year_baseline = _lit_year("HEATWAVE", "days_baseline")  # 2024 per literature_data.csv
+    hw_year_future   = _lit_year("HEATWAVE", "days_future")    # 2100 per literature_data.csv
+    # Days-per-year derived from hours_per_year so both share the same source
+    days_per_year    = float(assumptions["hours_per_year"]) / 24.0
+
+    # Linear increase from baseline year to future year, scaled by SSP intensity
+    hw_t        = np.clip(
+        (years - hw_year_baseline) / (hw_year_future - hw_year_baseline), 0.0, 1.0
+    )
     heatwave_days = hw_days_base + (hw_days_future - hw_days_base) * hw_t * wildfire_scale
-    heatwave_efficiency_losses = (heatwave_days / 365.0) * (hw_eff_pct / 100.0)
+    heatwave_efficiency_losses = (heatwave_days / days_per_year) * (hw_eff_pct / 100.0)
 
     # Total efficiency loss
     efficiency_losses = chronic_efficiency_losses + heatwave_efficiency_losses

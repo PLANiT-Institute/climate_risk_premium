@@ -3,7 +3,8 @@ function ScreenPhysical({ model }) {
   const [view, setView] = uS("scenarios"); // scenarios | channels | combined
   const [sel, setSel] = uS(model.physicalDefs.map(p => p.id));
 
-  const years = []; for (let y = 2025; y <= 2100; y++) years.push(y);
+  const _sy = MODEL_ASSUMPTIONS.start_year, _ey = MODEL_ASSUMPTIONS.end_year;
+  const years = []; for (let y = _sy; y <= _ey; y++) years.push(y);
 
   // All individual impact channels
   const channels = [
@@ -44,7 +45,7 @@ function ScreenPhysical({ model }) {
   const seriesFor = () => activeDefs.map(p => ({ key: p.id, label: p.name, color: p.color }));
 
   // Snapshot table at anchor years
-  const anchors = [2025, 2030, 2050, 2100];
+  const anchors = MODEL_ASSUMPTIONS.physical_anchor_years;
 
   return (
     <div className="page" style={{ padding: 14 }}>
@@ -83,7 +84,7 @@ function ScreenPhysical({ model }) {
             <Panel key={ch.key} title={ch.label} sub="% / year">
               <LineChart data={dataFor(ch.key)} series={seriesFor()} height={220}
                 yFormat={v => v.toFixed(4) + "%"} xFormat={v => v.toString()}
-                xMin={2025} xMax={2100} />
+                xMin={MODEL_ASSUMPTIONS.start_year} xMax={MODEL_ASSUMPTIONS.end_year} />
             </Panel>
           ))}
         </div>
@@ -119,7 +120,7 @@ function ScreenPhysical({ model }) {
                   { key: "efficiency", label: "Heat — Total eff. loss",     color: "#ef4444" },
                 ]}
                 height={280} yFormat={v => v.toFixed(4) + "%"} xFormat={v => v.toString()}
-                xMin={2025} xMax={2100} />
+                xMin={MODEL_ASSUMPTIONS.start_year} xMax={MODEL_ASSUMPTIONS.end_year} />
             </Panel>
           ))}
         </div>
@@ -130,7 +131,7 @@ function ScreenPhysical({ model }) {
           <Panel title="Combined Capacity-Factor Impact" sub="plant + transmission (wf + TC) + drought derate">
             <LineChart data={combinedCfData} series={seriesFor()} height={280}
               yFormat={v => v.toFixed(4) + "%"} xFormat={v => v.toString()}
-              xMin={2025} xMax={2100} area />
+              xMin={MODEL_ASSUMPTIONS.start_year} xMax={MODEL_ASSUMPTIONS.end_year} area />
           </Panel>
           <Panel title="Heat — Total Efficiency Loss" sub="chronic (ambient + SST) + heatwave acute · % / year">
             <LineChart
@@ -150,7 +151,7 @@ function ScreenPhysical({ model }) {
                 { key: p.id + "_hw",      label: p.name + " — Heatwave",color: p.color, dash: "1 3" },
               ])}
               height={280} yFormat={v => v.toFixed(4) + "%"} xFormat={v => v.toString()}
-              xMin={2025} xMax={2100} />
+              xMin={MODEL_ASSUMPTIONS.start_year} xMax={MODEL_ASSUMPTIONS.end_year} />
           </Panel>
         </div>
       )}

@@ -16,3 +16,9 @@ coverage_infinity_sentinel,99,times,Sentinel value substituted for EBITDA/Intere
 dscr_post_debt_fallback,1.5,ratio,Fallback DSCR used in year-by-year rating when actual DSCR is undefined (post-debt-maturity years)
 ebitda_coverage_fallback_dscr,2.0,ratio,Fallback DSCR estimate when no debt service info is available and coverage ratio exceeds sentinel
 carbon_price_years,2025-2030-2040-2050,years,Anchor years for carbon price interpolation; matches column names in data/transition/scenarios.csv
+debt_midpoint_ratio,0.5,decimal,Average outstanding debt balance as fraction of initial debt; approximates midpoint of linear repayment schedule
+debt_to_assets_fallback,100.0,pct,Fallback debt-to-assets ratio when total assets is zero (100% = fully debt-financed worst case)
+end_year,2100,year,Last modelled year; matches latest anchor year in data/physical/literature_data.csv climate factors
+ebitda_chart_end_year,2050,year,X-axis upper bound for the EBITDA trajectory chart on the overview screen (display parameter only)
+physical_anchor_years,2025-2030-2050-2100,years,Snapshot anchor years shown in the physical risk table; matches climate factor data anchors in literature_data.csv
+days_per_year,365,days,Calendar days per year; used to convert heatwave event-days to an annual fraction

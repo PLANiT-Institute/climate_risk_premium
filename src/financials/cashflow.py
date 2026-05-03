@@ -34,6 +34,9 @@ import numpy_financial as npf
 
 logger = logging.getLogger(__name__)
 
+# Unit conversion constants — mathematical facts, not domain parameters
+_KW_PER_MW: int = 1000  # 1 MW = 1 000 kW
+
 if TYPE_CHECKING:
     from src.risk.physical import YearlyPhysicalAdjustments
     from src.risk.transition import YearlyTransitionAdjustments
@@ -140,6 +143,7 @@ def compute_cashflows(
     debt_fraction = float(plant_params["debt_fraction"])
     debt_interest = float(plant_params["debt_interest_rate"])
     debt_tenor = int(plant_params["debt_tenor_years"])
+    hours_per_year = float(plant_params["hours_per_year"])  # from plant_parameters.csv
 
     # --- Time axis ---
     years = yearly_transition_adj.years.copy()
@@ -190,7 +194,7 @@ def compute_cashflows(
             )
 
     # --- Generation (MWh/year) ---
-    annual_mwh = capacity_mw * 8760 * cf_series
+    annual_mwh = capacity_mw * hours_per_year * cf_series
 
     # --- Revenue ---
     revenue = annual_mwh * price
@@ -202,7 +206,7 @@ def compute_cashflows(
     else:
         fuel_costs = annual_mwh * heat_rate * fuel_price
     variable_opex = annual_mwh * variable_opex_per_mwh
-    fixed_opex = np.full(n_years, capacity_mw * 1000 * fixed_opex_per_kw)
+    fixed_opex = np.full(n_years, capacity_mw * _KW_PER_MW * fixed_opex_per_kw)
 
     # Carbon costs (K-ETS): interpolated from policy anchor years
     carbon_cost_per_mwh = np.array(
