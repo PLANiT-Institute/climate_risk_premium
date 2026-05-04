@@ -1,4 +1,4 @@
-scenario,dispatch_penalty,retirement_years,description,source
-baseline,0.00,40,No policy intervention,default assumption
-moderate_transition,0.15,35,Moderate coal penalties with 11th Basic Plan NDC targets,11th Basic Plan NDC
-aggressive_transition,0.35,25,Aggressive phase-out aligned with 2040 carbon neutrality,Presidential pledge 2040
+scenario,dispatch_penalty,retirement_years,description,source,source_url
+baseline,0.00,40,No policy intervention,default,
+moderate_transition,0.00,35,Coal phase-out via 11th Basic Plan power mix targets,11th Basic Plan (Draft 2025),https://www.motie.go.kr/motie/ms/nt/announce/bbs/bbsView.do?bbs_cd_n=6&bbs_seq_n=68032
+aggressive_transition,0.00,25,Accelerated coal exit aligned with 2040 carbon neutrality pledge,Presidential pledge 2040,https://www.reuters.com/business/energy/south-korea-unveils-plan-go-carbon-neutral-by-2050-2020-10-28/

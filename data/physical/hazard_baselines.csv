@@ -1,8 +1,8 @@
-hazard_type,base_frequency,base_intensity,intensity_unit,outage_rate,capacity_derate,efficiency_loss,damage_ratio,confidence_low,confidence_high,source,methodology,climada_events,climada_years
-wildfire,0.75,25.0,FWI,0.000034,0.0,0.0,0.0001,0.000017,0.000051,CLIMADA WildFire + Korea Forest Service (2001-2023),Outage = Freq × P(outage|fire) × Duration / 8760,30,40
-tropical_cyclone,0.0,0.0,m/s,0.0,0.0,0.0,0.0,0.0,0.0,DISABLED (source unverified),No CLIMADA simulation performed for Samcheok site,0,0
-river_flood,0.0,0.0,m,0.0,0.0,0.0,0.0,0.0,0.0001,CLIMADA RiverFlood + ISIMIP (plant at 10m elevation),Plant not in flood zone; residual risk only,0,40
-coastal_flood,0.0,0.0,m,0.0,0.0,0.0,0.0,0.0,0.0,DISABLED (plant at 10m elevation - no impact),Surge + SLR cannot reach plant elevation,0,0
-drought,0.0,0.0,SPI,0.0,0.0,0.0,0.0,0.0,0.0,OS-Climate PhysRisk API (primary source),CSV fallback disabled - use PhysRisk live results only,0,0
-heat_stress,0.0,0.0,C,0.0,0.0,0.0,0.0,0.0,0.0,DISABLED (source unverified),KMA data referenced but not validated for Samcheok,0,0
-sea_level_rise,0.0,0.0,m,0.0,0.0,0.0,0.0,0.0,0.0,NASA/IPCC AR6 SLR projections for Korea,Impact via coastal flood frequency increase,0,0
+hazard_type,base_frequency,base_intensity,intensity_unit,outage_rate,capacity_derate,efficiency_loss,damage_ratio,confidence_low,confidence_high,source,methodology,climada_events,climada_years,source_url
+wildfire,0.75,25.0,FWI,0.000034,0.0,0.0,0.0001,0.000017,0.000051,CLIMADA WildFire + Korea Forest Service FIRMS (2001-2023),Outage = Freq x P(outage) x Duration / 8760,30,40,https://firms.modaps.eosdis.nasa.gov/
+tropical_cyclone,0.0,0.0,m/s,0.0,0.0,0.0,0.0,0.0,0.0,DISABLED (CLIMADA simulation not performed for site),Not verified for Samcheok,0,0,
+river_flood,0.0,0.0,m,0.0,0.0,0.0,0.0,0.0,0.0,DISABLED (plant at 10m elevation),Plant not in flood zone,0,0,
+coastal_flood,0.0,0.0,m,0.0,0.0,0.0,0.0,0.0,0.0,DISABLED (plant at 10m elevation),Surge + SLR cannot reach,0,0,
+drought,0.0,0.0,SPI,0.0,0.0,0.0,0.0,0.0,0.0,OS-Climate PhysRisk API (primary source; CSV fallback disabled),Use PhysRisk live results only,0,0,https://physrisk.os-climate.org/
+heat_stress,0.0,0.0,C,0.0,0.0,0.0,0.0,0.0,0.0,DISABLED (source not validated for Samcheok),KMA data referenced but not verified,0,0,
+sea_level_rise,0.0,0.0,m,0.0,0.0,0.0,0.0,0.0,0.0,NASA/IPCC AR6 SLR projections,Impact via coastal flood frequency,0,0,
