@@ -1,8 +1,8 @@
 hazard_type,base_frequency,base_intensity,intensity_unit,outage_rate,capacity_derate,efficiency_loss,damage_ratio,confidence_low,confidence_high,source,methodology,climada_events,climada_years
 wildfire,0.75,25.0,FWI,0.000034,0.0,0.0,0.0001,0.000017,0.000051,CLIMADA WildFire + Korea Forest Service (2001-2023),Outage = Freq × P(outage|fire) × Duration / 8760,30,40
-tropical_cyclone,0.15,35.0,m/s,0.000055,0.0,0.0,0.0005,0.000028,0.000083,CLIMADA TropCyclone + IBTrACS (1980-2023),Outage = Freq × P(outage|TC) × Duration / 8760,6,40
+tropical_cyclone,0.0,0.0,m/s,0.0,0.0,0.0,0.0,0.0,0.0,DISABLED (source unverified),No CLIMADA simulation performed for Samcheok site,0,0
 river_flood,0.0,0.0,m,0.0,0.0,0.0,0.0,0.0,0.0001,CLIMADA RiverFlood + ISIMIP (plant at 10m elevation),Plant not in flood zone; residual risk only,0,40
-coastal_flood,0.01,1.5,m,0.0,0.0,0.0,0.0,0.0,0.0002,CLIMADA CoastalFlood (10m plant elevation),Surge + SLR must exceed 10m for impact,0,40
-drought,0.15,-1.2,SPI,0.0,0.005,0.002,0.0,0.003,0.012,KMA drought statistics + SPEI data (1991-2020),Coastal plant: seawater cooling reduces drought impact,6,40
-heat_stress,7.0,36.5,C,0.0,0.0,0.001,0.0,0.0005,0.002,KMA heat wave data (1991-2020 baseline),Efficiency = f(ambient temp; cooling water temp),0,30
+coastal_flood,0.0,0.0,m,0.0,0.0,0.0,0.0,0.0,0.0,DISABLED (plant at 10m elevation - no impact),Surge + SLR cannot reach plant elevation,0,0
+drought,0.0,0.0,SPI,0.0,0.0,0.0,0.0,0.0,0.0,OS-Climate PhysRisk API (primary source),CSV fallback disabled - use PhysRisk live results only,0,0
+heat_stress,0.0,0.0,C,0.0,0.0,0.0,0.0,0.0,0.0,DISABLED (source unverified),KMA data referenced but not validated for Samcheok,0,0
 sea_level_rise,0.0,0.0,m,0.0,0.0,0.0,0.0,0.0,0.0,NASA/IPCC AR6 SLR projections for Korea,Impact via coastal flood frequency increase,0,0
