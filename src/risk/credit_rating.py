@@ -13,9 +13,57 @@ Reference:
 
 from __future__ import annotations
 
+import csv as _csv
 from dataclasses import dataclass
+from functools import lru_cache
+from pathlib import Path as _Path
 from typing import Dict, Any, Optional
 from enum import Enum
+
+
+@lru_cache(maxsize=1)
+def _load_rating_thresholds():
+    """Load rating thresholds from CSV."""
+    csv_path = _Path(__file__).resolve().parent.parent.parent / "data" / "raw" / "credit_rating_thresholds.csv"
+    if not csv_path.exists():
+        return None
+    thresholds = {}
+    with open(csv_path, "r", encoding="utf-8") as f:
+        for row in _csv.DictReader(f):
+            metric = row["metric"]
+            thresholds.setdefault(metric, []).append({
+                "threshold_min": float(row["threshold_min"]),
+                "rating": row["rating"],
+            })
+    # Sort each metric's thresholds descending by threshold_min
+    for metric in thresholds:
+        thresholds[metric].sort(key=lambda x: x["threshold_min"], reverse=True)
+    return thresholds
+
+
+@lru_cache(maxsize=1)
+def _load_rating_spreads():
+    """Load rating spreads from CSV."""
+    csv_path = _Path(__file__).resolve().parent.parent.parent / "data" / "raw" / "rating_spreads.csv"
+    if not csv_path.exists():
+        return None
+    spreads = {}
+    with open(csv_path, "r", encoding="utf-8") as f:
+        for row in _csv.DictReader(f):
+            spreads[row["rating"]] = int(row["spread_bps"])
+    return spreads
+
+
+def _rate_from_csv(metric: str, value: float) -> Optional["Rating"]:
+    """Look up rating from CSV thresholds. Returns None if CSV not available."""
+    thresholds = _load_rating_thresholds()
+    if not thresholds or metric not in thresholds:
+        return None
+    for entry in thresholds[metric]:  # sorted descending by threshold_min
+        if value >= entry["threshold_min"]:
+            return Rating[entry["rating"]]
+    # Below all thresholds
+    return Rating[thresholds[metric][-1]["rating"]]
 
 
 class Rating(Enum):
@@ -44,7 +92,7 @@ class Rating(Enum):
     def __str__(self):
         return self.name
 
-    def to_spread_bps(self) -> float:
+    def to_spread_bps(self) -> int:
         """
         Convert rating to typical spread over risk-free rate (bps).
 
@@ -52,19 +100,13 @@ class Rating(Enum):
         Bloomberg US Corporate Bond Index, 2020-2024 average).
         Distressed ratings (CC, C, D) use distressed debt trading levels.
         """
-        spread_map = {
-            Rating.AAA: 50,
-            Rating.AA: 100,
-            Rating.A: 150,
-            Rating.BBB: 250,
-            Rating.BB: 400,
-            Rating.B: 600,
-            Rating.CCC: 900,  # Substantial risk - typical CCC bond spread
-            Rating.CC: 1500,  # Very high risk - distressed debt territory
-            Rating.C: 2500,  # Near default - deep distress
-            Rating.D: 5000,  # Default - recovery value pricing
-        }
-        return spread_map[self]
+        csv_spreads = _load_rating_spreads()
+        if csv_spreads and self.name in csv_spreads:
+            return csv_spreads[self.name]
+        # Fallback if CSV not available
+        fallback = {"AAA": 50, "AA": 100, "A": 150, "BBB": 250, "BB": 400,
+                    "B": 600, "CCC": 900, "CC": 1500, "C": 2500, "D": 5000}
+        return fallback.get(self.name, 250)
 
     @property
     def numeric_score(self) -> int:
@@ -146,6 +188,10 @@ class RatingAssessment:
 
 def rate_capacity(capacity_mw: float) -> Rating:
     """Rate based on installed capacity (MW)."""
+    csv_rating = _rate_from_csv("capacity_mw", capacity_mw)
+    if csv_rating is not None:
+        return csv_rating
+    # Fallback (original hardcoded logic)
     if capacity_mw >= 2000:
         return Rating.AAA
     elif capacity_mw >= 800:
@@ -166,15 +212,19 @@ def rate_profitability(ebitda_to_fixed_assets: float, is_negative: bool = False)
 
     Enhanced to handle negative EBITDA cases which indicate severe distress.
     """
-    # Handle negative EBITDA - distressed ratings
-    if is_negative or ebitda_to_fixed_assets < -20:
+    # If is_negative flag is set explicitly, override to CC (severe distress)
+    if is_negative:
+        return Rating.CC
+    csv_rating = _rate_from_csv("ebitda_fixed_assets_pct", ebitda_to_fixed_assets)
+    if csv_rating is not None:
+        return csv_rating
+    # Fallback (original hardcoded logic)
+    if ebitda_to_fixed_assets < -20:
         return Rating.CC  # Severe loss
     elif ebitda_to_fixed_assets < -10:
         return Rating.CCC  # Significant loss
     elif ebitda_to_fixed_assets < 0:
         return Rating.B  # Marginal loss
-
-    # Standard thresholds for positive EBITDA
     if ebitda_to_fixed_assets >= 15:
         return Rating.AAA
     elif ebitda_to_fixed_assets >= 11:
@@ -197,7 +247,10 @@ def rate_coverage(ebitda_to_interest: float) -> Rating:
     Negative EBITDA/Interest indicates inability to cover interest
     from operations - a severe credit concern.
     """
-    # Handle negative coverage - distressed ratings
+    csv_rating = _rate_from_csv("coverage_ratio", ebitda_to_interest)
+    if csv_rating is not None:
+        return csv_rating
+    # Fallback (original hardcoded logic)
     if ebitda_to_interest < -5:
         return Rating.D  # Severe - cannot cover interest, likely default
     elif ebitda_to_interest < -2:
@@ -206,8 +259,6 @@ def rate_coverage(ebitda_to_interest: float) -> Rating:
         return Rating.CC  # Cannot cover interest from EBITDA
     elif ebitda_to_interest < 0.5:
         return Rating.CCC  # Barely any coverage
-
-    # Standard thresholds for positive coverage
     if ebitda_to_interest >= 12:
         return Rating.AAA
     elif ebitda_to_interest >= 6:
@@ -235,7 +286,10 @@ def rate_dscr(dscr: float) -> Rating:
 
     Project finance typically requires minimum DSCR of 1.2-1.4x.
     """
-    # Handle negative/very low DSCR - distressed
+    csv_rating = _rate_from_csv("dscr", dscr)
+    if csv_rating is not None:
+        return csv_rating
+    # Fallback (original hardcoded logic)
     if dscr < 0:
         return Rating.D  # Cannot service debt - default likely
     elif dscr < 0.5:
@@ -244,8 +298,6 @@ def rate_dscr(dscr: float) -> Rating:
         return Rating.CC  # Significant shortfall
     elif dscr < 1.0:
         return Rating.CCC  # Below breakeven
-
-    # Standard thresholds (project finance standards)
     if dscr >= 2.5:
         return Rating.AAA  # Very strong coverage
     elif dscr >= 2.0:

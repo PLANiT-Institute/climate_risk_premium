@@ -85,7 +85,7 @@ def apply_transition(
         Legacy scenarios access carbon price via scenario.get_carbon_price(year)
         in cash flow calculations, not stored in TransitionAdjustments.
     """
-    baseline_cf = float(plant_params.get("capacity_factor", 0.5))
+    baseline_cf = float(plant_params.get("capacity_factor", 0.85))
     baseline_life = int(plant_params.get("operating_years", 40))
     
     # Initialize with default values
@@ -183,7 +183,7 @@ def apply_korea_power_plan_trajectory(
         >>> print(cf_trajectory[2030])  # Capacity factor in 2030
         0.45
     """
-    baseline_cf = float(plant_params.get("capacity_factor", 0.5))
+    baseline_cf = float(plant_params.get("capacity_factor", 0.85))
 
     trajectory = {}
     for year in range(start_year, end_year + 1):

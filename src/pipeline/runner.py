@@ -371,10 +371,7 @@ class CRPModelRunner:
             transmission_outage_rate as _trans_outage,
             substation_outage_rate as _sub_outage,
         )
-        from ..planit.outage_assumptions import (
-            OUTAGE_DURATION_HOURS,
-            OUTAGE_RATE_PER_EVENT,
-        )
+        from ..planit.outage_model import load_outage_params, p_outage_given_event
 
         baselines = _load_baselines()
         line_params = (
@@ -394,10 +391,12 @@ class CRPModelRunner:
         line_outage = np.zeros(n)
         capex_loss = np.zeros(n)
 
-        # Defaults for plant-level wildfire conversion (only used if PLANiT inputs missing).
-        # Source notes and sensitivity ranges are centralized in outage_assumptions.py.
-        plant_wf_p = OUTAGE_RATE_PER_EVENT
-        plant_wf_dur = OUTAGE_DURATION_HOURS
+        # Plant-level wildfire outage: exponential failure model.
+        # P(outage|event) = 1 - exp(-λ×t), params from data/physical/outage_params.csv
+        _outage_params = load_outage_params()
+        _plant_params = _outage_params.get("power_plant", _outage_params.get("transmission_tower"))
+        plant_wf_p = p_outage_given_event(_plant_params.failure_rate_per_hour, _plant_params.exposure_duration_hours) if _plant_params else 0.45
+        plant_wf_dur = _plant_params.outage_duration_hours if _plant_params else 24.0
 
         wf = baselines.get("wildfire")
         tc = baselines.get("tropical_cyclone")
