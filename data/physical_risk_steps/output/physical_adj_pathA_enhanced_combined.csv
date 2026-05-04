@@ -1,6 +1,8 @@
 field,value
-outage_rate,0.0
-capacity_derate,0.0
+outage_rate,0.0014833590046223792
+capacity_derate,0.005
 efficiency_loss,0.0
 water_constrained_capacity,1.0
-notes,PLANiT (ssp245 y2040): wildfire_frequency_missing
+transmission_outage_rate,0.0
+asset_capex_loss_rate,0.0
+notes,"PLANiT (ssp245 y2040): wildfire_climate_factor=1.200, drought_metric=impact_mean, drought_impact=0.005000"

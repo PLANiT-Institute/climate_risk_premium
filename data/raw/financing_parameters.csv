@@ -1,4 +1,4 @@
-parameter,value,unit,source
+param_name,value,unit,source
 spread_slope_bps_per_pct,50,bps/%,Model assumption (reduced form credit model)
 equity_slope_pct_per_pct,0.8,%/%,Model assumption (equity risk premium)
 baseline_spread_bps,150,bps,Investment grade BBB baseline

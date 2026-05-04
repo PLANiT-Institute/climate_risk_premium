@@ -21,7 +21,7 @@ def _load_financing_defaults() -> dict:
     defaults = {}
     with open(csv_path, "r", encoding="utf-8") as f:
         for row in csv.DictReader(f):
-            defaults[row["parameter"]] = float(row["value"])
+            defaults[row.get("param_name", row.get("parameter", ""))] = float(row["value"])
     return defaults
 
 
