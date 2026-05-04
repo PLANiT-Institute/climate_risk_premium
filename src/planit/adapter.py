@@ -119,8 +119,6 @@ class PLANiTAdapter:
         # Wildfire-specific frequency metadata for probability-based outage.
         wf_frequency_rows: Dict[str, List[Tuple[int, float]]] = {}
         wf_frequency_source: Dict[str, str] = {}
-        # Wildfire damage ratio from CLIMADA impact (for deriving P(outage|event)).
-        wf_damage_ratio_rows: Dict[str, List[Tuple[int, float]]] = {}
         # PhysRisk distribution-derived expected impacts and disruption probabilities.
         dist_expected_rows: Dict[str, Dict[str, List[Tuple[int, float]]]] = {
             "drought": {},
@@ -142,8 +140,6 @@ class PLANiTAdapter:
                 if wf_freq is not None:
                     wf_frequency_rows.setdefault(r.scenario, []).append((r.year, wf_freq))
                     wf_frequency_source.setdefault(r.scenario, wf_freq_source)
-                if getattr(r, "damage_ratio_mean", None) is not None:
-                    wf_damage_ratio_rows.setdefault(r.scenario, []).append((r.year, r.damage_ratio_mean))
             if r.hazard_type in dist_expected_rows:
                 d_expected, d_prob_nonzero = self._distribution_expected_and_prob_nonzero(r)
                 if d_expected is not None:
@@ -189,22 +185,18 @@ class PLANiTAdapter:
                 )
                 break
 
-        # Interpolate damage ratio from CLIMADA results for this SSP/year.
-        wf_damage_ratio = self._interpolate_hazard(
-            wf_damage_ratio_rows.get(wf_source_scenario, []), target_year, None
-        )
-        logger.debug(f"[WILDFIRE] Computing outage rate: freq={wf_freq}, damage_ratio={wf_damage_ratio}, scenario={crp_scenario}, year={target_year}")
+        logger.debug(f"[WILDFIRE] Computing outage rate: freq={wf_freq}, scenario={crp_scenario}, year={target_year}")
         wf_outage_rate, wf_method = self._compute_wildfire_outage_rate(
-            wf_val, wf_freq, damage_ratio_mean=wf_damage_ratio,
-            target_year=target_year, crp_scenario=crp_scenario
+            wf_val, wf_freq, target_year=target_year, crp_scenario=crp_scenario
         )
         logger.debug(f"[WILDFIRE] Computed outage_rate={wf_outage_rate}")
         if wf_outage_rate is not None:
             outage_rate = wf_outage_rate
             if wf_method == "event_probability":
                 notes_parts.append(f"wildfire_event_freq={wf_freq:.6f}/yr")
-                _used_prob = wf_damage_ratio if wf_damage_ratio is not None and wf_damage_ratio > 0 else self._config.wildfire_outage_probability
-                notes_parts.append(f"wildfire_outage_prob={_used_prob:.6f}")
+                notes_parts.append(
+                    f"wildfire_outage_prob={self._config.wildfire_outage_probability:.3f}"
+                )
                 notes_parts.append(
                     f"wildfire_outage_duration_h={self._config.wildfire_outage_duration_hours:.1f}"
                 )
@@ -212,10 +204,13 @@ class PLANiTAdapter:
                     notes_parts.append(f"wildfire_freq_source={wf_freq_source}")
             if wf_source_scenario != ssp:
                 notes_parts.append(f"wildfire_source_scenario={wf_source_scenario}")
-            if wf_damage_ratio is not None:
-                notes_parts.append(f"wildfire_damage_ratio_mean={wf_damage_ratio:.6f}")
-            else:
-                notes_parts.append("wildfire_damage_ratio=fallback_to_config")
+            # Add climate factor note
+            try:
+                climate_factor = get_climate_factor("wildfire", target_year, crp_scenario)
+                if abs(climate_factor - 1.0) > 0.001:
+                    notes_parts.append(f"wildfire_climate_factor={climate_factor:.3f}")
+            except Exception:
+                pass
         elif "outage_rate" in baseline:
             # Apply climate factor to baseline fallback value
             outage_rate = baseline["outage_rate"]
@@ -314,39 +309,22 @@ class PLANiTAdapter:
         self,
         _wildfire_legacy_value: Optional[float],
         event_frequency_per_year: Optional[float],
-        damage_ratio_mean: Optional[float] = None,
         target_year: Optional[int] = None,
         crp_scenario: Optional[str] = None,
     ) -> Tuple[Optional[float], Optional[str]]:
-        """Compute wildfire outage_rate using event-frequency × damage-derived probability.
+        """Compute wildfire outage_rate using event-frequency probability method.
 
-        When CLIMADA provides damage_ratio_mean (mean |at_event| / total_exposure),
-        it is used as the conditional P(outage|event) — replacing the former hardcoded
-        0.10 placeholder. CLIMADA's SSP-specific fire_prop_probability already encodes
-        the climate change signal, so no additional climate_factor is applied here
-        (that would double-count).
+        Formula:
+            outage_rate = freq × P(outage|event) × (duration_h / 8760) × climate_factor
 
-        Falls back to configured outage_probability (outage_assumptions.py) when
-        damage_ratio_mean is unavailable.
+        - freq: from CLIMADA (identical across SSPs since fire_prop=0.21 for all)
+        - P(outage|event): from outage_assumptions.py (Dale et al. 2018, sensitivity [0.05, 0.20])
+        - climate_factor: from climate_factors.csv (IPCC AR6) — sole source of SSP differentiation
         """
         method = str(self._config.wildfire_outage_method).strip().lower()
 
         if method == "event_probability" and event_frequency_per_year is not None:
-            # Use CLIMADA-derived damage ratio as P(outage|event) when available.
-            if damage_ratio_mean is not None and damage_ratio_mean > 0:
-                outage_prob = min(1.0, max(0.0, float(damage_ratio_mean)))
-                logger.debug(
-                    "[WILDFIRE] Using CLIMADA-derived P(outage|event)=%.6f (damage_ratio_mean)",
-                    outage_prob,
-                )
-            else:
-                # Fallback: configured default from outage_assumptions.py
-                outage_prob = min(1.0, max(0.0, float(self._config.wildfire_outage_probability)))
-                logger.debug(
-                    "[WILDFIRE] No damage_ratio; falling back to configured P(outage|event)=%.4f",
-                    outage_prob,
-                )
-
+            outage_prob = min(1.0, max(0.0, float(self._config.wildfire_outage_probability)))
             outage_hours = max(0.0, float(self._config.wildfire_outage_duration_hours))
             hours_per_year = max(1.0, float(self._config.hours_per_year))
             outage_rate = event_freq_to_outage_rate(
@@ -356,9 +334,16 @@ class PLANiTAdapter:
                 hours_per_year=hours_per_year,
             )
 
-            # No climate_factor applied here: CLIMADA's per-SSP fire_prop_probability
-            # (unified_config.yaml scenario_params) already provides the SSP signal.
-            # Applying climate_factors.csv on top would double-count.
+            # Apply climate factor — sole source of SSP differentiation.
+            # CLIMADA fire_prop_probability is 0.21 for all SSPs (no SSP-specific scaling).
+            if target_year is not None and crp_scenario is not None:
+                try:
+                    climate_factor = get_climate_factor("wildfire", target_year, crp_scenario)
+                    outage_rate = outage_rate * climate_factor
+                except Exception as e:
+                    logger.warning(
+                        "Failed to apply climate factor for wildfire: %s. Using unadjusted rate.", e
+                    )
 
             return min(1.0, max(0.0, outage_rate)), "event_probability"
 
