@@ -35,6 +35,10 @@ class PLANiTHazardResult:
     event_frequency_per_year: Optional[float] = None
     event_count: Optional[float] = None
     reference_years: Optional[float] = None
+    # CLIMADA-derived damage ratio (mean of |at_event| / total_exposure).
+    # Used as P(outage|event) in the adapter instead of hardcoded 0.10.
+    damage_ratio_mean: Optional[float] = None
+    total_exposure_value: Optional[float] = None
     impact_bin_edges: Optional[List[float]] = None
     impact_probabilities: Optional[List[float]] = None
     impact_exceedance_values: Optional[List[float]] = None
@@ -53,6 +57,8 @@ class PLANiTHazardResult:
             "event_frequency_per_year": self.event_frequency_per_year,
             "event_count": self.event_count,
             "reference_years": self.reference_years,
+            "damage_ratio_mean": self.damage_ratio_mean,
+            "total_exposure_value": self.total_exposure_value,
             "impact_bin_edges": self.impact_bin_edges,
             "impact_probabilities": self.impact_probabilities,
             "impact_exceedance_values": self.impact_exceedance_values,
@@ -903,6 +909,8 @@ print("__PLANIT_RESULT_END__")
             annual_freq = _to_optional_float(scenario_data.get("annual_frequency_per_year"))
             event_count = _to_optional_float(scenario_data.get("n_events"))
             reference_years = _to_optional_float(scenario_data.get("years_covered"))
+            damage_ratio_mean = _to_optional_float(scenario_data.get("damage_ratio_mean"))
+            total_exposure_value = _to_optional_float(scenario_data.get("total_exposure_krw"))
             # CLIMADA wildfire has no year dimension — apply to all anchor years
             for year in self._config.anchor_years:
                 results.append(PLANiTHazardResult(
@@ -917,6 +925,8 @@ print("__PLANIT_RESULT_END__")
                     event_frequency_per_year=annual_freq,
                     event_count=event_count,
                     reference_years=reference_years,
+                    damage_ratio_mean=damage_ratio_mean,
+                    total_exposure_value=total_exposure_value,
                 ))
         return results
 
