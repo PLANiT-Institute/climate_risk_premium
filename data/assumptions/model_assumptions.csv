@@ -22,3 +22,5 @@ end_year,2100,year,Last modelled year; matches latest anchor year in data/physic
 ebitda_chart_end_year,2050,year,X-axis upper bound for the EBITDA trajectory chart on the overview screen (display parameter only)
 physical_anchor_years,2025-2030-2050-2100,years,Snapshot anchor years shown in the physical risk table; matches climate factor data anchors in literature_data.csv
 days_per_year,365,days,Calendar days per year; used to convert heatwave event-days to an annual fraction
+consecutive_loss_years_d,8,years,Threshold for consecutive loss years that triggers a D (default) rating override in the scoring model
+rating_base_score,60,score,Starting score in the simplified JS credit scoring model before metric deltas are applied

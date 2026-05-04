@@ -14,8 +14,8 @@ const SCREENS = [
 // Colour palette cycled across custom scenarios — distinct from all preset colours
 const _CUSTOM_PALETTE = ["#f97316","#14b8a6","#e879f9","#a3e635","#fb923c","#22d3ee","#f43f5e","#84cc16"];
 
-function App() {
-  const [model, setModel] = uS(() => buildModel(DEFAULT_PLANT));
+function App({ initialPlant }) {
+  const [model, setModel] = uS(() => buildModel(initialPlant || DEFAULT_PLANT));
   const [screen, setScreen] = uS("overview");
   const [pending, setPending] = uS({});
   const [inspector, setInspector] = uS(null);
@@ -179,4 +179,35 @@ function App() {
   );
 }
 
-ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+(async () => {
+  const root = document.getElementById("root");
+
+  // Show a minimal spinner while CSVs are loading from the backend
+  root.innerHTML =
+    '<div style="display:flex;align-items:center;justify-content:center;height:100vh;' +
+    'color:var(--tx-2);font-family:var(--font-mono);gap:14px">' +
+    '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"' +
+    ' style="animation:spin 1s linear infinite">' +
+    '<style>@keyframes spin{to{transform:rotate(360deg)}}</style>' +
+    '<path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4' +
+    'M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>' +
+    'Loading data…</div>';
+
+  try {
+    const data = await fetch("/api/data").then(r => {
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.json();
+    });
+    initFromData(data);          // populate all empty-shell constants
+    root.innerHTML = "";         // clear spinner
+    ReactDOM.createRoot(root).render(<App initialPlant={data.plant} />);
+  } catch (err) {
+    root.innerHTML =
+      '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;' +
+      'height:100vh;gap:16px;color:var(--neg);font-family:var(--font-mono)">' +
+      '<strong>Failed to load model data</strong>' +
+      '<span style="color:var(--tx-3);font-size:12px">' + err.message + '</span>' +
+      '<span style="color:var(--tx-4);font-size:11px">Is serve.py running on this port?</span>' +
+      '</div>';
+  }
+})();

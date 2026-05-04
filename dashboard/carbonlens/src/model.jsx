@@ -3,58 +3,33 @@
    Mirrors the Python pipeline at a high level: takes plant params + scenario
    defs, returns scenarios (NPV, CRP, ratings), per-year cashflows, ratings,
    and physical-risk trajectories. Fully deterministic, no I/O.
+
+   All domain constants are empty shells — populated at startup by
+   initFromData(d) after app.jsx fetches /api/data from serve.py.
+   Do NOT hardcode CSV values here; edit the source CSVs instead.
 --------------------------------------------------------------------- */
 
 const RATING_ORDER = ["AAA","AA","A","BBB","BB","B","CCC","CC","C","D"];
-const RATING_SPREADS = {
-  AAA: 50, AA: 100, A: 150, BBB: 250, BB: 400, B: 600,
-  CCC: 900, CC: 1500, C: 2500, D: 5000,
-};
 
-const DEFAULT_PLANT = {
-  name: "Samcheok Blue Power",
-  capacity_mw: 2100,
-  capacity_factor: 0.60,
-  total_capex_million: 3550,
-  debt_fraction: 0.80,
-  equity_fraction: 0.20,
-  debt_interest_rate: 0.05,
-  debt_tenor_years: 20,
-  operating_years: 40,
-  useful_life: 30,
-  depreciation_years: 20,
-  discount_rate: 0.08,
-  emissions_tco2_per_mwh: 0.82,
-  power_price_per_mwh: 80,
-  heat_rate_mmbtu_per_mwh: 8.8,  // fuel_cost_per_mwh is derived: heat_rate × fuel_price
-  fuel_price_per_mmbtu: 5.74,
-  fixed_opex_per_kw: 35,
-  variable_opex_per_mwh: 4.5,
-  tax_rate: 0.25,
-  inflation_rate: 0.02,
-  start_year: 2025,
-  risk_free_rate: 0.035,  // risk_free_rate — Korea 10Y Treasury (plant_parameters.csv)
-};
+// --- Empty shells — populated by initFromData() before React mounts --------
+const RATING_SPREADS      = {};    // ← data/credit/rating_spreads.csv
+const DEFAULT_PLANT       = {};    // ← data/plant/plant_parameters.csv
+const DEFAULT_TRANSITIONS = [];    // ← data/transition/scenarios.csv
+const DEFAULT_PHYSICAL    = [];    // ← data/physical/scenarios.csv
+const CLIMADA             = {};    // ← data/physical/climada_data.csv
+const PHYSICAL_ASSUMPTIONS = {};   // ← data/physical/model_assumptions.csv
+const WF_CLIMATE_FACTORS  = [];    // ← data/physical/literature_data.csv  WILDFIRE
+const TC_CLIMATE_FACTORS  = [];    // ← data/physical/literature_data.csv  TC
+const DR_CLIMATE_FACTORS  = [];    // ← data/physical/literature_data.csv  DROUGHT
+const TEMP_CHANGE_SSP585  = [];    // ← data/physical/literature_data.csv  HEAT
+const EFFICIENCY_PARAMS   = {};    // ← data/physical/literature_data.csv  EFFICIENCY
+const HEATWAVE_PARAMS     = {};    // ← data/physical/literature_data.csv  HEATWAVE
+const MODEL_ASSUMPTIONS   = {};    // ← data/assumptions/model_assumptions.csv
+const RATING_SCORE_MODEL  = {};    // ← data/credit/rating_score_model.csv
 
-// Default transition scenarios — mirrors data/transition/scenarios.csv
-const DEFAULT_TRANSITIONS = [
-  { id:"baseline",              name:"Baseline",              dispatch:0.00, retire:40, cp:[8,20,40,60],     desc:"K-ETS inertia, current policy" },
-  { id:"moderate_transition",   name:"Moderate Transition",   dispatch:0.10, retire:35, cp:[10,35,85,150],   desc:"K-ETS tightening" },
-  { id:"korea_ndc",             name:"Korea NDC",             dispatch:0.15, retire:30, cp:[15,80,180,280],  desc:"NDC-aligned coal phase-down" },
-  { id:"aggressive_transition", name:"Aggressive Transition", dispatch:0.25, retire:25, cp:[15,80,180,280],  desc:"Aggressive decarbonization" },
-  { id:"net_zero_2050",         name:"Net Zero 2050",         dispatch:0.20, retire:25, cp:[20,110,260,450], desc:"Net Zero 2050 trajectory" },
-  { id:"delayed_transition",    name:"Delayed Transition",    dispatch:0.05, retire:40, cp:[8,25,100,200],   desc:"Delayed action, late catch-up" },
-  { id:"high_ambition",         name:"High Ambition",         dispatch:0.30, retire:20, cp:[40,185,420,600], desc:"1.5°C aligned" },
-  { id:"no_carbon_baseline",    name:"No-Carbon (Counterfactual)", dispatch:0.00, retire:40, cp:[0,0,0,0], desc:"Hypothetical no carbon pricing" },
-];
-
-const DEFAULT_PHYSICAL = [
-  { id:"baseline",          name:"Baseline (SSP1-2.6)",       wildfire:0.30, color:"#22c55e" },
-  { id:"moderate_physical", name:"Moderate (SSP2-4.5)",       wildfire:0.60, color:"#f59e0b" },
-  { id:"high_physical",     name:"High (SSP5-8.5)",           wildfire:1.00, color:"#ef4444" },
-  { id:"severe_drought",    name:"Severe Drought (SSP5-8.5)", wildfire:1.00, color:"#7c3aed" },
-];
-
+// --- Composition logic — IDs must match server-returned transitions/physical --
+// DEFAULT_CLIMATE_SCENARIOS is pairing logic, not domain parameters.
+// It does not change when CSVs change, so it stays static here.
 const DEFAULT_CLIMATE_SCENARIOS = [
   { id:"no_risk_baseline",   name:"No-Risk Baseline",      transition:"no_carbon_baseline",    physical:"baseline",          desc:"Counterfactual: no carbon + low warming" },
   { id:"conservative",       name:"Conservative",          transition:"baseline",              physical:"baseline",          desc:"K-ETS inertia + low warming" },
@@ -65,6 +40,46 @@ const DEFAULT_CLIMATE_SCENARIOS = [
   { id:"delayed_moderate",   name:"Delayed × Moderate",    transition:"delayed_transition",    physical:"moderate_physical", desc:"Late policy + moderate warming" },
   { id:"high_ambition_high", name:"High Ambition × High",  transition:"high_ambition",         physical:"high_physical",     desc:"1.5°C + worst-case physical" },
 ];
+
+// ---------------------------------------------------------------------------
+// initFromData — called once by app.jsx after GET /api/data succeeds.
+// Mutates const shells in-place so all existing references remain valid.
+// ---------------------------------------------------------------------------
+function initFromData(d) {
+  Object.assign(RATING_SPREADS,       d.rating_spreads);
+  Object.assign(DEFAULT_PLANT,        d.plant);
+  Object.assign(CLIMADA,              d.climada);
+  Object.assign(PHYSICAL_ASSUMPTIONS, d.physical_assumptions);
+  Object.assign(EFFICIENCY_PARAMS,    d.efficiency_params);
+  Object.assign(HEATWAVE_PARAMS,      d.heatwave_params);
+  Object.assign(MODEL_ASSUMPTIONS,    d.model_assumptions);
+  Object.assign(RATING_SCORE_MODEL,   d.rating_score_model);
+
+  // Arrays — splice-replace keeps existing references valid
+  const _swap = (arr, src) => { arr.length = 0; arr.push(...src); };
+  _swap(DEFAULT_TRANSITIONS, d.transitions);
+  _swap(DEFAULT_PHYSICAL,    d.physical_scenarios);
+  _swap(WF_CLIMATE_FACTORS,  d.wf_climate_factors);
+  _swap(TC_CLIMATE_FACTORS,  d.tc_climate_factors);
+  _swap(DR_CLIMATE_FACTORS,  d.dr_climate_factors);
+  _swap(TEMP_CHANGE_SSP585,  d.temp_change_ssp585);
+
+  // Normalise JSON null thresholds → JS infinity sentinels so .find() comparisons work:
+  //   descending >= tiers (dscr, coverage):  null → -Infinity (last catch-all row)
+  //   ascending  <= tiers (equity_leverage): null → +Infinity (last catch-all row)
+  ["dscr", "coverage"].forEach(key => {
+    (RATING_SCORE_MODEL[key] || []).forEach(t => {
+      if (t.threshold == null) t.threshold = -Infinity;
+    });
+  });
+  (RATING_SCORE_MODEL.equity_leverage || []).forEach(t => {
+    if (t.threshold == null) t.threshold = Infinity;
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Carbon price interpolation
+// ---------------------------------------------------------------------------
 
 function carbonPrice(cp, year) {
   // cp = array of prices at MODEL_ASSUMPTIONS.carbon_price_years anchor points
@@ -79,121 +94,6 @@ function carbonPrice(cp, year) {
   }
   return cp[xs.length - 1];
 }
-
-// ---------------------------------------------------------------------------
-// Physical risk assumptions — mirrors data/physical/ CSV files exactly.
-// Every value here must trace to a specific row in one of the four CSVs.
-// Update these objects when the CSVs change; do not scatter numbers elsewhere.
-// ---------------------------------------------------------------------------
-
-// data/physical/climada_data.csv — CLIMADA event counts
-const CLIMADA = {
-  wildfire_events:       6,    // events_at_location  (NASA FIRMS MODIS)
-  wildfire_years:       20,    // years_covered
-  tc_damaging_events:    5,    // events_at_location  (IBTrACS > 30 m/s)
-  tc_damaging_years:    40,    // years_covered
-};
-
-// data/physical/model_assumptions.csv
-const PHYSICAL_ASSUMPTIONS = {
-  outage_prob_wildfire:          0.10,   // outage_prob_wildfire
-  outage_prob_tc:                0.30,   // outage_prob_tc
-  outage_duration_wildfire:      168,    // hours — outage_duration_wildfire
-  outage_duration_tc:            168,    // hours — outage_duration_tc
-  hours_per_year:               8760,   // hours_per_year
-  drought_capacity_derate_base:  0.005,  // drought_capacity_derate_base
-  drought_severe_multiplier:     2.4,    // implicit in severe_drought scenario row
-  days_per_year:                 365,    // days_per_year (= hours_per_year / 24)
-};
-
-// data/physical/literature_data.csv — climate factor anchors [year, factor]
-// category WILDFIRE, parameter climate_factor
-const WF_CLIMATE_FACTORS  = [[2024,1.0],[2030,2.0],[2050,2.0],[2100,4.0]];
-// category TC, parameter climate_factor  (Knutson et al. 2020)
-const TC_CLIMATE_FACTORS  = [[2024,1.0],[2030,1.05],[2050,1.10],[2100,1.10]];
-// category DROUGHT, parameter climate_factor  (IPCC AR6 WG1)
-const DR_CLIMATE_FACTORS  = [[2024,1.0],[2030,1.12],[2050,1.45],[2100,2.0]];
-// category HEAT, parameter korea_temp_change_ssp585  (Kim et al. 2016)
-const TEMP_CHANGE_SSP585  = [[2024,0.0],[2030,1.0],[2050,1.75],[2100,4.73]];
-
-// data/physical/literature_data.csv — EFFICIENCY rows (all years)
-const EFFICIENCY_PARAMS = {
-  ambient_derate_model:  0.08,    // %/°C — ambient_derate_model
-  cooling_water_derate:  0.133,   // %/°C — cooling_water_derate
-  sst_air_ratio:         0.80,    // dimensionless — sst_air_ratio
-};
-
-// data/physical/literature_data.csv — HEATWAVE rows
-// year_baseline / year_future come from the `year` column of those CSV rows.
-const HEATWAVE_PARAMS = {
-  days_baseline:    5.0,    // d/yr — days_baseline (year 2024)
-  days_future:     17.4,    // d/yr — days_future   (year 2100, SSP5-8.5, WWA 2025)
-  efficiency_loss:  4.0,    // % per event day — efficiency_loss
-  year_baseline:   2024,    // `year` column for days_baseline row
-  year_future:     2100,    // `year` column for days_future row
-};
-
-// data/assumptions/model_assumptions.csv
-const MODEL_ASSUMPTIONS = {
-  base_rate:                   0.0675,            // base_rate
-  baseline_equity_rate:        0.12,              // baseline_equity_rate
-  equity_premium_per_notch:    0.005,             // equity_premium_per_notch (per rating notch)
-  counterfactual_rating:       "A",               // counterfactual_rating
-  start_year:                  2025,              // start_year
-  end_year:                    2100,              // end_year
-  coverage_infinity_sentinel:  99,               // coverage_infinity_sentinel
-  dscr_post_debt_fallback:     1.5,              // dscr_post_debt_fallback
-  carbon_price_years:          [2025, 2030, 2040, 2050], // matches columns in data/transition/scenarios.csv
-  ebitda_chart_end_year:       2050,             // ebitda_chart_end_year (display only)
-  physical_anchor_years:       [2025, 2030, 2050, 2100], // physical_anchor_years (snapshot table)
-  consecutive_loss_years_d:    8,                // consecutive_loss_years_d — D-rating override threshold
-  rating_base_score:           60,               // rating_base_score — starting score in JS scoring model
-};
-
-// data/credit/rating_score_model.csv — JS simplified scoring model
-// Maps metric → (threshold, score_delta) pairs; cutoffs map score → rating.
-const RATING_SCORE_MODEL = {
-  dscr: [
-    { threshold: 2.5, delta: +18 },
-    { threshold: 2.0, delta: +12 },
-    { threshold: 1.6, delta:  +6 },
-    { threshold: 1.3, delta:   0 },
-    { threshold: 1.1, delta:  -6 },
-    { threshold: 1.0, delta: -10 },
-    { threshold: 0.8, delta: -20 },
-    { threshold: 0.5, delta: -28 },
-    { threshold: -Infinity, delta: -38 },
-  ],
-  coverage: [
-    { threshold: 12, delta:  +6 },
-    { threshold:  6, delta:  +3 },
-    { threshold:  4, delta:   0 },
-    { threshold:  2, delta:  -4 },
-    { threshold:  1, delta:  -7 },
-    { threshold: -Infinity, delta: -12 },
-  ],
-  equity_leverage: [
-    { threshold:  80, delta:  +6 },  // lower is better — first matching (<=) wins
-    { threshold: 150, delta:  +3 },
-    { threshold: 250, delta:   0 },
-    { threshold: 300, delta:  -3 },
-    { threshold: 400, delta:  -6 },
-    { threshold: Infinity, delta: -12 },
-  ],
-  scale_threshold_mw: 2000,  // scale_bonus threshold
-  scale_bonus:           4,  // score bonus for >= scale_threshold_mw
-  cutoffs: [
-    { score: 92, rating: "AAA" },
-    { score: 82, rating: "AA"  },
-    { score: 72, rating: "A"   },
-    { score: 62, rating: "BBB" },
-    { score: 52, rating: "BB"  },
-    { score: 42, rating: "B"   },
-    { score: 30, rating: "CCC" },
-    { score: 18, rating: "CC"  },
-    { score:  0, rating: "C"   },
-  ],
-};
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -476,7 +376,7 @@ function runModel(plant, transitions, physicalDefs, climateScenarios, options = 
   return { plant, transitions, physicalDefs, climateScenarios, scenarios };
 }
 
-// Initial run for dashboard  startup
+// Initial run for dashboard startup
 function defaultModel() {
   return runModel(DEFAULT_PLANT, DEFAULT_TRANSITIONS, DEFAULT_PHYSICAL, DEFAULT_CLIMATE_SCENARIOS);
 }
@@ -522,6 +422,8 @@ Object.assign(window, {
   DEFAULT_PLANT, DEFAULT_TRANSITIONS, DEFAULT_PHYSICAL, DEFAULT_CLIMATE_SCENARIOS,
   CLIMADA, PHYSICAL_ASSUMPTIONS, MODEL_ASSUMPTIONS, EFFICIENCY_PARAMS, HEATWAVE_PARAMS,
   WF_CLIMATE_FACTORS, TC_CLIMATE_FACTORS, DR_CLIMATE_FACTORS, TEMP_CHANGE_SSP585,
+  RATING_SCORE_MODEL,
+  initFromData,
   carbonPrice, physicalAdjustment, _linInterp, ratingFromMetrics,
   computeScenario, runModel, defaultModel, buildModel,
   fmtNum, fmtPct, niceTicks,
