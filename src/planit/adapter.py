@@ -7,12 +7,11 @@ from typing import Dict, List, Optional, Tuple
 import numpy as np
 
 from .config import PLANiTIntegrationConfig
-from .outage_assumptions import (
-    OUTAGE_DURATION_HOURS,
-    OUTAGE_DURATION_HOURS_SENSITIVITY,
-    OUTAGE_RATE_PER_EVENT,
-    OUTAGE_RATE_PER_EVENT_SENSITIVITY,
-    event_freq_to_outage_rate,
+from .outage_model import (
+    HOURS_PER_YEAR,
+    compute_outage_rate,
+    load_outage_params,
+    p_outage_given_event,
 )
 from .runner import PLANiTHazardResult
 from ..data.loaders import get_climate_factor
@@ -312,42 +311,50 @@ class PLANiTAdapter:
         target_year: Optional[int] = None,
         crp_scenario: Optional[str] = None,
     ) -> Tuple[Optional[float], Optional[str]]:
-        """Compute wildfire outage_rate using event-frequency probability method.
+        """Compute wildfire outage_rate using exponential failure model.
 
         Formula:
-            outage_rate = freq × P(outage|event) × (duration_h / 8760) × climate_factor
+            P(outage|event) = 1 - exp(-λ × t)
+            outage_rate = freq × P(outage|event) × (outage_duration / 8760) × climate_factor
 
-        - freq: from CLIMADA (identical across SSPs since fire_prop=0.21 for all)
-        - P(outage|event): from outage_assumptions.py (Dale et al. 2018, sensitivity [0.05, 0.20])
-        - climate_factor: from climate_factors.csv (IPCC AR6) — sole source of SSP differentiation
+        Parameters loaded from data/physical/outage_params.csv:
+            λ = failure_rate_per_hour (Choobineh & Mohagheghi 2015)
+            t = exposure_duration_hours (KFS 산불통계, sensitivity)
+
+        SSP differentiation via climate_factors.csv (IPCC AR6):
+            CLIMADA uses fire_prop=0.21 for all SSPs; climate_factor is sole SSP source.
         """
-        method = str(self._config.wildfire_outage_method).strip().lower()
+        if event_frequency_per_year is None:
+            return None, None
 
-        if method == "event_probability" and event_frequency_per_year is not None:
-            outage_prob = min(1.0, max(0.0, float(self._config.wildfire_outage_probability)))
-            outage_hours = max(0.0, float(self._config.wildfire_outage_duration_hours))
-            hours_per_year = max(1.0, float(self._config.hours_per_year))
-            outage_rate = event_freq_to_outage_rate(
-                event_frequency_per_year,
-                outage_probability=outage_prob,
-                outage_duration_hours=outage_hours,
-                hours_per_year=hours_per_year,
+        # Load outage params from CSV (cached by caller or loaded here)
+        outage_params = load_outage_params()
+        params = outage_params.get("transmission_tower", outage_params.get("power_plant"))
+
+        if params is not None:
+            outage_prob = p_outage_given_event(
+                params.failure_rate_per_hour,
+                params.exposure_duration_hours,
             )
+            outage_hours = params.outage_duration_hours
+        else:
+            # Fallback to config (should not happen if CSV exists)
+            outage_prob = self._config.wildfire_outage_probability
+            outage_hours = self._config.wildfire_outage_duration_hours
 
-            # Apply climate factor — sole source of SSP differentiation.
-            # CLIMADA fire_prop_probability is 0.21 for all SSPs (no SSP-specific scaling).
-            if target_year is not None and crp_scenario is not None:
-                try:
-                    climate_factor = get_climate_factor("wildfire", target_year, crp_scenario)
-                    outage_rate = outage_rate * climate_factor
-                except Exception as e:
-                    logger.warning(
-                        "Failed to apply climate factor for wildfire: %s. Using unadjusted rate.", e
-                    )
+        outage_rate = event_frequency_per_year * outage_prob * (outage_hours / HOURS_PER_YEAR)
 
-            return min(1.0, max(0.0, outage_rate)), "event_probability"
+        # Apply climate factor — sole source of SSP differentiation.
+        if target_year is not None and crp_scenario is not None:
+            try:
+                climate_factor = get_climate_factor("wildfire", target_year, crp_scenario)
+                outage_rate = outage_rate * climate_factor
+            except Exception as e:
+                logger.warning(
+                    "Failed to apply climate factor for wildfire: %s. Using unadjusted rate.", e
+                )
 
-        return None, None
+        return min(1.0, max(0.0, outage_rate)), "exponential_failure"
 
     @staticmethod
     def _distribution_expected_and_prob_nonzero(

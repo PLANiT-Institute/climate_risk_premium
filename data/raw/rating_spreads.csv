@@ -1,0 +1,11 @@
+rating,spread_bps,source
+AAA,50,Bloomberg US Corporate Bond Index 2020-2024 average
+AA,100,Bloomberg US Corporate Bond Index 2020-2024 average
+A,150,Bloomberg US Corporate Bond Index 2020-2024 average
+BBB,250,Bloomberg US Corporate Bond Index 2020-2024 average
+BB,400,Bloomberg US Corporate Bond Index 2020-2024 average
+B,600,Bloomberg US Corporate Bond Index 2020-2024 average
+CCC,900,Bloomberg US Corporate Bond Index 2020-2024 average (distressed)
+CC,1500,Distressed debt trading levels
+C,2500,Distressed debt deep distress
+D,5000,Default recovery value pricing

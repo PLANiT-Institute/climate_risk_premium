@@ -14,9 +14,78 @@ pledge for coal exit by 2040 (2040년 탈석탄, special legislation pending).
 """
 from __future__ import annotations
 
+import csv as _csv
 from dataclasses import dataclass, field
+from pathlib import Path as _Path
 from typing import Dict, List, Optional, Tuple
 import numpy as np
+
+
+def _get_data_root():
+    return _Path(__file__).resolve().parent.parent.parent / "data" / "raw"
+
+
+def _load_carbon_prices() -> dict:
+    """Load K-ETS carbon prices from CSV. Returns {year: price_won}."""
+    csv_path = _get_data_root() / "k_ets_carbon_prices.csv"
+    if not csv_path.exists():
+        return {}
+    prices = {}
+    with open(csv_path, "r", encoding="utf-8") as f:
+        for row in _csv.DictReader(f):
+            prices[int(row["year"])] = int(row["carbon_price_krw"])
+    return prices
+
+
+def _load_coal_phase_out() -> dict:
+    """Load coal phase-out schedule. Returns {year: {'capacity_gw': float, 'capacity_factor': float}}."""
+    csv_path = _get_data_root() / "coal_phase_out_schedule.csv"
+    if not csv_path.exists():
+        return {}
+    schedule = {}
+    with open(csv_path, "r", encoding="utf-8") as f:
+        for row in _csv.DictReader(f):
+            schedule[int(row["year"])] = {
+                "capacity_gw": float(row["capacity_gw"]),
+                "capacity_factor": float(row["capacity_factor"]),
+            }
+    return schedule
+
+
+def _load_nuclear_expansion() -> list:
+    """Load nuclear expansion plan. Returns list of phase dicts."""
+    csv_path = _get_data_root() / "nuclear_expansion_plan.csv"
+    if not csv_path.exists():
+        return []
+    phases = []
+    with open(csv_path, "r", encoding="utf-8") as f:
+        for row in _csv.DictReader(f):
+            phases.append({
+                "phase": int(row["phase"]),
+                "year": int(row["year"]),
+                "cumulative_capacity_gw": float(row["cumulative_capacity_gw"]),
+                "addition_gw": float(row["addition_gw"]),
+                "unit_type": row["unit_type"],
+            })
+    return phases
+
+
+def _load_renewable_targets() -> dict:
+    """Load renewable targets. Returns {year: {'solar_gw': float, ...}}."""
+    csv_path = _get_data_root() / "renewable_targets.csv"
+    if not csv_path.exists():
+        return {}
+    targets = {}
+    with open(csv_path, "r", encoding="utf-8") as f:
+        for row in _csv.DictReader(f):
+            targets[int(row["year"])] = {
+                "solar_gw": float(row["solar_gw"]),
+                "wind_gw": float(row["wind_gw"]),
+                "hydro_gw": float(row.get("hydro_gw", 6.5)),
+                "grid_stability_gw": float(row.get("grid_stability_gw", 0)),
+                "battery_gw": float(row.get("battery_gw", 0)),
+            }
+    return targets
 
 
 @dataclass
@@ -81,59 +150,25 @@ class KETSCarbonPrice:
     def create_price_trajectory(cls) -> Dict[int, 'KETSCarbonPrice']:
         """Create complete K-ETS price trajectory to 2050."""
         prices = {}
-        
-        # Phase 1 (2021-2025): Implementation phase
-        # Source: KRX 배출권시장, 2024 avg ~9,465 KRW/ton
-        phase1_prices = {
-            2024: 9_500,   # KRX market average (KRW/ton)
-            2025: 11_000,  # Projected increase
-        }
-        
-        # Phase 2 (2026-2030): NDC alignment phase
-        phase2_prices = {
-            2026: 14_000,
-            2027: 18_000,
-            2028: 22_000,
-            2029: 26_000,
-            2030: 30_000,  # NDC-aligned target
-        }
-        
-        # Phase 3 (2031-2040): Climate alignment phase
-        phase3_prices = {
-            2031: 33_000,
-            2032: 36_000,
-            2033: 39_000,
-            2034: 42_000,
-            2035: 46_000,
-            2036: 50_000,
-            2037: 54_000,
-            2038: 58_000,  # Enhanced target
-            2039: 62_000,
-            2040: 66_000,
-        }
-        
-        # Phase 4 (2041-2050): Net-zero alignment
-        phase4_prices = {
-            2041: 72_000,
-            2042: 78_000,
-            2043: 84_000,
-            2044: 90_000,
-            2045: 97_000,
-            2046: 104_000,
-            2047: 112_000,
-            2048: 120_000,
-            2049: 130_000,
-            2050: 150_000,  # Net-zero pricing
-        }
-        
-        # Convert to KETSCarbonPrice objects
-        all_prices = {**phase1_prices, **phase2_prices, **phase3_prices, **phase4_prices}
-        
+
+        # Load K-ETS carbon prices from CSV
+        all_prices = _load_carbon_prices()
+        if not all_prices:
+            # Fallback to hardcoded values if CSV not found
+            all_prices = {
+                2024: 9_500, 2025: 11_000,
+                2026: 14_000, 2027: 18_000, 2028: 22_000, 2029: 26_000, 2030: 30_000,
+                2031: 33_000, 2032: 36_000, 2033: 39_000, 2034: 42_000, 2035: 46_000,
+                2036: 50_000, 2037: 54_000, 2038: 58_000, 2039: 62_000, 2040: 66_000,
+                2041: 72_000, 2042: 78_000, 2043: 84_000, 2044: 90_000, 2045: 97_000,
+                2046: 104_000, 2047: 112_000, 2048: 120_000, 2049: 130_000, 2050: 150_000,
+            }
+
         for year, price_won in all_prices.items():
             price_usd = price_won / 1300  # Approximate exchange rate
             phase = 1 if year <= 2025 else (2 if year <= 2030 else (3 if year <= 2040 else 4))
             policy_scenario = "current" if year <= 2025 else ("ndc_aligned" if year <= 2030 else "climate_aligned")
-            
+
             prices[year] = KETSCarbonPrice(
                 year=year,
                 carbon_price_won=price_won,
@@ -141,7 +176,7 @@ class KETSCarbonPrice:
                 phase=phase,
                 policy_scenario=policy_scenario
             )
-        
+
         return prices
 
 
@@ -156,6 +191,16 @@ class CoalPhaseoutSchedule:
     target_coal_capacity_gw: float = 0.0   # Complete phase-out
     phase_out_start_year: int = 2025
     complete_phase_out_year: int = 2040  # Presidential pledge (2040년 탈석탄)
+
+    def __post_init__(self):
+        """Load schedule from CSV if available."""
+        coal_schedule = _load_coal_phase_out()
+        if coal_schedule:
+            years_sorted = sorted(coal_schedule.keys())
+            self.initial_coal_capacity_gw = coal_schedule[years_sorted[0]]["capacity_gw"]
+            self.target_coal_capacity_gw = coal_schedule[years_sorted[-1]]["capacity_gw"]
+            self.phase_out_start_year = years_sorted[0]
+            self.complete_phase_out_year = years_sorted[-1]
     
     def get_coal_capacity(self, year: int) -> float:
         """Get coal capacity for given year.
@@ -510,31 +555,69 @@ def create_enhanced_11th_plan() -> EnhancedKoreaPowerPlan:
     ]
     
     # Renewable expansion targets (cumulative installed capacity, GW)
-    renewable_targets = [
-        RenewableExpansionTarget(
-            year=2024, solar_capacity_gw=25.0, wind_capacity_gw=1.7,
-            total_renewable_gw=26.7, annual_addition_gw=3.0
-        ),
-        RenewableExpansionTarget(
-            year=2030, solar_capacity_gw=39.0, wind_capacity_gw=10.0,
-            total_renewable_gw=49.0, annual_addition_gw=5.5
-        ),
-        RenewableExpansionTarget(
-            year=2038, solar_capacity_gw=77.2, wind_capacity_gw=40.7,
-            total_renewable_gw=117.9, annual_addition_gw=8.5,
-            grid_stability_requirement=21.5,  # GW of storage needed
-            storage_requirement_gw=35.0  # GW of BESS
-        ),
-    ]
+    renewable_targets_data = _load_renewable_targets()
+    if renewable_targets_data:
+        renewable_targets = []
+        years_sorted = sorted(renewable_targets_data.keys())
+        for i, yr in enumerate(years_sorted):
+            rd = renewable_targets_data[yr]
+            total_gw = rd["solar_gw"] + rd["wind_gw"]
+            # Estimate annual addition from difference with previous year
+            if i > 0:
+                prev_rd = renewable_targets_data[years_sorted[i - 1]]
+                prev_total = prev_rd["solar_gw"] + prev_rd["wind_gw"]
+                year_gap = yr - years_sorted[i - 1]
+                annual_addition = (total_gw - prev_total) / year_gap if year_gap > 0 else 0.0
+            else:
+                annual_addition = 3.0  # Default for first year
+            renewable_targets.append(RenewableExpansionTarget(
+                year=yr,
+                solar_capacity_gw=rd["solar_gw"],
+                wind_capacity_gw=rd["wind_gw"],
+                total_renewable_gw=total_gw,
+                annual_addition_gw=annual_addition,
+                grid_stability_requirement=rd["grid_stability_gw"] if rd["grid_stability_gw"] > 0 else None,
+                storage_requirement_gw=rd["battery_gw"] if rd["battery_gw"] > 0 else None,
+            ))
+    else:
+        # Fallback to hardcoded values
+        renewable_targets = [
+            RenewableExpansionTarget(
+                year=2024, solar_capacity_gw=25.0, wind_capacity_gw=1.7,
+                total_renewable_gw=26.7, annual_addition_gw=3.0
+            ),
+            RenewableExpansionTarget(
+                year=2030, solar_capacity_gw=39.0, wind_capacity_gw=10.0,
+                total_renewable_gw=49.0, annual_addition_gw=5.5
+            ),
+            RenewableExpansionTarget(
+                year=2038, solar_capacity_gw=77.2, wind_capacity_gw=40.7,
+                total_renewable_gw=117.9, annual_addition_gw=8.5,
+                grid_stability_requirement=21.5,
+                storage_requirement_gw=35.0
+            ),
+        ]
     
     # Nuclear expansion plan (2 large units + 1 SMR)
-    nuclear_plan = NuclearExpansionPlan(
-        phase={
-            2028: {'total_capacity': 25.7, 'addition': 1.0},  # First large unit
-            2032: {'total_capacity': 28.1, 'addition': 2.4},  # Second large unit
-            2035: {'total_capacity': 30.1, 'addition': 2.0},  # SMR unit
-        }
-    )
+    nuclear_phases_data = _load_nuclear_expansion()
+    if nuclear_phases_data:
+        phase_dict = {}
+        for pd in nuclear_phases_data:
+            if pd["addition_gw"] > 0:  # Only include phases with actual additions
+                phase_dict[pd["year"]] = {
+                    'total_capacity': pd["cumulative_capacity_gw"],
+                    'addition': pd["addition_gw"],
+                }
+        nuclear_plan = NuclearExpansionPlan(phase=phase_dict)
+    else:
+        # Fallback to hardcoded values
+        nuclear_plan = NuclearExpansionPlan(
+            phase={
+                2028: {'total_capacity': 25.7, 'addition': 1.0},  # First large unit
+                2032: {'total_capacity': 28.1, 'addition': 2.4},  # Second large unit
+                2035: {'total_capacity': 30.1, 'addition': 2.0},  # SMR unit
+            }
+        )
     
     # Coal phase-out schedule (42% faster than 10th Plan)
     coal_schedule = CoalPhaseoutSchedule()

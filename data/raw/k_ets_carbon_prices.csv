@@ -1,0 +1,28 @@
+year,carbon_price_krw,carbon_price_usd,phase,source
+2024,9500,7.31,1,KRX market average 2024
+2025,11000,8.46,1,KRX projected
+2026,14000,10.77,2,NDC alignment assumption
+2027,18000,13.85,2,NDC alignment assumption
+2028,22000,16.92,2,NDC alignment assumption
+2029,26000,20.00,2,NDC alignment assumption
+2030,30000,23.08,2,NDC-aligned target
+2031,33000,25.38,3,Climate alignment
+2032,36000,27.69,3,Climate alignment
+2033,39000,30.00,3,Climate alignment
+2034,42000,32.31,3,Climate alignment
+2035,46000,35.38,3,Climate alignment
+2036,50000,38.46,3,Climate alignment
+2037,54000,41.54,3,Climate alignment
+2038,58000,44.62,3,Enhanced target
+2039,62000,47.69,3,Climate alignment
+2040,66000,50.77,3,Climate alignment
+2041,72000,55.38,4,Net-zero pricing
+2042,78000,60.00,4,Net-zero pricing
+2043,84000,64.62,4,Net-zero pricing
+2044,90000,69.23,4,Net-zero pricing
+2045,97000,74.62,4,Net-zero pricing
+2046,104000,80.00,4,Net-zero pricing
+2047,112000,86.15,4,Net-zero pricing
+2048,120000,92.31,4,Net-zero pricing
+2049,130000,100.00,4,Net-zero pricing
+2050,150000,115.38,4,Net-zero pricing

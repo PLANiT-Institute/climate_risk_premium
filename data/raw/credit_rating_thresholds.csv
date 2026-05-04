@@ -1,0 +1,36 @@
+metric,threshold_min,threshold_max,rating,source
+capacity_mw,2000,999999,AAA,KIS credit methodology
+capacity_mw,800,2000,AA,KIS credit methodology
+capacity_mw,400,800,A,KIS credit methodology
+capacity_mw,100,400,BBB,KIS credit methodology
+capacity_mw,20,100,BB,KIS credit methodology
+capacity_mw,0,20,B,KIS credit methodology
+ebitda_fixed_assets_pct,15,999,AAA,KIS credit methodology
+ebitda_fixed_assets_pct,11,15,AA,KIS credit methodology
+ebitda_fixed_assets_pct,8,11,A,KIS credit methodology
+ebitda_fixed_assets_pct,4,8,BBB,KIS credit methodology
+ebitda_fixed_assets_pct,1,4,BB,KIS credit methodology
+ebitda_fixed_assets_pct,0,1,B,KIS credit methodology
+ebitda_fixed_assets_pct,-10,0,B,KIS credit methodology (negative)
+ebitda_fixed_assets_pct,-20,-10,CCC,KIS credit methodology (distressed)
+ebitda_fixed_assets_pct,-999,-20,CC,KIS credit methodology (severe distress)
+coverage_ratio,12,999,AAA,KIS credit methodology
+coverage_ratio,6,12,AA,KIS credit methodology
+coverage_ratio,4,6,A,KIS credit methodology
+coverage_ratio,2,4,BBB,KIS credit methodology
+coverage_ratio,1,2,BB,KIS credit methodology
+coverage_ratio,0.5,1,B,KIS credit methodology
+coverage_ratio,0,0.5,CCC,KIS credit methodology (distressed)
+coverage_ratio,-2,0,CC,KIS credit methodology (distressed)
+coverage_ratio,-5,-2,C,KIS credit methodology (near default)
+coverage_ratio,-999,-5,D,KIS credit methodology (default)
+dscr,2.5,999,AAA,"Moody's Global Infrastructure Finance (2021)"
+dscr,2.0,2.5,AA,"Moody's Global Infrastructure Finance (2021)"
+dscr,1.6,2.0,A,"S&P Project Finance Criteria (2022)"
+dscr,1.3,1.6,BBB,"S&P Project Finance Criteria (2022)"
+dscr,1.1,1.3,BB,"S&P Project Finance Criteria (2022)"
+dscr,1.0,1.1,B,"S&P Project Finance Criteria (2022)"
+dscr,0.8,1.0,CCC,"S&P Project Finance Criteria (2022)"
+dscr,0.5,0.8,CC,"S&P Project Finance Criteria (2022)"
+dscr,0,0.5,C,"S&P Project Finance Criteria (2022)"
+dscr,-999,0,D,"S&P Project Finance Criteria (2022)"

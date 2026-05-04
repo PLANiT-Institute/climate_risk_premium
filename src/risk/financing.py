@@ -7,8 +7,25 @@ and counterfactual-based CRP calculation for proper climate risk pricing.
 
 from __future__ import annotations
 
+import csv
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Dict, Any, Optional
+
+
+def _load_financing_defaults() -> dict:
+    """Load default financing parameters from CSV."""
+    csv_path = Path(__file__).resolve().parent.parent.parent / "data" / "raw" / "financing_parameters.csv"
+    if not csv_path.exists():
+        return {}
+    defaults = {}
+    with open(csv_path, "r", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            defaults[row["parameter"]] = float(row["value"])
+    return defaults
+
+
+_FINANCING_DEFAULTS = _load_financing_defaults()
 
 
 @dataclass
@@ -73,12 +90,12 @@ def map_expected_loss_to_spreads(
                            If provided, overrides the linear spread slope model.
     """
     # Extract parameters
-    spread_slope = float(params.get("spread_slope_bps_per_pct", 50))
-    equity_slope = float(params.get("equity_slope_pct_per_pct", 0.8))
-    baseline_spread = float(params.get("baseline_spread_bps", 150))
-    risk_free_rate = float(params.get("risk_free_rate", 0.03))
-    debt_fraction = float(params.get("debt_fraction", 0.70))
-    equity_fraction = float(params.get("equity_fraction", 0.30))
+    spread_slope = float(params.get("spread_slope_bps_per_pct", _FINANCING_DEFAULTS.get("spread_slope_bps_per_pct", 50)))
+    equity_slope = float(params.get("equity_slope_pct_per_pct", _FINANCING_DEFAULTS.get("equity_slope_pct_per_pct", 0.8)))
+    baseline_spread = float(params.get("baseline_spread_bps", _FINANCING_DEFAULTS.get("baseline_spread_bps", 150)))
+    risk_free_rate = float(params.get("risk_free_rate", _FINANCING_DEFAULTS.get("risk_free_rate", 0.03)))
+    debt_fraction = float(params.get("debt_fraction", _FINANCING_DEFAULTS.get("debt_fraction", 0.70)))
+    equity_fraction = float(params.get("equity_fraction", _FINANCING_DEFAULTS.get("equity_fraction", 0.30)))
 
     # Baseline debt cost
     baseline_debt_rate = risk_free_rate + (baseline_spread / 10000)
@@ -94,7 +111,7 @@ def map_expected_loss_to_spreads(
     adjusted_debt_rate = risk_free_rate + (debt_spread / 10000)
 
     # Equity cost (baseline equity return ~12%, adjusted by risk premium)
-    baseline_equity_rate = 0.12
+    baseline_equity_rate = float(params.get("baseline_equity_rate", _FINANCING_DEFAULTS.get("baseline_equity_rate", 0.12)))
     equity_premium_pct = expected_loss_pct * equity_slope
     adjusted_equity_rate = baseline_equity_rate + (equity_premium_pct / 100)
 
@@ -136,10 +153,10 @@ def calculate_financing_from_rating(
         params: Financing parameters
     """
     # Extract parameters
-    equity_slope = float(params.get("equity_slope_pct_per_pct", 0.8))
-    risk_free_rate = float(params.get("risk_free_rate", 0.03))
-    debt_fraction = float(params.get("debt_fraction", 0.70))
-    equity_fraction = float(params.get("equity_fraction", 0.30))
+    equity_slope = float(params.get("equity_slope_pct_per_pct", _FINANCING_DEFAULTS.get("equity_slope_pct_per_pct", 0.8)))
+    risk_free_rate = float(params.get("risk_free_rate", _FINANCING_DEFAULTS.get("risk_free_rate", 0.03)))
+    debt_fraction = float(params.get("debt_fraction", _FINANCING_DEFAULTS.get("debt_fraction", 0.70)))
+    equity_fraction = float(params.get("equity_fraction", _FINANCING_DEFAULTS.get("equity_fraction", 0.30)))
 
     # Calculate Expected Loss % (for reporting purposes, even if not driving spread)
     expected_loss_pct = 0.0
@@ -157,7 +174,7 @@ def calculate_financing_from_rating(
     # 2. Equity Cost
     # Linear model for equity premium (no credit rating equivalent for equity)
     # Could scale by spread increase ratio, but slope approach is safer.
-    baseline_equity_rate = 0.12
+    baseline_equity_rate = float(params.get("baseline_equity_rate", _FINANCING_DEFAULTS.get("baseline_equity_rate", 0.12)))
     equity_premium_pct = expected_loss_pct * equity_slope
     adjusted_equity_rate = baseline_equity_rate + (equity_premium_pct / 100)
 
@@ -213,10 +230,10 @@ def calculate_financing_with_counterfactual(
         FinancingImpact with CRP calculated against counterfactual
     """
     # Extract parameters
-    risk_free_rate = float(params.get("risk_free_rate", 0.03))
-    debt_fraction = float(params.get("debt_fraction", 0.70))
-    equity_fraction = float(params.get("equity_fraction", 0.30))
-    baseline_equity_rate = 0.12
+    risk_free_rate = float(params.get("risk_free_rate", _FINANCING_DEFAULTS.get("risk_free_rate", 0.03)))
+    debt_fraction = float(params.get("debt_fraction", _FINANCING_DEFAULTS.get("debt_fraction", 0.70)))
+    equity_fraction = float(params.get("equity_fraction", _FINANCING_DEFAULTS.get("equity_fraction", 0.30)))
+    baseline_equity_rate = float(params.get("baseline_equity_rate", _FINANCING_DEFAULTS.get("baseline_equity_rate", 0.12)))
 
     # Calculate Expected Loss % (for reporting)
     expected_loss_pct = 0.0
