@@ -1,4 +1,4 @@
-scenario,dispatch_priority_penalty,retirement_years,description,source
+scenario,dispatch_penalty,retirement_years,description,source
 baseline,0.00,40,No policy intervention,default assumption
 moderate_transition,0.15,35,Moderate coal penalties with 11th Basic Plan NDC targets,11th Basic Plan NDC
 aggressive_transition,0.35,25,Aggressive phase-out aligned with 2040 carbon neutrality,Presidential pledge 2040
