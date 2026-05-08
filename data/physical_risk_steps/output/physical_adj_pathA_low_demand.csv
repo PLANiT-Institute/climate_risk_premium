@@ -5,4 +5,4 @@ efficiency_loss,0.0
 water_constrained_capacity,1.0
 transmission_outage_rate,0.0
 asset_capex_loss_rate,0.0
-notes,"PLANiT (ssp126 y2024): drought_metric=impact_mean, drought_impact=0.000000, water_risk_metric=impact_mean, water_risk_impact=0.000000"
+notes,PLANiT (ssp126 y2024): wildfire_frequency_missing

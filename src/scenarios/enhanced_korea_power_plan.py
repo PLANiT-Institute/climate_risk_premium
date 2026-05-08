@@ -308,6 +308,10 @@ class EnhancedKoreaPowerPlan:
         if self.cf_trajectory and year in self.cf_trajectory:
             return min(self.cf_trajectory[year], baseline_cf)
 
+        # Post-retirement: plant is fully retired
+        if year >= self.coal_schedule.complete_phase_out_year:
+            return 0.0
+
         # Calculate based on power mix targets
         power_mix_target = self.get_power_mix_target(year)
         if not power_mix_target:

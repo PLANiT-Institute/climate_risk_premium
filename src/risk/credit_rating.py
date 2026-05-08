@@ -546,48 +546,6 @@ def calculate_rating_metrics_from_financials(
     )
 
 
-def rating_migration_analysis(
-    baseline_rating: RatingAssessment,
-    risk_rating: RatingAssessment,
-) -> Dict[str, Any]:
-    """
-    Analyze credit rating migration from baseline to risk scenario.
-
-    Returns dictionary with migration details and impact.
-    """
-    notch_change = risk_rating.overall_rating.value - baseline_rating.overall_rating.value
-    spread_change = (
-        risk_rating.overall_rating.to_spread_bps() - baseline_rating.overall_rating.to_spread_bps()
-    )
-
-    if notch_change == 0:
-        migration = "No Change"
-    elif notch_change > 0:
-        migration = f"Downgrade by {notch_change} notch(es)"
-    else:
-        migration = f"Upgrade by {abs(notch_change)} notch(es)"
-
-    # Identify which metrics deteriorated most
-    metric_changes = {}
-    for metric_name in baseline_rating.component_ratings.keys():
-        baseline_val = baseline_rating.component_ratings[metric_name].value
-        risk_val = risk_rating.component_ratings[metric_name].value
-        metric_changes[metric_name] = risk_val - baseline_val
-
-    worst_metric = max(metric_changes.items(), key=lambda x: x[1])
-
-    return {
-        "baseline_rating": str(baseline_rating.overall_rating),
-        "risk_rating": str(risk_rating.overall_rating),
-        "migration": migration,
-        "notch_change": notch_change,
-        "spread_increase_bps": spread_change,
-        "worst_deteriorating_metric": worst_metric[0],
-        "worst_deterioration_notches": worst_metric[1],
-        "metric_changes": {k: v for k, v in metric_changes.items()},
-    }
-
-
 def calculate_crp_from_ratings(
     baseline_rating: Rating,
     scenario_rating: Rating,

@@ -5,8 +5,6 @@ Scenario definitions for transition and physical risks.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional
-
 
 @dataclass
 class TransitionScenario:
@@ -31,10 +29,3 @@ class PhysicalScenario:
     drought_derate: float  # capacity derate percentage
     cooling_temp_penalty: float  # efficiency loss percentage
     water_availability_pct: float = 100.0  # % of normal water supply available
-
-
-@dataclass
-class ScenarioSet:
-    baseline_years: int
-    transition: Optional[TransitionScenario]
-    physical: Optional[PhysicalScenario]

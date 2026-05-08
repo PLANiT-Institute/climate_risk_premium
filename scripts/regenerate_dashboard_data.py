@@ -92,7 +92,7 @@ def load_transmission_params(project_root: Path) -> dict:
     if not path.exists():
         return {}
     out = {}
-    with open(path, newline="") as f:
+    with open(path, newline="", encoding="utf-8") as f:
         for row in csv.DictReader(f):
             try:
                 out[row["param_name"]] = float(row["value"])

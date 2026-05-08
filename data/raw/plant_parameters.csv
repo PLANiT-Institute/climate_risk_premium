@@ -12,7 +12,10 @@ debt_fraction,0.80,decimal,Estimated debt financing share
 equity_fraction,0.20,decimal,Estimated equity share
 debt_interest_rate,0.05,decimal,Recent bond yield (6.1%)
 debt_schedule_file,debt_repayment_schedule.csv,filename,Custom repayment profile
-debt_tenor_years,20,years,Loan repayment period (fallback)
+debt_tenor_years,30,years,Loan repayment period (삼척블루파워 대출약정서)
+amortization_type,sculpted,type,Debt amortization method: annuity or sculpted
+target_dscr,1.0,ratio,Target DSCR for sculpted amortization (PWYC: DS = CFADS)
+grace_period_years,0,years,Interest-only grace period (없음)
 risk_free_rate,0.035,decimal,Korea 10Y Treasury
 market_risk_premium,0.06,decimal,Korea Equity Risk Premium
 beta,1.2,decimal,Utility sector beta (adjusted for coal risk)
@@ -20,7 +23,7 @@ corporate_tax_rate,0.25,decimal,Korea Corporate Tax Rate (25% effective Jan 2026
 tax_rate,0.25,decimal,Korea Corporate Tax Rate (alias)
 useful_life,30,years,Economic life
 operating_years,40,years,Total expected operating life
-depreciation_years,20,years,Depreciation schedule
+depreciation_years,30,years,Depreciation schedule (삼척블루파워 사업보고서 - 구축물 내용연수 30년)
 inflation_rate,0.02,decimal,Long-term inflation target
 power_price_per_mwh,80.0,USD/MWh,Wholesale electricity price
 heat_rate_mmbtu_mwh,8.8,MMBtu/MWh,Heat rate for supercritical coal plant

@@ -18,7 +18,6 @@ from .credit_rating import (
     RatingAssessment,
     assess_credit_rating,
     calculate_rating_metrics_from_financials,
-    rating_migration_analysis,
 )
 from .attribution import decompose_risk_shapley
 
@@ -39,6 +38,5 @@ __all__ = [
     "RatingAssessment",
     "assess_credit_rating",
     "calculate_rating_metrics_from_financials",
-    "rating_migration_analysis",
     "decompose_risk_shapley",
 ]

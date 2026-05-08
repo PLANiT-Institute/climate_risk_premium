@@ -29,7 +29,7 @@ from src.risk.financing import calculate_financing_with_counterfactual
 from src.risk.attribution import decompose_risk_shapley
 from src.financials import compute_cashflows_timeseries, calculate_metrics, CashFlowTimeSeries, FinancialMetrics
 from src.scenarios.korea_power_plan import load_korea_power_plan_scenarios
-from src.risk.physical import PhysicalAdjustments, load_yearly_from_output_csv, YearlyPhysicalAdjustments
+from src.risk.physical import PhysicalAdjustments, YearlyPhysicalAdjustments
 from src.planit import PLANiTRunner, PLANiTAdapter, PLANiTIntegrationConfig
 
 # Conditional import for enhanced 11th Basic Plan

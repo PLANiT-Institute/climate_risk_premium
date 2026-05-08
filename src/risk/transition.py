@@ -117,7 +117,22 @@ def apply_transition(
             logger.warning(
                 "Enhanced transition failed, falling back to legacy approach: %s", e
             )
-    
+            # Explicit fallback: use enhanced plan's operating_years if available,
+            # otherwise use scenario retirement_years
+            adjusted_life = min(
+                baseline_life,
+                enhanced_korea_scenario.get_operating_years(
+                    plant_params.get("cod_year", 2024), baseline_life
+                ) if hasattr(enhanced_korea_scenario, "get_operating_years") else scenario.retirement_years
+            )
+            adjusted_cf = max(0.0, baseline_cf - scenario.dispatch_priority_penalty)
+            notes = f"Enhanced transition fallback: {scenario.name} | operating_years={adjusted_life}"
+            return TransitionAdjustments(
+                capacity_factor=adjusted_cf,
+                operating_years=adjusted_life,
+                notes=notes,
+            )
+
     # Use legacy Korea Power Plan trajectory if available
     elif korea_plan_scenario is not None and KOREA_POWER_PLAN_AVAILABLE:
         if current_year is not None:
