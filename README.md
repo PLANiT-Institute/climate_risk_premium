@@ -183,6 +183,9 @@ npm run dev
 ## Key outputs
 
 - Authoritative outputs: `results/`
+  - `results/scenario_comparison.csv` — per-scenario NPV, IRR, DSCR, credit rating summary
+  - `results/yearly_ratings.csv` — year-by-year credit ratings for all scenarios (scenario, display_name, year, dscr, rating, spread_bps, cost_of_debt, ebitda, debt_service)
+  - `results/cashflow_*.csv` — annual cash flow time series per scenario
 - Dashboard JSON outputs: `crp-dashboard/src/data/`
 - Processed CSVs: `data/processed/`
 

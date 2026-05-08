@@ -149,19 +149,23 @@ WACC = 0.70 × (Rf + Spread) + 0.30 × (Re + Equity_Premium)
 
 ```python
 # Weighted average approach (project finance standard)
+# src/risk/credit_rating.py — assess_credit_rating()
 weights = {
-    "capacity": 0.05,        # Business scale
-    "profitability": 0.10,   # Operating efficiency
-    "coverage": 0.15,        # Interest coverage
-    "dscr": 0.35,            # PRIMARY: Debt service coverage
-    "net_debt_leverage": 0.15,  # Leverage
-    "equity_leverage": 0.10,    # Capital structure
-    "asset_leverage": 0.10,     # Balance sheet strength
+    "policy_industry":   0.50,  # Policy & industry risk (fixed AA for coal)
+    "profitability":     0.10,  # EBITDA / total assets
+    "coverage":          0.12,  # EBITDA / interest expense
+    "net_debt_leverage": 0.12,  # Net debt / EBITDA
+    "asset_leverage":    0.08,  # Total debt / total assets
+    "equity_leverage":   0.08,  # Total debt / total equity
 }
+# Note: DSCR is excluded from the weighted score.
+# It is computed as a component (rate_dscr()) but used only as an override (see below).
 
-# Distress override
-if any critical metric in distress (CCC or worse):
-    overall_rating = max(weighted_score, worst_distressed_metric)
+# DSCR override — applied after weighted score calculation
+if metrics.dscr < 0:
+    overall_rating = D
+elif metrics.dscr < 1.0:
+    overall_rating = weighted_result + 1 notch  # 1-notch downgrade
 ```
 
 ## Recent Literature Integration (2024-2025)

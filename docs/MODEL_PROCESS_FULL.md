@@ -74,6 +74,11 @@
 
 - `overall_rating(AAA~D)`, 구성지표 등급, 지표값
 
+`results/yearly_ratings.csv` (연간 신용등급 시계열):
+
+- `scenario, display_name, year, dscr, rating, spread_bps, cost_of_debt, ebitda, debt_service`
+- 11개 시나리오 × 운영 연수 (총 352행)
+
 `FinancingImpact`:
 
 - `expected_loss_pct, debt_spread_bps, equity_premium_pct, crp_bps, wacc_baseline_pct, wacc_adjusted_pct`
