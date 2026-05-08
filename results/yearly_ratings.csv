@@ -1,0 +1,353 @@
+scenario,display_name,year,dscr,rating,spread_bps,cost_of_debt,ebitda,debt_service
+baseline,Baseline,2025,1.072,A,150,0.0825,201877275.18,184746075.63
+baseline,Baseline,2026,1.072,BBB,250,0.0925,201877275.18,184746075.63
+baseline,Baseline,2027,1.072,BBB,250,0.0925,201877275.18,184746075.63
+baseline,Baseline,2028,1.072,BBB,250,0.0925,201877275.18,184746075.63
+baseline,Baseline,2029,1.072,BBB,250,0.0925,201877275.18,184746075.63
+baseline,Baseline,2030,1.072,BBB,250,0.0925,201877275.18,184746075.63
+baseline,Baseline,2031,1.072,BBB,250,0.0925,201877275.18,184746075.63
+baseline,Baseline,2032,1.072,BBB,250,0.0925,201877275.18,184746075.63
+baseline,Baseline,2033,1.072,BBB,250,0.0925,201877275.18,184746075.63
+baseline,Baseline,2034,1.072,A,150,0.0825,201877275.18,184746075.63
+baseline,Baseline,2035,1.072,A,150,0.0825,201877275.18,184746075.63
+baseline,Baseline,2036,1.072,A,150,0.0825,201877275.18,184746075.63
+baseline,Baseline,2037,1.072,A,150,0.0825,201877275.18,184746075.63
+baseline,Baseline,2038,1.072,A,150,0.0825,201877275.18,184746075.63
+baseline,Baseline,2039,1.072,A,150,0.0825,201877275.18,184746075.63
+baseline,Baseline,2040,1.072,A,150,0.0825,201877275.18,184746075.63
+baseline,Baseline,2041,1.072,A,150,0.0825,201877275.18,184746075.63
+baseline,Baseline,2042,1.072,A,150,0.0825,201877275.18,184746075.63
+baseline,Baseline,2043,1.07,A,150,0.0825,201877275.18,184746075.63
+baseline,Baseline,2044,1.063,A,150,0.0825,201877275.18,184746075.63
+baseline,Baseline,2045,1.056,A,150,0.0825,201877275.18,184746075.63
+baseline,Baseline,2046,1.048,A,150,0.0825,201877275.18,184746075.63
+baseline,Baseline,2047,1.04,A,150,0.0825,201877275.18,184746075.63
+baseline,Baseline,2048,1.031,A,150,0.0825,201877275.18,184746075.63
+baseline,Baseline,2049,1.022,A,150,0.0825,201877275.18,184746075.63
+baseline,Baseline,2050,1.013,A,150,0.0825,201877275.18,184746075.63
+baseline,Baseline,2051,1.003,A,150,0.0825,201877275.18,184746075.63
+baseline,Baseline,2052,0.993,BBB,250,0.0925,201877275.18,184746075.63
+baseline,Baseline,2053,0.982,BBB,250,0.0925,201877275.18,184746075.63
+baseline,Baseline,2054,0.971,A,150,0.0825,201877275.18,184746075.63
+baseline,Baseline,2055,0.0,BBB,250,0.0925,201877275.18,0.0
+baseline,Baseline,2056,0.0,BBB,250,0.0925,201877275.18,0.0
+baseline,Baseline,2057,0.0,BBB,250,0.0925,201877275.18,0.0
+baseline,Baseline,2058,0.0,BBB,250,0.0925,201877275.18,0.0
+baseline,Baseline,2059,0.0,BBB,250,0.0925,201877275.18,0.0
+baseline,Baseline,2060,0.0,BBB,250,0.0925,201877275.18,0.0
+baseline,Baseline,2061,0.0,BBB,250,0.0925,201877275.18,0.0
+baseline,Baseline,2062,0.0,BBB,250,0.0925,201877275.18,0.0
+baseline,Baseline,2063,0.0,BBB,250,0.0925,201877275.18,0.0
+baseline,Baseline,2064,0.0,BBB,250,0.0925,201877275.18,0.0
+moderate_transition,Moderate Transition,2025,0.824,BBB,250,0.0925,155981062.65,184746075.63
+moderate_transition,Moderate Transition,2026,0.824,BB,400,0.1075,155981062.65,184746075.63
+moderate_transition,Moderate Transition,2027,0.824,BB,400,0.1075,155981062.65,184746075.63
+moderate_transition,Moderate Transition,2028,0.824,BB,400,0.1075,155981062.65,184746075.63
+moderate_transition,Moderate Transition,2029,0.824,BB,400,0.1075,155981062.65,184746075.63
+moderate_transition,Moderate Transition,2030,0.824,BB,400,0.1075,155981062.65,184746075.63
+moderate_transition,Moderate Transition,2031,0.824,BB,400,0.1075,155981062.65,184746075.63
+moderate_transition,Moderate Transition,2032,0.824,BB,400,0.1075,155981062.65,184746075.63
+moderate_transition,Moderate Transition,2033,0.824,BB,400,0.1075,155981062.65,184746075.63
+moderate_transition,Moderate Transition,2034,0.824,BB,400,0.1075,155981062.65,184746075.63
+moderate_transition,Moderate Transition,2035,0.824,BB,400,0.1075,155981062.65,184746075.63
+moderate_transition,Moderate Transition,2036,0.824,BB,400,0.1075,155981062.65,184746075.63
+moderate_transition,Moderate Transition,2037,0.824,BB,400,0.1075,155981062.65,184746075.63
+moderate_transition,Moderate Transition,2038,0.824,BB,400,0.1075,155981062.65,184746075.63
+moderate_transition,Moderate Transition,2039,0.824,BB,400,0.1075,155981062.65,184746075.63
+moderate_transition,Moderate Transition,2040,0.824,BB,400,0.1075,155981062.65,184746075.63
+moderate_transition,Moderate Transition,2041,0.824,BBB,250,0.0925,155981062.65,184746075.63
+moderate_transition,Moderate Transition,2042,0.824,BBB,250,0.0925,155981062.65,184746075.63
+moderate_transition,Moderate Transition,2043,0.824,BBB,250,0.0925,155981062.65,184746075.63
+moderate_transition,Moderate Transition,2044,0.824,BBB,250,0.0925,155981062.65,184746075.63
+moderate_transition,Moderate Transition,2045,0.824,BBB,250,0.0925,155981062.65,184746075.63
+moderate_transition,Moderate Transition,2046,0.824,BBB,250,0.0925,155981062.65,184746075.63
+moderate_transition,Moderate Transition,2047,0.824,BBB,250,0.0925,155981062.65,184746075.63
+moderate_transition,Moderate Transition,2048,0.824,BBB,250,0.0925,155981062.65,184746075.63
+moderate_transition,Moderate Transition,2049,0.824,BBB,250,0.0925,155981062.65,184746075.63
+moderate_transition,Moderate Transition,2050,0.824,BBB,250,0.0925,155981062.65,184746075.63
+moderate_transition,Moderate Transition,2051,0.817,BBB,250,0.0925,155981062.65,184746075.63
+moderate_transition,Moderate Transition,2052,0.807,BBB,250,0.0925,155981062.65,184746075.63
+moderate_transition,Moderate Transition,2053,0.796,BBB,250,0.0925,155981062.65,184746075.63
+moderate_transition,Moderate Transition,2054,0.785,A,150,0.0825,155981062.65,184746075.63
+moderate_transition,Moderate Transition,2055,0.0,BBB,250,0.0925,155981062.65,0.0
+moderate_transition,Moderate Transition,2056,0.0,BBB,250,0.0925,155981062.65,0.0
+moderate_transition,Moderate Transition,2057,0.0,BBB,250,0.0925,155981062.65,0.0
+moderate_transition,Moderate Transition,2058,0.0,BBB,250,0.0925,155981062.65,0.0
+moderate_transition,Moderate Transition,2059,0.0,BBB,250,0.0925,155981062.65,0.0
+aggressive_transition,Aggressive Transition,2025,0.451,BB,400,0.1075,87136743.86,184746075.63
+aggressive_transition,Aggressive Transition,2026,0.451,BB,400,0.1075,87136743.86,184746075.63
+aggressive_transition,Aggressive Transition,2027,0.451,BB,400,0.1075,87136743.86,184746075.63
+aggressive_transition,Aggressive Transition,2028,0.451,BB,400,0.1075,87136743.86,184746075.63
+aggressive_transition,Aggressive Transition,2029,0.451,BB,400,0.1075,87136743.86,184746075.63
+aggressive_transition,Aggressive Transition,2030,0.451,BB,400,0.1075,87136743.86,184746075.63
+aggressive_transition,Aggressive Transition,2031,0.451,BB,400,0.1075,87136743.86,184746075.63
+aggressive_transition,Aggressive Transition,2032,0.451,BB,400,0.1075,87136743.86,184746075.63
+aggressive_transition,Aggressive Transition,2033,0.451,BB,400,0.1075,87136743.86,184746075.63
+aggressive_transition,Aggressive Transition,2034,0.451,BB,400,0.1075,87136743.86,184746075.63
+aggressive_transition,Aggressive Transition,2035,0.451,BB,400,0.1075,87136743.86,184746075.63
+aggressive_transition,Aggressive Transition,2036,0.451,BB,400,0.1075,87136743.86,184746075.63
+aggressive_transition,Aggressive Transition,2037,0.451,BB,400,0.1075,87136743.86,184746075.63
+aggressive_transition,Aggressive Transition,2038,0.451,BB,400,0.1075,87136743.86,184746075.63
+aggressive_transition,Aggressive Transition,2039,0.451,BB,400,0.1075,87136743.86,184746075.63
+aggressive_transition,Aggressive Transition,2040,0.451,BB,400,0.1075,87136743.86,184746075.63
+aggressive_transition,Aggressive Transition,2041,0.451,BB,400,0.1075,87136743.86,184746075.63
+aggressive_transition,Aggressive Transition,2042,0.451,BB,400,0.1075,87136743.86,184746075.63
+aggressive_transition,Aggressive Transition,2043,0.451,BB,400,0.1075,87136743.86,184746075.63
+aggressive_transition,Aggressive Transition,2044,0.451,BB,400,0.1075,87136743.86,184746075.63
+aggressive_transition,Aggressive Transition,2045,0.451,BB,400,0.1075,87136743.86,184746075.63
+aggressive_transition,Aggressive Transition,2046,0.451,BB,400,0.1075,87136743.86,184746075.63
+aggressive_transition,Aggressive Transition,2047,0.451,BB,400,0.1075,87136743.86,184746075.63
+aggressive_transition,Aggressive Transition,2048,0.451,BB,400,0.1075,87136743.86,184746075.63
+aggressive_transition,Aggressive Transition,2049,0.451,BBB,250,0.0925,87136743.86,184746075.63
+moderate_physical,Moderate Physical,2025,1.072,A,150,0.0825,201877275.18,184746075.63
+moderate_physical,Moderate Physical,2026,1.072,BBB,250,0.0925,201877275.18,184746075.63
+moderate_physical,Moderate Physical,2027,1.072,BBB,250,0.0925,201877275.18,184746075.63
+moderate_physical,Moderate Physical,2028,1.072,BBB,250,0.0925,201877275.18,184746075.63
+moderate_physical,Moderate Physical,2029,1.072,BBB,250,0.0925,201877275.18,184746075.63
+moderate_physical,Moderate Physical,2030,1.072,BBB,250,0.0925,201877275.18,184746075.63
+moderate_physical,Moderate Physical,2031,1.072,BBB,250,0.0925,201877275.18,184746075.63
+moderate_physical,Moderate Physical,2032,1.072,BBB,250,0.0925,201877275.18,184746075.63
+moderate_physical,Moderate Physical,2033,1.072,BBB,250,0.0925,201877275.18,184746075.63
+moderate_physical,Moderate Physical,2034,1.072,A,150,0.0825,201877275.18,184746075.63
+moderate_physical,Moderate Physical,2035,1.072,A,150,0.0825,201877275.18,184746075.63
+moderate_physical,Moderate Physical,2036,1.072,A,150,0.0825,201877275.18,184746075.63
+moderate_physical,Moderate Physical,2037,1.072,A,150,0.0825,201877275.18,184746075.63
+moderate_physical,Moderate Physical,2038,1.072,A,150,0.0825,201877275.18,184746075.63
+moderate_physical,Moderate Physical,2039,1.072,A,150,0.0825,201877275.18,184746075.63
+moderate_physical,Moderate Physical,2040,1.072,A,150,0.0825,201877275.18,184746075.63
+moderate_physical,Moderate Physical,2041,1.072,A,150,0.0825,201877275.18,184746075.63
+moderate_physical,Moderate Physical,2042,1.072,A,150,0.0825,201877275.18,184746075.63
+moderate_physical,Moderate Physical,2043,1.07,A,150,0.0825,201877275.18,184746075.63
+moderate_physical,Moderate Physical,2044,1.063,A,150,0.0825,201877275.18,184746075.63
+moderate_physical,Moderate Physical,2045,1.056,A,150,0.0825,201877275.18,184746075.63
+moderate_physical,Moderate Physical,2046,1.048,A,150,0.0825,201877275.18,184746075.63
+moderate_physical,Moderate Physical,2047,1.04,A,150,0.0825,201877275.18,184746075.63
+moderate_physical,Moderate Physical,2048,1.031,A,150,0.0825,201877275.18,184746075.63
+moderate_physical,Moderate Physical,2049,1.022,A,150,0.0825,201877275.18,184746075.63
+moderate_physical,Moderate Physical,2050,1.013,A,150,0.0825,201877275.18,184746075.63
+moderate_physical,Moderate Physical,2051,1.003,A,150,0.0825,201877275.18,184746075.63
+moderate_physical,Moderate Physical,2052,0.993,BBB,250,0.0925,201877275.18,184746075.63
+moderate_physical,Moderate Physical,2053,0.982,BBB,250,0.0925,201877275.18,184746075.63
+moderate_physical,Moderate Physical,2054,0.971,A,150,0.0825,201877275.18,184746075.63
+moderate_physical,Moderate Physical,2055,0.0,BBB,250,0.0925,201877275.18,0.0
+moderate_physical,Moderate Physical,2056,0.0,BBB,250,0.0925,201877275.18,0.0
+moderate_physical,Moderate Physical,2057,0.0,BBB,250,0.0925,201877275.18,0.0
+moderate_physical,Moderate Physical,2058,0.0,BBB,250,0.0925,201877275.18,0.0
+moderate_physical,Moderate Physical,2059,0.0,BBB,250,0.0925,201877275.18,0.0
+moderate_physical,Moderate Physical,2060,0.0,BBB,250,0.0925,201877275.18,0.0
+moderate_physical,Moderate Physical,2061,0.0,BBB,250,0.0925,201877275.18,0.0
+moderate_physical,Moderate Physical,2062,0.0,BBB,250,0.0925,201877275.18,0.0
+moderate_physical,Moderate Physical,2063,0.0,BBB,250,0.0925,201877275.18,0.0
+moderate_physical,Moderate Physical,2064,0.0,BBB,250,0.0925,201877275.18,0.0
+high_physical,High Physical,2025,1.072,A,150,0.0825,201870105.26,184746075.63
+high_physical,High Physical,2026,1.071,BBB,250,0.0925,201862935.37,184746075.63
+high_physical,High Physical,2027,1.071,BBB,250,0.0925,201855765.53,184746075.63
+high_physical,High Physical,2028,1.071,BBB,250,0.0925,201848595.73,184746075.63
+high_physical,High Physical,2029,1.07,BBB,250,0.0925,201841425.98,184746075.63
+high_physical,High Physical,2030,1.07,BBB,250,0.0925,201834256.27,184746075.63
+high_physical,High Physical,2031,1.07,BBB,250,0.0925,201829954.46,184746075.63
+high_physical,High Physical,2032,1.069,BBB,250,0.0925,201825652.67,184746075.63
+high_physical,High Physical,2033,1.069,BBB,250,0.0925,201821350.89,184746075.63
+high_physical,High Physical,2034,1.069,A,150,0.0825,201817049.13,184746075.63
+high_physical,High Physical,2035,1.069,A,150,0.0825,201812747.39,184746075.63
+high_physical,High Physical,2036,1.068,A,150,0.0825,201808445.65,184746075.63
+high_physical,High Physical,2037,1.068,A,150,0.0825,201804143.94,184746075.63
+high_physical,High Physical,2038,1.068,A,150,0.0825,201799842.24,184746075.63
+high_physical,High Physical,2039,1.068,A,150,0.0825,201795540.56,184746075.63
+high_physical,High Physical,2040,1.067,A,150,0.0825,201791238.89,184746075.63
+high_physical,High Physical,2041,1.067,A,150,0.0825,201786937.23,184746075.63
+high_physical,High Physical,2042,1.067,A,150,0.0825,201782635.6,184746075.63
+high_physical,High Physical,2043,1.065,A,150,0.0825,201778333.97,184746075.63
+high_physical,High Physical,2044,1.057,A,150,0.0825,201774032.37,184746075.63
+high_physical,High Physical,2045,1.05,A,150,0.0825,201769730.77,184746075.63
+high_physical,High Physical,2046,1.042,A,150,0.0825,201765429.2,184746075.63
+high_physical,High Physical,2047,1.034,A,150,0.0825,201761127.63,184746075.63
+high_physical,High Physical,2048,1.025,A,150,0.0825,201756826.09,184746075.63
+high_physical,High Physical,2049,1.016,A,150,0.0825,201752524.56,184746075.63
+high_physical,High Physical,2050,1.006,A,150,0.0825,201748223.04,184746075.63
+high_physical,High Physical,2051,0.996,BBB,250,0.0925,201742200.95,184746075.63
+high_physical,High Physical,2052,0.986,BBB,250,0.0925,201736178.88,184746075.63
+high_physical,High Physical,2053,0.975,BBB,250,0.0925,201730156.85,184746075.63
+high_physical,High Physical,2054,0.963,A,150,0.0825,201724134.84,184746075.63
+high_physical,High Physical,2055,0.0,BBB,250,0.0925,201718112.87,0.0
+high_physical,High Physical,2056,0.0,BBB,250,0.0925,201712090.92,0.0
+high_physical,High Physical,2057,0.0,BBB,250,0.0925,201706069.01,0.0
+high_physical,High Physical,2058,0.0,BBB,250,0.0925,201700047.12,0.0
+high_physical,High Physical,2059,0.0,BBB,250,0.0925,201694025.27,0.0
+high_physical,High Physical,2060,0.0,BBB,250,0.0925,201688003.44,0.0
+high_physical,High Physical,2061,0.0,BBB,250,0.0925,201681981.65,0.0
+high_physical,High Physical,2062,0.0,BBB,250,0.0925,201675959.88,0.0
+high_physical,High Physical,2063,0.0,BBB,250,0.0925,201669938.15,0.0
+high_physical,High Physical,2064,0.0,BBB,250,0.0925,201663916.44,0.0
+combined_moderate,Combined Moderate,2025,0.824,BBB,250,0.0925,155981062.65,184746075.63
+combined_moderate,Combined Moderate,2026,0.824,BB,400,0.1075,155981062.65,184746075.63
+combined_moderate,Combined Moderate,2027,0.824,BB,400,0.1075,155981062.65,184746075.63
+combined_moderate,Combined Moderate,2028,0.824,BB,400,0.1075,155981062.65,184746075.63
+combined_moderate,Combined Moderate,2029,0.824,BB,400,0.1075,155981062.65,184746075.63
+combined_moderate,Combined Moderate,2030,0.824,BB,400,0.1075,155981062.65,184746075.63
+combined_moderate,Combined Moderate,2031,0.824,BB,400,0.1075,155981062.65,184746075.63
+combined_moderate,Combined Moderate,2032,0.824,BB,400,0.1075,155981062.65,184746075.63
+combined_moderate,Combined Moderate,2033,0.824,BB,400,0.1075,155981062.65,184746075.63
+combined_moderate,Combined Moderate,2034,0.824,BB,400,0.1075,155981062.65,184746075.63
+combined_moderate,Combined Moderate,2035,0.824,BB,400,0.1075,155981062.65,184746075.63
+combined_moderate,Combined Moderate,2036,0.824,BB,400,0.1075,155981062.65,184746075.63
+combined_moderate,Combined Moderate,2037,0.824,BB,400,0.1075,155981062.65,184746075.63
+combined_moderate,Combined Moderate,2038,0.824,BB,400,0.1075,155981062.65,184746075.63
+combined_moderate,Combined Moderate,2039,0.824,BB,400,0.1075,155981062.65,184746075.63
+combined_moderate,Combined Moderate,2040,0.824,BB,400,0.1075,155981062.65,184746075.63
+combined_moderate,Combined Moderate,2041,0.824,BBB,250,0.0925,155981062.65,184746075.63
+combined_moderate,Combined Moderate,2042,0.824,BBB,250,0.0925,155981062.65,184746075.63
+combined_moderate,Combined Moderate,2043,0.824,BBB,250,0.0925,155981062.65,184746075.63
+combined_moderate,Combined Moderate,2044,0.824,BBB,250,0.0925,155981062.65,184746075.63
+combined_moderate,Combined Moderate,2045,0.824,BBB,250,0.0925,155981062.65,184746075.63
+combined_moderate,Combined Moderate,2046,0.824,BBB,250,0.0925,155981062.65,184746075.63
+combined_moderate,Combined Moderate,2047,0.824,BBB,250,0.0925,155981062.65,184746075.63
+combined_moderate,Combined Moderate,2048,0.824,BBB,250,0.0925,155981062.65,184746075.63
+combined_moderate,Combined Moderate,2049,0.824,BBB,250,0.0925,155981062.65,184746075.63
+combined_moderate,Combined Moderate,2050,0.824,BBB,250,0.0925,155981062.65,184746075.63
+combined_moderate,Combined Moderate,2051,0.817,BBB,250,0.0925,155981062.65,184746075.63
+combined_moderate,Combined Moderate,2052,0.807,BBB,250,0.0925,155981062.65,184746075.63
+combined_moderate,Combined Moderate,2053,0.796,BBB,250,0.0925,155981062.65,184746075.63
+combined_moderate,Combined Moderate,2054,0.785,A,150,0.0825,155981062.65,184746075.63
+combined_moderate,Combined Moderate,2055,0.0,BBB,250,0.0925,155981062.65,0.0
+combined_moderate,Combined Moderate,2056,0.0,BBB,250,0.0925,155981062.65,0.0
+combined_moderate,Combined Moderate,2057,0.0,BBB,250,0.0925,155981062.65,0.0
+combined_moderate,Combined Moderate,2058,0.0,BBB,250,0.0925,155981062.65,0.0
+combined_moderate,Combined Moderate,2059,0.0,BBB,250,0.0925,155981062.65,0.0
+combined_aggressive,Combined Aggressive,2025,0.451,BB,400,0.1075,87132561.4,184746075.63
+combined_aggressive,Combined Aggressive,2026,0.45,BB,400,0.1075,87128378.97,184746075.63
+combined_aggressive,Combined Aggressive,2027,0.45,BB,400,0.1075,87124196.56,184746075.63
+combined_aggressive,Combined Aggressive,2028,0.45,BB,400,0.1075,87120014.18,184746075.63
+combined_aggressive,Combined Aggressive,2029,0.449,BB,400,0.1075,87115831.82,184746075.63
+combined_aggressive,Combined Aggressive,2030,0.449,BB,400,0.1075,87111649.49,184746075.63
+combined_aggressive,Combined Aggressive,2031,0.449,BB,400,0.1075,87109140.1,184746075.63
+combined_aggressive,Combined Aggressive,2032,0.448,BB,400,0.1075,87106630.72,184746075.63
+combined_aggressive,Combined Aggressive,2033,0.448,BB,400,0.1075,87104121.35,184746075.63
+combined_aggressive,Combined Aggressive,2034,0.448,BB,400,0.1075,87101611.99,184746075.63
+combined_aggressive,Combined Aggressive,2035,0.448,BB,400,0.1075,87099102.64,184746075.63
+combined_aggressive,Combined Aggressive,2036,0.447,BB,400,0.1075,87096593.3,184746075.63
+combined_aggressive,Combined Aggressive,2037,0.447,BB,400,0.1075,87094083.96,184746075.63
+combined_aggressive,Combined Aggressive,2038,0.447,BB,400,0.1075,87091574.64,184746075.63
+combined_aggressive,Combined Aggressive,2039,0.447,BB,400,0.1075,87089065.32,184746075.63
+combined_aggressive,Combined Aggressive,2040,0.447,BB,400,0.1075,87086556.02,184746075.63
+combined_aggressive,Combined Aggressive,2041,0.446,BB,400,0.1075,87084046.72,184746075.63
+combined_aggressive,Combined Aggressive,2042,0.446,BB,400,0.1075,87081537.43,184746075.63
+combined_aggressive,Combined Aggressive,2043,0.446,BB,400,0.1075,87079028.15,184746075.63
+combined_aggressive,Combined Aggressive,2044,0.446,BB,400,0.1075,87076518.88,184746075.63
+combined_aggressive,Combined Aggressive,2045,0.445,BB,400,0.1075,87074009.62,184746075.63
+combined_aggressive,Combined Aggressive,2046,0.445,BB,400,0.1075,87071500.36,184746075.63
+combined_aggressive,Combined Aggressive,2047,0.445,BB,400,0.1075,87068991.12,184746075.63
+combined_aggressive,Combined Aggressive,2048,0.445,BB,400,0.1075,87066481.89,184746075.63
+combined_aggressive,Combined Aggressive,2049,0.445,BBB,250,0.0925,87063972.66,184746075.63
+low_demand,Low Demand,2025,1.072,A,150,0.0825,201877275.18,184746075.63
+low_demand,Low Demand,2026,1.034,BBB,250,0.0925,194759431.64,184746075.63
+low_demand,Low Demand,2027,0.996,BB,400,0.1075,187799611.54,184746075.63
+low_demand,Low Demand,2028,0.959,BB,400,0.1075,180994506.43,184746075.63
+low_demand,Low Demand,2029,0.923,BB,400,0.1075,174340875.34,184746075.63
+low_demand,Low Demand,2030,0.888,BB,400,0.1075,167835543.42,184746075.63
+low_demand,Low Demand,2031,0.853,BB,400,0.1075,161475400.59,184746075.63
+low_demand,Low Demand,2032,0.82,BB,400,0.1075,155257400.25,184746075.63
+low_demand,Low Demand,2033,0.787,BB,400,0.1075,149178558.02,184746075.63
+low_demand,Low Demand,2034,0.755,BB,400,0.1075,143235950.45,184746075.63
+low_demand,Low Demand,2035,0.723,BB,400,0.1075,137426713.81,184746075.63
+low_demand,Low Demand,2036,0.692,BB,400,0.1075,131748042.9,184746075.63
+low_demand,Low Demand,2037,0.662,BB,400,0.1075,126197189.83,184746075.63
+low_demand,Low Demand,2038,0.633,BB,400,0.1075,120771462.9,184746075.63
+low_demand,Low Demand,2039,0.604,BB,400,0.1075,115468225.47,184746075.63
+low_demand,Low Demand,2040,0.576,BB,400,0.1075,110284894.82,184746075.63
+low_demand,Low Demand,2041,0.549,BB,400,0.1075,105218941.07,184746075.63
+low_demand,Low Demand,2042,0.522,BB,400,0.1075,100267886.15,184746075.63
+low_demand,Low Demand,2043,0.496,BB,400,0.1075,95429302.71,184746075.63
+low_demand,Low Demand,2044,0.47,BB,400,0.1075,90700813.1,184746075.63
+low_demand,Low Demand,2045,0.445,BB,400,0.1075,86080088.39,184746075.63
+low_demand,Low Demand,2046,0.421,BB,400,0.1075,81564847.39,184746075.63
+low_demand,Low Demand,2047,0.397,BB,400,0.1075,77152855.67,184746075.63
+low_demand,Low Demand,2048,0.374,BB,400,0.1075,72841924.59,184746075.63
+low_demand,Low Demand,2049,0.351,BB,400,0.1075,68629910.43,184746075.63
+low_demand,Low Demand,2050,0.329,BB,400,0.1075,64514713.45,184746075.63
+low_demand,Low Demand,2051,0.307,BBB,250,0.0925,60494277.01,184746075.63
+low_demand,Low Demand,2052,0.286,BBB,250,0.0925,56566586.69,184746075.63
+low_demand,Low Demand,2053,0.265,BBB,250,0.0925,52729669.45,184746075.63
+low_demand,Low Demand,2054,0.244,BBB,250,0.0925,48981592.78,184746075.63
+low_demand,Low Demand,2055,0.0,BBB,250,0.0925,45320463.9,0.0
+low_demand,Low Demand,2056,0.0,BBB,250,0.0925,41744428.94,0.0
+low_demand,Low Demand,2057,0.0,BBB,250,0.0925,38251672.15,0.0
+low_demand,Low Demand,2058,0.0,BBB,250,0.0925,34840415.15,0.0
+low_demand,Low Demand,2059,0.0,BBB,250,0.0925,31508916.15,0.0
+low_demand,Low Demand,2060,0.0,BBB,250,0.0925,28255469.23,0.0
+low_demand,Low Demand,2061,0.0,BBB,250,0.0925,25078403.59,0.0
+low_demand,Low Demand,2062,0.0,BBB,250,0.0925,21976082.88,0.0
+low_demand,Low Demand,2063,0.0,BBB,250,0.0925,18946904.46,0.0
+low_demand,Low Demand,2064,0.0,BBB,250,0.0925,15989298.73,0.0
+severe_drought,Severe Drought,2025,1.072,A,150,0.0825,201870105.26,184746075.63
+severe_drought,Severe Drought,2026,1.071,BBB,250,0.0925,201862935.37,184746075.63
+severe_drought,Severe Drought,2027,1.071,BBB,250,0.0925,201855765.53,184746075.63
+severe_drought,Severe Drought,2028,1.071,BBB,250,0.0925,201848595.73,184746075.63
+severe_drought,Severe Drought,2029,1.07,BBB,250,0.0925,201841425.98,184746075.63
+severe_drought,Severe Drought,2030,1.07,BBB,250,0.0925,201834256.27,184746075.63
+severe_drought,Severe Drought,2031,1.07,BBB,250,0.0925,201829954.46,184746075.63
+severe_drought,Severe Drought,2032,1.069,BBB,250,0.0925,201825652.67,184746075.63
+severe_drought,Severe Drought,2033,1.069,BBB,250,0.0925,201821350.89,184746075.63
+severe_drought,Severe Drought,2034,1.069,A,150,0.0825,201817049.13,184746075.63
+severe_drought,Severe Drought,2035,1.069,A,150,0.0825,201812747.39,184746075.63
+severe_drought,Severe Drought,2036,1.068,A,150,0.0825,201808445.65,184746075.63
+severe_drought,Severe Drought,2037,1.068,A,150,0.0825,201804143.94,184746075.63
+severe_drought,Severe Drought,2038,1.068,A,150,0.0825,201799842.24,184746075.63
+severe_drought,Severe Drought,2039,1.068,A,150,0.0825,201795540.56,184746075.63
+severe_drought,Severe Drought,2040,1.067,A,150,0.0825,201791238.89,184746075.63
+severe_drought,Severe Drought,2041,1.067,A,150,0.0825,201786937.23,184746075.63
+severe_drought,Severe Drought,2042,1.067,A,150,0.0825,201782635.6,184746075.63
+severe_drought,Severe Drought,2043,1.065,A,150,0.0825,201778333.97,184746075.63
+severe_drought,Severe Drought,2044,1.057,A,150,0.0825,201774032.37,184746075.63
+severe_drought,Severe Drought,2045,1.05,A,150,0.0825,201769730.77,184746075.63
+severe_drought,Severe Drought,2046,1.042,A,150,0.0825,201765429.2,184746075.63
+severe_drought,Severe Drought,2047,1.034,A,150,0.0825,201761127.63,184746075.63
+severe_drought,Severe Drought,2048,1.025,A,150,0.0825,201756826.09,184746075.63
+severe_drought,Severe Drought,2049,1.016,A,150,0.0825,201752524.56,184746075.63
+severe_drought,Severe Drought,2050,1.006,A,150,0.0825,201748223.04,184746075.63
+severe_drought,Severe Drought,2051,0.996,BBB,250,0.0925,201742200.95,184746075.63
+severe_drought,Severe Drought,2052,0.986,BBB,250,0.0925,201736178.88,184746075.63
+severe_drought,Severe Drought,2053,0.975,BBB,250,0.0925,201730156.85,184746075.63
+severe_drought,Severe Drought,2054,0.963,A,150,0.0825,201724134.84,184746075.63
+severe_drought,Severe Drought,2055,0.0,BBB,250,0.0925,201718112.87,0.0
+severe_drought,Severe Drought,2056,0.0,BBB,250,0.0925,201712090.92,0.0
+severe_drought,Severe Drought,2057,0.0,BBB,250,0.0925,201706069.01,0.0
+severe_drought,Severe Drought,2058,0.0,BBB,250,0.0925,201700047.12,0.0
+severe_drought,Severe Drought,2059,0.0,BBB,250,0.0925,201694025.27,0.0
+severe_drought,Severe Drought,2060,0.0,BBB,250,0.0925,201688003.44,0.0
+severe_drought,Severe Drought,2061,0.0,BBB,250,0.0925,201681981.65,0.0
+severe_drought,Severe Drought,2062,0.0,BBB,250,0.0925,201675959.88,0.0
+severe_drought,Severe Drought,2063,0.0,BBB,250,0.0925,201669938.15,0.0
+severe_drought,Severe Drought,2064,0.0,BBB,250,0.0925,201663916.44,0.0
+enhanced_11th_plan,Enhanced 11th Plan,2025,0.766,BBB,250,0.0925,145285126.85,184746075.63
+enhanced_11th_plan,Enhanced 11th Plan,2026,0.676,BB,400,0.1075,128622683.41,184746075.63
+enhanced_11th_plan,Enhanced 11th Plan,2027,0.585,BB,400,0.1075,111960239.98,184746075.63
+enhanced_11th_plan,Enhanced 11th Plan,2028,0.495,BB,400,0.1075,95297796.54,184746075.63
+enhanced_11th_plan,Enhanced 11th Plan,2029,0.448,BB,400,0.1075,86642476.95,184746075.63
+enhanced_11th_plan,Enhanced 11th Plan,2030,0.353,BB,400,0.1075,69103062.81,184746075.63
+enhanced_11th_plan,Enhanced 11th Plan,2031,0.308,BB,400,0.1075,60646014.86,184746075.63
+enhanced_11th_plan,Enhanced 11th Plan,2032,0.277,BB,400,0.1075,55041028.17,184746075.63
+enhanced_11th_plan,Enhanced 11th Plan,2033,0.247,BB,400,0.1075,49436041.47,184746075.63
+enhanced_11th_plan,Enhanced 11th Plan,2034,0.217,BB,400,0.1075,43831054.78,184746075.63
+enhanced_11th_plan,Enhanced 11th Plan,2035,0.186,BB,400,0.1075,38226068.09,184746075.63
+enhanced_11th_plan,Enhanced 11th Plan,2036,0.156,BB,400,0.1075,32621081.39,184746075.63
+enhanced_11th_plan,Enhanced 11th Plan,2037,0.122,BB,400,0.1075,26268763.14,184746075.63
+enhanced_11th_plan,Enhanced 11th Plan,2038,0.087,BB,400,0.1075,19916444.89,184746075.63
+enhanced_11th_plan,Enhanced 11th Plan,2039,-0.161,D,5000,0.5675,-25838548.53,184746075.63
+enhanced_11th_plan,Enhanced 11th Plan,2040,-0.419,D,5000,0.5675,-73500000.0,184746075.63
+enhanced_combined,Enhanced Combined,2025,0.766,BBB,250,0.0925,145285126.85,184746075.63
+enhanced_combined,Enhanced Combined,2026,0.676,BB,400,0.1075,128622683.41,184746075.63
+enhanced_combined,Enhanced Combined,2027,0.585,BB,400,0.1075,111960239.98,184746075.63
+enhanced_combined,Enhanced Combined,2028,0.495,BB,400,0.1075,95297796.54,184746075.63
+enhanced_combined,Enhanced Combined,2029,0.448,BB,400,0.1075,86642476.95,184746075.63
+enhanced_combined,Enhanced Combined,2030,0.353,BB,400,0.1075,69103062.81,184746075.63
+enhanced_combined,Enhanced Combined,2031,0.308,BB,400,0.1075,60646014.86,184746075.63
+enhanced_combined,Enhanced Combined,2032,0.277,BB,400,0.1075,55041028.17,184746075.63
+enhanced_combined,Enhanced Combined,2033,0.247,BB,400,0.1075,49436041.47,184746075.63
+enhanced_combined,Enhanced Combined,2034,0.217,BB,400,0.1075,43831054.78,184746075.63
+enhanced_combined,Enhanced Combined,2035,0.186,BB,400,0.1075,38226068.09,184746075.63
+enhanced_combined,Enhanced Combined,2036,0.156,BB,400,0.1075,32621081.39,184746075.63
+enhanced_combined,Enhanced Combined,2037,0.122,BB,400,0.1075,26268763.14,184746075.63
+enhanced_combined,Enhanced Combined,2038,0.087,BB,400,0.1075,19916444.89,184746075.63
+enhanced_combined,Enhanced Combined,2039,-0.161,D,5000,0.5675,-25838548.53,184746075.63
+enhanced_combined,Enhanced Combined,2040,-0.419,D,5000,0.5675,-73500000.0,184746075.63

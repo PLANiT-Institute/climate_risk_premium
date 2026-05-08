@@ -259,13 +259,6 @@ def build_yearly_ratings(results: dict, plant_params: dict) -> list:
             assessment = assess_credit_rating(rating_metrics)
             rating = assessment.overall_rating.name
 
-            # Apply downgrade for sub-1.0 DSCR using current year's DSCR
-            if dscr_i < 0:
-                rating = "D"
-            elif dscr_i < 1.0:
-                idx = RATING_ORDER.index(rating)
-                rating = RATING_ORDER[min(idx + 1, len(RATING_ORDER) - 1)]
-
             spread_bps = RATING_SPREAD_MAP.get(rating, 900)
 
             rows.append({
@@ -492,6 +485,17 @@ def main():
     print("\n6. Writing TypeScript constants...")
     output_path = PROJECT_ROOT / "crp-dashboard" / "src" / "lib" / "generated" / "data.ts"
     generate_typescript(scenario_comparison, yearly_ratings, cashflows, scenario_risks, plant_params, output_path)
+
+    print("\n7. Writing yearly_ratings.csv...")
+    import csv
+    yearly_ratings_path = PROJECT_ROOT / "results" / "yearly_ratings.csv"
+    if yearly_ratings:
+        fieldnames = list(yearly_ratings[0].keys())
+        with open(yearly_ratings_path, "w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(yearly_ratings)
+        print(f"  Written: results/yearly_ratings.csv  ({len(yearly_ratings)} rows)")
 
     print("\n" + "=" * 60)
     print("Done! Next steps:")
