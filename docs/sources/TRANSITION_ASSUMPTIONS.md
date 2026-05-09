@@ -85,24 +85,45 @@ This document provides full citations for carbon pricing and policy data.
 
 **Description**: Official 11th Basic Plan for Electricity Supply and Demand (2024-2038).
 
-| Year | Coal (GW) | Solar (GW) | Wind (GW) | Carbon-Free % |
-|------|-----------|------------|-----------|----------------|
-| 2024 | 26.7 | 25.0 | 1.7 | 38.2% |
-| 2030 | 18.0 | 39.0 | 10.0 | 52.0% |
-| 2038 | 3.6 | 77.2 | 40.7 | 72.5% |
-| 2040 | 0.0 | 86.8 | 48.3 | 83.0% |
+**2038 Power Mix (발전비중, 확정안)**:
+
+| Source | Share (%) | Capacity (GW, rated) |
+|--------|-----------|---------------------|
+| Nuclear | 35.2 | 35.2 |
+| Renewable | 29.7 | 121.9 (rated) / 16.5 (effective) |
+| Coal | 10.1 | 22.2 (rated) / 21.8 (effective) |
+| LNG | 10.6 | - |
+| H2/Ammonia | 6.2 | - |
+| **Carbon-Free** | **70.7** | - |
+
+**2030 Power Mix (발전비중, 확정안)**:
+
+| Source | Share (%) |
+|--------|-----------|
+| Nuclear | 31.8 |
+| Renewable | 21.6 |
+| Coal | 17.4 |
+| LNG | 25.1 |
+| H2/Ammonia | 2.4 |
+
+**Nuclear Expansion**:
+- Shin Hanul 3&4: 2.8 GW combined (2 large units, by end of 2038)
+- SMR: 0.7 GW (1 unit, 2036)
+- Total new: +3.5 GW (originally 4.9 GW in draft, 1 large reactor deferred)
 
 **Key Features**:
-- 42% faster coal phase-out compared to 10th Plan
+- Coal: 28 aging units phased out, 12 additional units (6.8 GW) converted to carbon-free by 2037-2038
 - Complete coal phase-out by 2040 (대통령 공약, special legislation pending)
-- 72.5% carbon-free generation by 2038
-- Nuclear expansion: 2 large units + 1 SMR (+6.4 GW total)
+- 70.7% carbon-free generation by 2038
+- Renewable capacity quadrupled to 121.9 GW by 2038
 
 **Sources**:
 1. **Ministry of Trade, Industry and Energy (2025)**
    - Title: 제11차 전력수급기본계획 (2024-2038)
    - English: 11th Basic Plan for Power Supply and Demand
    - Official Gazette: 산업통상자원부 공고 제2025-169호 (2025.2.21 확정)
+2. **IEEFA (2025)** - South Korea's 11th power plan analysis
+3. **대한민국 정책브리핑** - 보도자료 (2025.2.21)
 
 ### 2. Korea 10th Basic Plan (`korea_10th_plan`)
 

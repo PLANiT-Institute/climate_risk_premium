@@ -1,7 +1,6 @@
 year,capacity_gw,capacity_factor,policy_reference
-2024,26.7,0.65,11th Basic Plan baseline
-2025,25.0,0.60,11th Basic Plan phase-down start
-2030,18.0,0.45,11th Basic Plan target
-2035,14.0,0.30,11th Basic Plan interpolation
-2038,12.5,0.20,11th Basic Plan target
-2040,0.0,0.00,Presidential pledge 2040 탈석탄
+2024,38.9,0.65,11th Basic Plan baseline (2023 actual ~39.2GW)
+2030,30.0,0.50,11th Basic Plan - 28 aging units phased out
+2035,25.0,0.35,11th Basic Plan interpolation
+2038,22.2,0.25,11th Basic Plan target (정격용량 기준)
+2040,0.0,0.00,Presidential pledge 2040 탈석탄 (계획 범위 밖)

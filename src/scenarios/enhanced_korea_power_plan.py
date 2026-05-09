@@ -121,8 +121,8 @@ class NuclearExpansionPlan:
     """Nuclear capacity expansion plan."""
     current_capacity_gw: float = 24.7
     phase: Dict[int, Dict[str, float]] = field(default_factory=dict)
-    total_additions_gw: float = 6.4  # 2 large units + 1 SMR
-    target_2038_gw: float = 31.1
+    total_additions_gw: float = 3.5  # 2 large units (2.8GW) + 1 SMR (0.7GW)
+    target_2038_gw: float = 35.2  # 11차 전기본 확정안 (includes existing + under construction)
     
     def get_nuclear_capacity(self, year: int) -> float:
         """Get nuclear capacity for given year."""
@@ -187,7 +187,7 @@ class CoalPhaseoutSchedule:
     Note: Complete phase-out year set to 2040 based on presidential pledge
     for coal exit by 2040 (special legislation pending in National Assembly).
     """
-    initial_coal_capacity_gw: float = 26.7  # 2024
+    initial_coal_capacity_gw: float = 38.9  # 2024 (2023 actual ~39.2GW)
     target_coal_capacity_gw: float = 0.0   # Complete phase-out
     phase_out_start_year: int = 2025
     complete_phase_out_year: int = 2040  # Presidential pledge (2040년 탈석탄)
@@ -206,8 +206,8 @@ class CoalPhaseoutSchedule:
         """Get coal capacity for given year.
 
         Linear phase-out from 2025 to 2040:
-        - 26.7 GW (2024) → 0.0 GW (2040)
-        - Annual reduction: 26.7 / 15 = 1.78 GW/year
+        - 38.9 GW (2024) → 0.0 GW (2040)
+        - Annual reduction: 38.9 / 15 = 2.59 GW/year
         """
         if year <= 2024:
             return self.initial_coal_capacity_gw
@@ -526,6 +526,7 @@ def create_enhanced_11th_plan() -> EnhancedKoreaPowerPlan:
     """Create Enhanced 11th Basic Plan scenario with all targets."""
     
     # Power mix targets (key years)
+    # Source: 제11차 전력수급기본계획 확정안 (산자부 공고 제2025-169호, 2025.2.21)
     power_mix_targets = [
         PowerMixTarget(
             year=2024,
@@ -534,23 +535,23 @@ def create_enhanced_11th_plan() -> EnhancedKoreaPowerPlan:
         ),
         PowerMixTarget(
             year=2030,  # NDC target year
-            coal_share=18.7, nuclear_share=32.0, renewable_share=21.3,
-            gas_share=18.0, hydrogen_share=10.0, total_demand_twh=720.0
+            coal_share=17.4, nuclear_share=31.8, renewable_share=21.6,
+            gas_share=25.1, hydrogen_share=2.4, total_demand_twh=720.0
         ),
         PowerMixTarget(
-            year=2036,  # End of 10th Plan period
-            coal_share=14.2, nuclear_share=34.0, renewable_share=26.8,
-            gas_share=15.0, hydrogen_share=10.0, total_demand_twh=750.0
+            year=2036,  # Interpolation between 2030 and 2038
+            coal_share=13.5, nuclear_share=33.6, renewable_share=25.9,
+            gas_share=17.4, hydrogen_share=4.4, total_demand_twh=750.0
         ),
         PowerMixTarget(
             year=2038,  # 11th Plan target year
-            coal_share=12.5, nuclear_share=36.5, renewable_share=21.7,
-            gas_share=14.3, hydrogen_share=15.0, total_demand_twh=780.0
+            coal_share=10.1, nuclear_share=35.2, renewable_share=29.7,
+            gas_share=10.6, hydrogen_share=6.2, total_demand_twh=780.0
         ),
         PowerMixTarget(
-            year=2040,  # Presidential pledge: complete coal exit by 2040
-            coal_share=0.0, nuclear_share=40.0, renewable_share=30.0,
-            gas_share=12.0, hydrogen_share=18.0, total_demand_twh=800.0
+            year=2040,  # Presidential pledge: complete coal exit by 2040 (계획 범위 밖, 가정값)
+            coal_share=0.0, nuclear_share=38.0, renewable_share=32.0,
+            gas_share=8.0, hydrogen_share=8.0, total_demand_twh=800.0
         ),
     ]
     
@@ -610,12 +611,12 @@ def create_enhanced_11th_plan() -> EnhancedKoreaPowerPlan:
                 }
         nuclear_plan = NuclearExpansionPlan(phase=phase_dict)
     else:
-        # Fallback to hardcoded values
+        # Fallback to hardcoded values (11차 전기본 확정안)
         nuclear_plan = NuclearExpansionPlan(
             phase={
-                2028: {'total_capacity': 25.7, 'addition': 1.0},  # First large unit
-                2032: {'total_capacity': 28.1, 'addition': 2.4},  # Second large unit
-                2035: {'total_capacity': 30.1, 'addition': 2.0},  # SMR unit
+                2026: {'total_capacity': 27.5, 'addition': 2.8},  # Saemul 3&4
+                2032: {'total_capacity': 30.3, 'addition': 2.8},  # Shin Hanul 3&4
+                2036: {'total_capacity': 31.0, 'addition': 0.7},  # SMR (700MW)
             }
         )
     
