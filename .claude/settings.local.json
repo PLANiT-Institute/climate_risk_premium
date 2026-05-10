@@ -4,7 +4,8 @@
       "Bash(grep -E \"^d|^-.*\\\\.py$|^-.*\\\\.md$\")",
       "Bash(grep -E \"\\\\.py$\")",
       "Bash(git rm *)",
-      "Bash(python -c \"from src.pipeline.runner import CRPModelRunner; print\\('import OK'\\)\")"
+      "Bash(python -c \"from src.pipeline.runner import CRPModelRunner; print\\('import OK'\\)\")",
+      "Bash(python -c ' *)"
     ]
   }
 }
