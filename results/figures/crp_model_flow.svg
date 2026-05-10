@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 900 275"
+     width="100%"
+     role="img"
+     aria-labelledby="crp-title"
+     aria-describedby="crp-desc">
+
+  <title id="crp-title">PLANiT Credit risk premium (CRP) 모델 플로우차트</title>
+  <desc id="crp-desc">CRP 모델 5단계: 발전소 입력 → 전환·물리적 리스크 조정 → 현금흐름 분석 → 신용등급 산출 → 신용 프리미엄 산출</desc>
+
+  <defs>
+    <marker id="arr" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto">
+      <polygon points="0 0, 7 2.5, 0 5" fill="#2A72BA"/>
+    </marker>
+  </defs>
+
+  <rect width="900" height="275" fill="#FFFFFF"/>
+
+  <!-- ═══ TITLE ═══ -->
+  <text x="450" y="22"
+        font-family="system-ui,-apple-system,sans-serif"
+        font-size="15" font-weight="700" fill="#1A3A5C" text-anchor="middle">
+    PLANiT Credit risk premium (CRP) 모델
+  </text>
+
+  <!--
+    Layout
+    ──────────────────────────────────────────────────────────────────────
+    col width=158, gap=22, side-margin=10
+    col x:  10 / 190 / 370 / 550 / 730   right: 168/348/528/708/888
+
+    Sub-boxes (전환/물리): x=190, w=158
+      sub1  y=38  h=96  bottom=134  centre_y=86
+      sub2  y=149 h=96  bottom=245  centre_y=197
+      gap=15
+
+    Main cols (1,3,4,5): y=38, h=207, bottom=245
+      centre_y = 38+103.5 = 141.5 ≈ 142
+      sub midpoint = (86+197)/2 = 141.5 ✓
+
+    All horizontal arrows at y=142
+    fork bar (179,86)↕(179,197)  |  merge bar (359,86)↕(359,197)
+
+    Header h=30, font-size=12   Bullets font-size=10, line-spacing=14
+    Content vertically centred per box:
+      y_first = box_top + header_h + (content_area – text_block_h)/2 + font_size×0.75
+    ──────────────────────────────────────────────────────────────────────
+  -->
+
+  <!-- ════════════════════════════════════════
+       COL 1 — 발전소 입력
+       y=38 h=207  5 lines → y_first=131
+  ════════════════════════════════════════ -->
+  <rect x="10" y="38" width="158" height="207"
+        fill="#EBF4FD" stroke="#2A72BA" stroke-width="1.5" rx="4"/>
+  <rect x="10" y="38" width="158" height="30"
+        fill="#2A72BA" rx="4"/>
+  <text x="89" y="57"
+        font-family="system-ui,-apple-system,sans-serif"
+        font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">발전소 입력</text>
+
+  <text x="20" y="131" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#1A3A5C">· 설비용량</text>
+  <text x="20" y="145" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#1A3A5C">· 운영연수</text>
+  <text x="20" y="159" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#1A3A5C">· 자본투자금액 · 자본구조</text>
+  <text x="20" y="173" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#1A3A5C">· 기준 이용률</text>
+  <text x="20" y="187" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#1A3A5C">· 연료비 · 전력가격</text>
+
+  <!-- ════════════════════════════════════════
+       FORK ARROW  col1 → col2
+       stem (168,142)→(179,142)
+       bar  (179,86)↕(179,197)
+       heads →(190,86) and →(190,197)
+  ════════════════════════════════════════ -->
+  <line x1="168" y1="142" x2="179" y2="142" stroke="#2A72BA" stroke-width="1.5"/>
+  <line x1="179" y1="86"  x2="179" y2="197" stroke="#2A72BA" stroke-width="1.5"/>
+  <line x1="179" y1="86"  x2="190" y2="86"  stroke="#2A72BA" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="179" y1="197" x2="190" y2="197" stroke="#2A72BA" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- ════════════════════════════════════════
+       SUB-BOX TOP — 물리적 리스크
+       y=38 h=96 centre_y=86
+       3 lines → y_first=90
+  ════════════════════════════════════════ -->
+  <rect x="190" y="38" width="158" height="96"
+        fill="#EBF4FD" stroke="#2A72BA" stroke-width="1.5" rx="4"/>
+  <rect x="190" y="38" width="158" height="30"
+        fill="#2A72BA" rx="4"/>
+  <text x="269" y="57"
+        font-family="system-ui,-apple-system,sans-serif"
+        font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">물리적 리스크</text>
+
+  <text x="200" y="90"  font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#1A3A5C">· 산불: 국내연구 적용</text>
+  <text x="200" y="104" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#1A3A5C">· 냉각수·홍수·해안침식·가뭄</text>
+  <text x="213" y="118" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#1A3A5C">등: PhysRisk 모델 적용</text>
+
+  <!-- ════════════════════════════════════════
+       SUB-BOX BOTTOM — 전환 리스크
+       y=149 h=96 centre_y=197
+       2 lines → y_first=208
+  ════════════════════════════════════════ -->
+  <rect x="190" y="149" width="158" height="96"
+        fill="#EBF4FD" stroke="#2A72BA" stroke-width="1.5" rx="4"/>
+  <rect x="190" y="149" width="158" height="30"
+        fill="#2A72BA" rx="4"/>
+  <text x="269" y="168"
+        font-family="system-ui,-apple-system,sans-serif"
+        font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">전환 리스크</text>
+
+  <text x="200" y="208" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#1A3A5C">· 정책 강도에 따른</text>
+  <text x="213" y="222" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#1A3A5C">이용률 · 운영연수 시나리오</text>
+
+  <!-- ════════════════════════════════════════
+       MERGE ARROW  col2 → col3
+       (348,86)→(359,86)  (348,197)→(359,197)
+       bar (359,86)↕(359,197)
+       head (359,142)→(370,142)
+  ════════════════════════════════════════ -->
+  <line x1="348" y1="86"  x2="359" y2="86"  stroke="#2A72BA" stroke-width="1.5"/>
+  <line x1="348" y1="197" x2="359" y2="197" stroke="#2A72BA" stroke-width="1.5"/>
+  <line x1="359" y1="86"  x2="359" y2="197" stroke="#2A72BA" stroke-width="1.5"/>
+  <line x1="359" y1="142" x2="370" y2="142" stroke="#2A72BA" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- ════════════════════════════════════════
+       COL 3 — 현금흐름 분석
+       y=38 h=207  4 lines → y_first=138
+  ════════════════════════════════════════ -->
+  <rect x="370" y="38" width="158" height="207"
+        fill="#EBF4FD" stroke="#2A72BA" stroke-width="1.5" rx="4"/>
+  <rect x="370" y="38" width="158" height="30"
+        fill="#2A72BA" rx="4"/>
+  <text x="449" y="57"
+        font-family="system-ui,-apple-system,sans-serif"
+        font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">현금흐름 분석</text>
+
+  <text x="380" y="138" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#1A3A5C">· 발전량 · 매출</text>
+  <text x="380" y="152" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#1A3A5C">· 연료비 · 운영비용</text>
+  <text x="380" y="166" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#1A3A5C">· FCF · EBITDA</text>
+  <text x="380" y="180" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#1A3A5C">· NPV · IRR · DSCR</text>
+
+  <!-- Arrow col3 → col4 -->
+  <line x1="528" y1="142" x2="550" y2="142" stroke="#2A72BA" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- ════════════════════════════════════════
+       COL 4 — 신용등급 산출
+       y=38 h=207  6 lines → y_first=124
+  ════════════════════════════════════════ -->
+  <rect x="550" y="38" width="158" height="207"
+        fill="#EBF4FD" stroke="#2A72BA" stroke-width="1.5" rx="4"/>
+  <rect x="550" y="38" width="158" height="30"
+        fill="#2A72BA" rx="4"/>
+  <text x="629" y="57"
+        font-family="system-ui,-apple-system,sans-serif"
+        font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">신용등급 산출</text>
+
+  <text x="560" y="124" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#1A3A5C">· KIS방법론 기반 PLANiT 조정</text>
+  <text x="560" y="138" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#1A3A5C">· 산업전망 정성평가(AA) 50%</text>
+  <text x="560" y="152" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#1A3A5C">· 수익성과 재무안정성 관련</text>
+  <text x="573" y="166" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#1A3A5C">재무지표 정량평가 50%</text>
+  <text x="560" y="180" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#1A3A5C">· DSCR 비율로 자금조달</text>
+  <text x="573" y="194" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#1A3A5C">리스크 조정</text>
+
+  <!-- Arrow col4 → col5 -->
+  <line x1="708" y1="142" x2="730" y2="142" stroke="#2A72BA" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- ════════════════════════════════════════
+       COL 5 — 신용 프리미엄 산출
+       y=38 h=207  2 lines → y_first=152
+  ════════════════════════════════════════ -->
+  <rect x="730" y="38" width="158" height="207"
+        fill="#EBF4FD" stroke="#2A72BA" stroke-width="1.5" rx="4"/>
+  <rect x="730" y="38" width="158" height="30"
+        fill="#2A72BA" rx="4"/>
+  <text x="809" y="57"
+        font-family="system-ui,-apple-system,sans-serif"
+        font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">신용 프리미엄 산출</text>
+
+  <text x="740" y="152" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#1A3A5C">· CRP (bps) 산출</text>
+  <text x="740" y="166" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#1A3A5C">· WACC 상승분 계산</text>
+
+  <!-- Generated by AI - Verified by Joowon Kweon -->
+</svg>
