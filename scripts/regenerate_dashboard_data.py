@@ -258,10 +258,12 @@ def build_yearly_ratings(results: dict, plant_params: dict) -> list:
             )
             assessment = assess_credit_rating(rating_metrics)
             rating = assessment.overall_rating.name
+            assessment_dict = assessment.to_dict()
 
             spread_bps = RATING_SPREAD_MAP.get(rating, 900)
 
             rows.append({
+                # --- existing columns (backward compat) ---
                 "scenario":     scenario_name,
                 "display_name": display_name,
                 "year":         int(year),
@@ -271,6 +273,26 @@ def build_yearly_ratings(results: dict, plant_params: dict) -> list:
                 "cost_of_debt": round(BASE_RATE + spread_bps / 10000, 6),
                 "ebitda":       round(ebitda, 2),
                 "debt_service": round(full_debt_svc, 2),
+                # --- financial ratios (rating inputs) ---
+                "ebitda_to_fixed_assets":   round(rating_metrics.ebitda_to_fixed_assets, 6),
+                "ebitda_to_interest":       round(rating_metrics.ebitda_to_interest, 6),
+                "net_debt_to_ebitda":       round(rating_metrics.net_debt_to_ebitda, 6),
+                "debt_to_equity":           round(rating_metrics.debt_to_equity, 6),
+                "debt_to_assets":           round(rating_metrics.debt_to_assets, 6),
+                "is_ebitda_negative":       rating_metrics.is_ebitda_negative,
+                # --- balance sheet intermediates ---
+                "fixed_assets":             round(fixed_assets, 2),
+                "debt_outstanding":         round(debt_out, 2),
+                "total_equity":             round(total_equity, 2),
+                "total_assets":             round(total_assets, 2),
+                "interest_expense":         round(interest, 2),
+                # --- component sub-ratings ---
+                "profitability_rating":     assessment_dict.get("profitability_rating", ""),
+                "coverage_rating":          assessment_dict.get("coverage_rating", ""),
+                "dscr_rating":              assessment_dict.get("dscr_rating", ""),
+                "net_debt_leverage_rating": assessment_dict.get("net_debt_leverage_rating", ""),
+                "equity_leverage_rating":   assessment_dict.get("equity_leverage_rating", ""),
+                "asset_leverage_rating":    assessment_dict.get("asset_leverage_rating", ""),
             })
 
     return rows
@@ -488,14 +510,36 @@ def main():
 
     print("\n7. Writing yearly_ratings.csv...")
     import csv
+    YEARLY_RATINGS_FIELDS = [
+        "scenario", "display_name", "year",
+        "dscr", "rating", "spread_bps", "cost_of_debt", "ebitda", "debt_service",
+    ]
     yearly_ratings_path = PROJECT_ROOT / "results" / "yearly_ratings.csv"
     if yearly_ratings:
-        fieldnames = list(yearly_ratings[0].keys())
         with open(yearly_ratings_path, "w", newline="", encoding="utf-8") as f:
-            writer = csv.DictWriter(f, fieldnames=fieldnames)
+            writer = csv.DictWriter(f, fieldnames=YEARLY_RATINGS_FIELDS, extrasaction="ignore")
             writer.writeheader()
             writer.writerows(yearly_ratings)
         print(f"  Written: results/yearly_ratings.csv  ({len(yearly_ratings)} rows)")
+
+    print("\n8. Writing yearly_financial_ratios.csv...")
+    RATIO_FIELDS = [
+        "scenario", "year",
+        "dscr", "ebitda", "interest_expense",
+        "fixed_assets", "debt_outstanding", "total_equity", "total_assets",
+        "ebitda_to_fixed_assets", "ebitda_to_interest",
+        "net_debt_to_ebitda", "debt_to_equity", "debt_to_assets",
+        "is_ebitda_negative",
+        "profitability_rating", "coverage_rating", "dscr_rating",
+        "net_debt_leverage_rating", "equity_leverage_rating", "asset_leverage_rating",
+    ]
+    ratio_path = PROJECT_ROOT / "results" / "yearly_financial_ratios.csv"
+    if yearly_ratings:
+        with open(ratio_path, "w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=RATIO_FIELDS, extrasaction="ignore")
+            writer.writeheader()
+            writer.writerows(yearly_ratings)
+        print(f"  Written: results/yearly_financial_ratios.csv  ({len(yearly_ratings)} rows)")
 
     print("\n" + "=" * 60)
     print("Done! Next steps:")

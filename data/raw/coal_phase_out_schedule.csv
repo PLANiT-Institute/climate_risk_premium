@@ -1,7 +1,7 @@
 year,capacity_gw,capacity_factor,policy_reference
-2024,26.7,0.65,11th Basic Plan baseline
-2025,25.0,0.60,11th Basic Plan phase-down start
-2030,17.2,0.42,11th Basic Plan target
-2035,12.9,0.31,11th Basic Plan interpolation
-2038,10.1,0.25,11th Basic Plan target
+2024,26.7,0.60,11th Basic Plan baseline
+2025,25.0,0.56,11th Basic Plan phase-down start
+2030,17.2,0.39,11th Basic Plan target
+2035,12.9,0.29,11th Basic Plan interpolation
+2038,10.1,0.23,11th Basic Plan target
 2040,0.0,0.00,Presidential pledge 2040 탈석탄

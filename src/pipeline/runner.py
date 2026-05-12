@@ -662,9 +662,12 @@ class CRPModelRunner:
             physical_scenario_name, _phys_start, _phys_end
         )
 
-        self._save_physical_adjustments(
-            physical_adj, yearly_physical_adj, scenario_name
-        )
+        try:
+            self._save_physical_adjustments(
+                physical_adj, yearly_physical_adj, scenario_name
+            )
+        except OSError as _e:
+            logger.warning("Could not save physical adjustment debug files: %s", _e)
 
         # --- Combined run (always performed, same as before) ---
         combined = self._compute_component(

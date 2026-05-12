@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 1100 290"
+     width="100%"
+     role="img"
+     aria-labelledby="crp-title"
+     aria-describedby="crp-desc">
+
+  <title id="crp-title">PLANiT Credit Risk Premium (CRP) Model Flowchart</title>
+  <desc id="crp-desc">CRP Model 5 Steps: Plant Inputs → Transition &amp; Physical Risk Adjustment → Cash Flow Analysis → Credit Rating → Credit Premium</desc>
+
+  <defs>
+    <marker id="arr" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto">
+      <polygon points="0 0, 7 2.5, 0 5" fill="#2A72BA"/>
+    </marker>
+  </defs>
+
+  <rect width="1100" height="290" fill="#FFFFFF"/>
+
+  <!-- ═══ TITLE ═══ -->
+  <text x="550" y="22"
+        font-family="system-ui,-apple-system,sans-serif"
+        font-size="15" font-weight="700" fill="#1A3A5C" text-anchor="middle">
+    PLANiT Credit Risk Premium (CRP) Model
+  </text>
+
+  <!--
+    Layout (box width 190 px, gap 18 px, left margin 10 px)
+    ─────────────────────────────────────────────────────────
+    Col x :  10 /  218 /  426 /  634 /  842    right: 200/408/616/824/1032
+    cx    : 105 /  313 /  521 /  729 /  937
+
+    Sub-boxes (Physical / Transition): x=218, w=190
+      sub1  y=38  h=96   centre_y=86
+      sub2  y=149 h=96   centre_y=197
+
+    Main cols (1,3,4,5): y=38 h=207   centre_y=142
+
+    Fork  bar x=209  (midpoint 200–218)
+    Merge bar x=417  (midpoint 408–426)
+
+    Bullet font-size=9, header font-size=12
+    ─────────────────────────────────────────────────────────
+  -->
+
+  <!-- ════════════════════════════════════════
+       COL 1 — Plant Inputs
+       6 bullet lines (one split for length)
+  ════════════════════════════════════════ -->
+  <rect x="10" y="38" width="190" height="207"
+        fill="#EBF4FD" stroke="#2A72BA" stroke-width="1.5" rx="4"/>
+  <rect x="10" y="38" width="190" height="30"
+        fill="#2A72BA" rx="4"/>
+  <text x="105" y="57"
+        font-family="system-ui,-apple-system,sans-serif"
+        font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">Plant Inputs</text>
+
+  <!-- 6 lines centred in content area (y=68–245, h=177): y_first=124 -->
+  <text x="18" y="124" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#1A3A5C">· Installed Capacity</text>
+  <text x="18" y="137" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#1A3A5C">· Operating Years</text>
+  <text x="18" y="150" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#1A3A5C">· Capital Investment</text>
+  <text x="18" y="163" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#1A3A5C">  · Capital Structure</text>
+  <text x="18" y="176" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#1A3A5C">· Baseline Capacity Factor</text>
+  <text x="18" y="189" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#1A3A5C">· Fuel Cost · Power Price</text>
+
+  <!-- ════════════════════════════════════════
+       FORK ARROW  col1 → col2
+       stem (200,142)→(209,142)
+       bar  (209,86)↕(209,197)
+       heads →(218,86) and →(218,197)
+  ════════════════════════════════════════ -->
+  <line x1="200" y1="142" x2="209" y2="142" stroke="#2A72BA" stroke-width="1.5"/>
+  <line x1="209" y1="86"  x2="209" y2="197" stroke="#2A72BA" stroke-width="1.5"/>
+  <line x1="209" y1="86"  x2="218" y2="86"  stroke="#2A72BA" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="209" y1="197" x2="218" y2="197" stroke="#2A72BA" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- ════════════════════════════════════════
+       SUB-BOX TOP — Physical Risk
+       3 bullet lines; content y=68–134 (h=66): y_first=90
+  ════════════════════════════════════════ -->
+  <rect x="218" y="38" width="190" height="96"
+        fill="#EBF4FD" stroke="#2A72BA" stroke-width="1.5" rx="4"/>
+  <rect x="218" y="38" width="190" height="30"
+        fill="#2A72BA" rx="4"/>
+  <text x="313" y="57"
+        font-family="system-ui,-apple-system,sans-serif"
+        font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">Physical Risk</text>
+
+  <text x="226" y="90"  font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#1A3A5C">· Wildfire: domestic lit. applied</text>
+  <text x="226" y="103" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#1A3A5C">· Cooling water · flood ·</text>
+  <text x="226" y="116" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#1A3A5C">  coastal erosion · drought (PhysRisk)</text>
+
+  <!-- ════════════════════════════════════════
+       SUB-BOX BOTTOM — Transition Risk
+       3 bullet lines; content y=179–245 (h=66): y_first=199
+  ════════════════════════════════════════ -->
+  <rect x="218" y="149" width="190" height="96"
+        fill="#EBF4FD" stroke="#2A72BA" stroke-width="1.5" rx="4"/>
+  <rect x="218" y="149" width="190" height="30"
+        fill="#2A72BA" rx="4"/>
+  <text x="313" y="168"
+        font-family="system-ui,-apple-system,sans-serif"
+        font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">Transition Risk</text>
+
+  <text x="226" y="199" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#1A3A5C">· Policy-intensity-based</text>
+  <text x="226" y="212" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#1A3A5C">capacity factor</text>
+  <text x="226" y="225" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#1A3A5C">· operating life scenarios</text>
+
+  <!-- ════════════════════════════════════════
+       MERGE ARROW  col2 → col3
+       (408,86)→(417,86)  (408,197)→(417,197)
+       bar (417,86)↕(417,197)
+       head (417,142)→(426,142)
+  ════════════════════════════════════════ -->
+  <line x1="408" y1="86"  x2="417" y2="86"  stroke="#2A72BA" stroke-width="1.5"/>
+  <line x1="408" y1="197" x2="417" y2="197" stroke="#2A72BA" stroke-width="1.5"/>
+  <line x1="417" y1="86"  x2="417" y2="197" stroke="#2A72BA" stroke-width="1.5"/>
+  <line x1="417" y1="142" x2="426" y2="142" stroke="#2A72BA" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- ════════════════════════════════════════
+       COL 3 — Cash Flow Analysis
+       4 bullet lines; y_first=138
+  ════════════════════════════════════════ -->
+  <rect x="426" y="38" width="190" height="207"
+        fill="#EBF4FD" stroke="#2A72BA" stroke-width="1.5" rx="4"/>
+  <rect x="426" y="38" width="190" height="30"
+        fill="#2A72BA" rx="4"/>
+  <text x="521" y="57"
+        font-family="system-ui,-apple-system,sans-serif"
+        font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">Cash Flow Analysis</text>
+
+  <text x="434" y="138" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#1A3A5C">· Generation · Revenue</text>
+  <text x="434" y="151" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#1A3A5C">· Fuel Cost · Operating Cost</text>
+  <text x="434" y="164" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#1A3A5C">· FCF · EBITDA</text>
+  <text x="434" y="177" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#1A3A5C">· NPV · IRR · DSCR</text>
+
+  <!-- Arrow col3 → col4 -->
+  <line x1="616" y1="142" x2="634" y2="142" stroke="#2A72BA" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- ════════════════════════════════════════
+       COL 4 — Credit Rating
+       8 bullet lines (two splits); y_first=111
+  ════════════════════════════════════════ -->
+  <rect x="634" y="38" width="190" height="207"
+        fill="#EBF4FD" stroke="#2A72BA" stroke-width="1.5" rx="4"/>
+  <rect x="634" y="38" width="190" height="30"
+        fill="#2A72BA" rx="4"/>
+  <text x="729" y="57"
+        font-family="system-ui,-apple-system,sans-serif"
+        font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">Credit Rating</text>
+
+  <text x="642" y="111" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#1A3A5C">· KIS methodology</text>
+  <text x="642" y="124" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#1A3A5C">  + PLANiT adjustments</text>
+  <text x="642" y="137" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#1A3A5C">· Industry outlook (AA)</text>
+  <text x="642" y="150" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#1A3A5C">  qualitative: 50%</text>
+  <text x="642" y="163" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#1A3A5C">· Profitability &amp; fin. stability</text>
+  <text x="642" y="176" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#1A3A5C">  (quantitative): 50%</text>
+  <text x="642" y="189" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#1A3A5C">· DSCR-based financing</text>
+  <text x="642" y="202" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#1A3A5C">  risk adjustment</text>
+
+  <!-- Arrow col4 → col5 -->
+  <line x1="824" y1="142" x2="842" y2="142" stroke="#2A72BA" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- ════════════════════════════════════════
+       COL 5 — Credit Premium
+       2 bullet lines; y_first=150
+  ════════════════════════════════════════ -->
+  <rect x="842" y="38" width="190" height="207"
+        fill="#EBF4FD" stroke="#2A72BA" stroke-width="1.5" rx="4"/>
+  <rect x="842" y="38" width="190" height="30"
+        fill="#2A72BA" rx="4"/>
+  <text x="937" y="57"
+        font-family="system-ui,-apple-system,sans-serif"
+        font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">Credit Premium</text>
+
+  <text x="850" y="150" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#1A3A5C">· CRP (bps) calculation</text>
+  <text x="850" y="163" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#1A3A5C">· WACC premium calculation</text>
+
+  <!-- Generated by AI - Verified by Joowon Kweon -->
+</svg>
