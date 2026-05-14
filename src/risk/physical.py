@@ -69,6 +69,19 @@ class YearlyPhysicalAdjustments:
             )
         return PhysicalAdjustments(0, 0, 0, 1.0, 0.0, 0.0, "Out of range")
 
+    def to_dataframe(self) -> "pd.DataFrame":
+        """Serialize to a pandas DataFrame (one row per year)."""
+        import pandas as pd
+        return pd.DataFrame({
+            "year": self.years.astype(int),
+            "outage_rate": self.outage_rates,
+            "capacity_derate": self.capacity_derates,
+            "water_constrained_capacity": self.water_constraints,
+            "efficiency_loss": self.efficiency_losses,
+            "transmission_outage_rate": self.transmission_outage_rates,
+            "asset_capex_loss_rate": self.asset_capex_loss_rates,
+        })
+
 
 
 def load_yearly_from_output_csv(

@@ -127,3 +127,38 @@ class PLANiTIntegrationConfig:
         if base_dir:
             return Path(base_dir) / p
         return p
+
+
+# ---------------------------------------------------------------------------
+# physrisk-lib native hazard policy (hazard names as returned by get_asset_impact)
+# ---------------------------------------------------------------------------
+
+# Hazards whose impact_mean must be forced to 0.0 before entering the CRP pipeline.
+# Key = physrisk hazard_type string; Value = reason for zeroing.
+PHYSRISK_ZEROED_HAZARDS: dict[str, str] = {
+    "WaterTemperature": (
+        "physrisk default model uses IICEC freshwater discharge limit (~30 °C); "
+        "Korea operates seawater once-through cooling and has no discharge temperature regulation"
+    ),
+    "RiverineInundation": (
+        "~1 km grid resolution causes false positives at coastal sites; "
+        "flood_depth values are grid artefacts, not real inundation risk for this asset"
+    ),
+}
+
+# Hazards whose non-zero impact drives *operational disruption probability*
+# → maps to outage_rate / capacity_derate / water_constrained_capacity
+PHYSRISK_DISRUPTION_HAZARDS: frozenset[str] = frozenset({
+    "AirTemperature",
+    "CoastalInundation",
+    "Drought",
+    "WaterRisk",
+})
+
+# Hazards whose non-zero impact drives *physical facility damage*
+# → maps to asset_capex_loss_rate
+PHYSRISK_DAMAGE_HAZARDS: frozenset[str] = frozenset({
+    "Fire",
+    "Hail",
+    "Wind",
+})

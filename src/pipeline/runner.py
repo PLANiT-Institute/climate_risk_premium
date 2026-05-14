@@ -95,6 +95,7 @@ class ScenarioResult:
     counterfactual_crp: Dict[str, Any] | None = None  # Counterfactual-based CRP analysis
     risk_components: Dict[str, RiskComponentResult] | None = None
     risk_attribution: RiskAttribution | None = None
+    yearly_physical_adj: YearlyPhysicalAdjustments | None = None  # Year-by-year physical adjustments
 
 
 class CRPModelRunner:
@@ -699,6 +700,7 @@ class CRPModelRunner:
                     dscr=combined.metrics.avg_dscr,
                 )
             ),
+            yearly_physical_adj=yearly_physical_adj,
         )
 
         if not decompose:
@@ -864,6 +866,200 @@ class CRPModelRunner:
 
         return results
 
+    def _export_hazard_progression(self, phys_dir: Path) -> Optional[Path]:
+        """Export raw hazard progression time series from baselines × climate factors."""
+        from src.data.loaders import load_hazard_baselines, get_climate_factor
+        from src.planit.outage_model import load_outage_params, p_outage_given_event
+
+        baselines = load_hazard_baselines()
+        outage_params_map = load_outage_params()
+
+        plant_prm = outage_params_map.get("power_plant") or outage_params_map.get("transmission_tower")
+        static_p_outage = (
+            p_outage_given_event(plant_prm.failure_rate_per_hour, plant_prm.exposure_duration_hours)
+            if plant_prm else float("nan")
+        )
+
+        scenario_map = [("SSP1-2.6", "ssp126"), ("RCP4.5", "ssp245"), ("RCP8.5", "ssp585")]
+        rows = []
+        for crp_label, ssp in scenario_map:
+            for year in range(2025, 2064):
+                wf = baselines.get("wildfire")
+                dr = baselines.get("drought")
+                wf_cf = get_climate_factor("wildfire", year, crp_label)
+                dr_cf = get_climate_factor("drought", year, crp_label)
+                rows.append({
+                    "year": year,
+                    "scenario": ssp,
+                    "wildfire_freq_per_year": wf.base_frequency * wf_cf if wf else float("nan"),
+                    "wildfire_climate_factor": wf_cf,
+                    "drought_impact_mean": dr.capacity_derate * dr_cf if dr else float("nan"),
+                    "outage_prob_per_event": static_p_outage,
+                })
+
+        df = pd.DataFrame(rows)
+        path = phys_dir / "physical_hazard_progression.csv"
+        df.to_csv(path, index=False)
+        return path
+
+    def _export_physical_outputs(
+        self,
+        results: Dict[str, ScenarioResult],
+        output_dir: Path,
+    ) -> Dict[str, Path]:
+        """Save physical risk intermediate outputs to results/physical/.
+
+        Exports per-scenario:
+          - physical_adjustments_<scenario>.csv  : YearlyPhysicalAdjustments (CH1–CH5 inputs)
+          - physical_channel_impact_<scenario>.csv: revenue/cost impact by channel
+        Exports aggregate:
+          - physical_hazard_progression.csv : raw hazard metrics across SSPs
+          - physical_risk_summary.csv       : cross-scenario table for paper
+        """
+        phys_dir = Path(output_dir) / "physical"
+        phys_dir.mkdir(parents=True, exist_ok=True)
+        paths: Dict[str, Path] = {}
+
+        plant_params = self._get_plant_params()
+        capacity_mw = float(plant_params["capacity_mw"])
+        price = float(plant_params["power_price_per_mwh"])
+        heat_rate = float(plant_params["heat_rate_mmbtu_mwh"])
+        fuel_price = float(plant_params["fuel_price_per_mmbtu"])
+        total_capex = float(plant_params["total_capex_million"]) * 1e6
+        discount_rate = float(plant_params.get("discount_rate", 0.08))
+
+        physical_scenarios = {"baseline", "moderate_physical", "high_physical", "severe_drought"}
+        summary_rows: List[Dict] = []
+        baseline_result = results.get("baseline")
+
+        for scenario_name, result in results.items():
+            if scenario_name not in physical_scenarios:
+                continue
+            ya = result.yearly_physical_adj
+            if ya is None:
+                logger.warning(
+                    "No yearly_physical_adj for scenario '%s'; skipping physical export", scenario_name
+                )
+                continue
+
+            # --- 1-A: physical_adjustments_<scenario>.csv ---
+            adj_df = ya.to_dataframe()
+            adj_path = phys_dir / f"physical_adjustments_{scenario_name}.csv"
+            adj_df.to_csv(adj_path, index=False)
+            paths[f"physical_adjustments_{scenario_name}"] = adj_path
+            logger.info("Saved %s", adj_path.name)
+
+            # --- 1-B: physical_channel_impact_<scenario>.csv ---
+            cashflow = result.cashflow
+            yrs = cashflow.years
+            n = len(yrs)
+            prices = np.full(n, price)
+
+            adj_list = [ya.get_adjustment_for_year(int(y)) for y in yrs]
+            plant_outage = np.array([a.outage_rate for a in adj_list])
+            line_outage = np.array([a.transmission_outage_rate for a in adj_list])
+            eff_losses = np.array([a.efficiency_loss for a in adj_list])
+            capex_rates = np.array([a.asset_capex_loss_rate for a in adj_list])
+
+            # CH1: outage revenue loss (already in cashflow output)
+            ch1_loss = cashflow.lost_revenue_from_outages
+
+            # CH2+CH3: derate + water-constraint revenue loss
+            # avail_frac = fraction of time plant was generating (after outage)
+            no_risk_cf = cashflow.no_risk_capacity_factor
+            risk_cf = cashflow.capacity_factor
+            avail_frac = np.where(risk_cf > 1e-9, cashflow.final_cf / risk_cf, 0.0)
+            ch2_ch3_loss = np.maximum(
+                0.0, (no_risk_cf - risk_cf) * capacity_mw * 8760 * avail_frac * prices
+            )
+
+            # CH4: additional fuel cost from efficiency loss (actual_mwh = capacity_mw × 8760 × final_cf)
+            actual_mwh = capacity_mw * 8760 * cashflow.final_cf
+            ch4_fuel_extra = actual_mwh * heat_rate * eff_losses * fuel_price
+
+            # CH5: capex damage from asset destruction
+            ch5_capex = total_capex * capex_rates
+
+            total_impact = ch1_loss + ch2_ch3_loss + ch4_fuel_extra + ch5_capex
+            baseline_rev = cashflow.revenue + ch1_loss + ch2_ch3_loss
+            impact_pct = np.where(baseline_rev > 0, total_impact / baseline_rev * 100.0, np.nan)
+
+            channel_df = pd.DataFrame({
+                "year": yrs.astype(int),
+                "ch1_outage_revenue_loss_krw": ch1_loss,
+                "ch2_ch3_derate_water_revenue_loss_krw": ch2_ch3_loss,
+                "ch4_efficiency_fuel_cost_krw": ch4_fuel_extra,
+                "ch5_capex_damage_loss_krw": ch5_capex,
+                "total_physical_impact_krw": total_impact,
+                "total_physical_impact_pct_revenue": impact_pct,
+            })
+            channel_path = phys_dir / f"physical_channel_impact_{scenario_name}.csv"
+            channel_df.to_csv(channel_path, index=False)
+            paths[f"physical_channel_impact_{scenario_name}"] = channel_path
+            logger.info("Saved %s", channel_path.name)
+
+            # Collect rows for summary table (ref years 2030, 2040, 2050)
+            for ref_year in [2030, 2040, 2050]:
+                idx_arr = np.where(yrs == ref_year)[0]
+                if len(idx_arr) == 0:
+                    continue
+                i = int(idx_arr[0])
+                adj = adj_list[i]
+
+                future_yrs = (yrs[i:] - yrs[0]).astype(float)
+                discount_factors = (1.0 + discount_rate) ** (-future_yrs)
+                npv_loss = float(np.sum(total_impact[i:] * discount_factors))
+
+                baseline_npv = baseline_result.metrics.npv if baseline_result else None
+                npv_loss_pct: Optional[float] = (
+                    npv_loss / abs(baseline_npv) * 100.0
+                    if baseline_npv and baseline_npv != 0 else None
+                )
+
+                crp_bps = 0.0
+                if result.counterfactual_crp:
+                    crp_bps = float(result.counterfactual_crp.get("crp_bps", 0.0))
+
+                rating_change = ""
+                if (
+                    result.credit_rating
+                    and baseline_result
+                    and baseline_result.credit_rating
+                ):
+                    b = baseline_result.credit_rating.overall_rating.name
+                    s = result.credit_rating.overall_rating.name
+                    rating_change = f"{b}→{s}"
+
+                summary_rows.append({
+                    "scenario": scenario_name,
+                    "ref_year": ref_year,
+                    "total_outage_rate_pct": adj.outage_rate * 100.0,
+                    "capacity_derate_pct": adj.capacity_derate * 100.0,
+                    "npv_physical_loss_krw": npv_loss,
+                    "npv_physical_loss_pct_baseline": npv_loss_pct,
+                    "credit_rating_change": rating_change,
+                    "crp_bps": crp_bps,
+                })
+
+        # --- 1-D: physical_risk_summary.csv ---
+        if summary_rows:
+            summary_df = pd.DataFrame(summary_rows)
+            summary_path = phys_dir / "physical_risk_summary.csv"
+            summary_df.to_csv(summary_path, index=False)
+            paths["physical_risk_summary"] = summary_path
+            logger.info("Saved %s", summary_path.name)
+
+        # --- 1-C: physical_hazard_progression.csv ---
+        try:
+            hazard_path = self._export_hazard_progression(phys_dir)
+            if hazard_path:
+                paths["physical_hazard_progression"] = hazard_path
+                logger.info("Saved %s", hazard_path.name)
+        except Exception as exc:
+            logger.warning("Could not export hazard progression: %s", exc)
+
+        return paths
+
     def export_results(
         self,
         results: Dict[str, ScenarioResult],
@@ -936,5 +1132,12 @@ class CRPModelRunner:
             attr_path = output_dir / "risk_attribution.csv"
             attr_df.to_csv(attr_path, index=False)
             paths["risk_attribution"] = attr_path
+
+        # Export physical risk intermediate outputs to results/physical/
+        try:
+            phys_paths = self._export_physical_outputs(results, output_dir)
+            paths.update(phys_paths)
+        except Exception as exc:
+            logger.warning("Physical output export failed: %s", exc)
 
         return paths

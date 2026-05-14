@@ -50,12 +50,15 @@ class CashFlowTimeSeries:
     final_cf: np.ndarray
     carbon_costs: np.ndarray = field(default=None)  # type: ignore[arg-type]
     dscr: np.ndarray = field(default=None)  # type: ignore[arg-type]
+    no_risk_capacity_factor: np.ndarray = field(default=None)  # type: ignore[arg-type]
 
     def __post_init__(self) -> None:
         if self.carbon_costs is None:
             self.carbon_costs = np.zeros_like(self.years, dtype=float)
         if self.dscr is None:
             self.dscr = np.zeros_like(self.years, dtype=float)
+        if self.no_risk_capacity_factor is None:
+            self.no_risk_capacity_factor = np.zeros_like(self.years, dtype=float)
 
     def to_dict(self) -> Dict[str, List[float]]:
         """Convert to dict for CSV export."""
@@ -175,6 +178,9 @@ def compute_cashflows_timeseries(
             [market_scenario.get_demand_factor(int(year), start_year) for year in years]
         )
         base_cf_series = np.minimum(1.0, base_cf_series * demand_factors)
+
+    # Snapshot CF before physical risk channels are applied (used for channel decomposition)
+    no_risk_cf_series = base_cf_series.copy()
 
     # Capacity derates from Chronic hazards (Drought) reduce generation capacity
     cf_series = base_cf_series * (1 - capacity_derates)
@@ -336,6 +342,7 @@ def compute_cashflows_timeseries(
         final_cf=final_cf_series,
         carbon_costs=carbon_costs,
         dscr=dscr_series,
+        no_risk_capacity_factor=no_risk_cf_series,
     )
 
 
