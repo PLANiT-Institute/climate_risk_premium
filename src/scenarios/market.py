@@ -18,7 +18,7 @@ class MarketScenario:
     """
 
     name: str
-    demand_growth_pct: float = 1.0  # 1% annual growth
+    demand_growth_pct: float = 0.0  # no demand growth by default
     price_sensitivity: float = 0.5  # 0.5% price change per 1% demand change
     base_power_price: float = 80.0
 

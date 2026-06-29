@@ -6,13 +6,6 @@ from .physical import (
     YearlyPhysicalAdjustments,
     apply_physical,
 )
-
-# Optional imports for PLANiT integration
-try:
-    from .physical import get_physical_risk_from_planit, create_yearly_physical_adjustments_from_planit
-except ImportError:
-    get_physical_risk_from_planit = None
-    create_yearly_physical_adjustments_from_planit = None
 from .financing import (
     FinancingImpact,
     map_expected_loss_to_spreads,
@@ -37,8 +30,6 @@ __all__ = [
     "PhysicalAdjustments",
     "YearlyPhysicalAdjustments",
     "apply_physical",
-    "get_physical_risk_from_planit",
-    "create_yearly_physical_adjustments_from_planit",
     "FinancingImpact",
     "map_expected_loss_to_spreads",
     "calculate_expected_loss",

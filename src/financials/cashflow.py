@@ -47,11 +47,21 @@ class CashFlowTimeSeries:
     capex: np.ndarray
     free_cash_flow: np.ndarray
     capacity_factor: np.ndarray
+    final_cf: np.ndarray
     carbon_costs: np.ndarray = field(default=None)  # type: ignore[arg-type]
+    dscr: np.ndarray = field(default=None)  # type: ignore[arg-type]
+    water_temp_disruption: np.ndarray = field(default=None)  # type: ignore[arg-type]
+    lost_revenue_from_water_temp: np.ndarray = field(default=None)  # type: ignore[arg-type]
 
     def __post_init__(self) -> None:
         if self.carbon_costs is None:
             self.carbon_costs = np.zeros_like(self.years, dtype=float)
+        if self.dscr is None:
+            self.dscr = np.zeros_like(self.years, dtype=float)
+        if self.water_temp_disruption is None:
+            self.water_temp_disruption = np.zeros_like(self.years, dtype=float)
+        if self.lost_revenue_from_water_temp is None:
+            self.lost_revenue_from_water_temp = np.zeros_like(self.years, dtype=float)
 
     def to_dict(self) -> Dict[str, List[float]]:
         """Convert to dict for CSV export."""
@@ -72,7 +82,11 @@ class CashFlowTimeSeries:
             "capex": self.capex.tolist(),
             "free_cash_flow": self.free_cash_flow.tolist(),
             "capacity_factor": self.capacity_factor.tolist(),
+            "final_cf": self.final_cf.tolist(),
             "carbon_costs": self.carbon_costs.tolist(),
+            "dscr": self.dscr.tolist(),
+            "water_temp_disruption": self.water_temp_disruption.tolist(),
+            "lost_revenue_from_water_temp": self.lost_revenue_from_water_temp.tolist(),
         }
 
 
@@ -133,25 +147,21 @@ def compute_cashflows_timeseries(
         outage_rates = np.array(
             [yearly_physical_adj.get_adjustment_for_year(int(y)).outage_rate for y in years]
         )
-        capacity_derates = np.array(
-            [yearly_physical_adj.get_adjustment_for_year(int(y)).capacity_derate for y in years]
-        )
         efficiency_losses = np.array(
             [yearly_physical_adj.get_adjustment_for_year(int(y)).efficiency_loss for y in years]
         )
-        water_constraints = np.array(
+        water_temp_disruptions = np.array(
             [
-                yearly_physical_adj.get_adjustment_for_year(int(y)).water_constrained_capacity
+                yearly_physical_adj.get_adjustment_for_year(int(y)).water_temp_disruption
                 for y in years
             ]
         )
     else:
         # Static physical risks (same for all years)
         outage_rates = np.full(n_years, physical_adj.outage_rate)
-        capacity_derates = np.full(n_years, physical_adj.capacity_derate)
         efficiency_losses = np.full(n_years, physical_adj.efficiency_loss)
-        water_constraints = np.full(
-            n_years, getattr(physical_adj, "water_constrained_capacity", 1.0)
+        water_temp_disruptions = np.full(
+            n_years, getattr(physical_adj, "water_temp_disruption", 0.0)
         )
 
     # === CAPACITY FACTOR CALCULATION ===
@@ -169,12 +179,7 @@ def compute_cashflows_timeseries(
         )
         base_cf_series = np.minimum(1.0, base_cf_series * demand_factors)
 
-    # Apply capacity derates (year-by-year)
-    cf_series = base_cf_series * (1 - capacity_derates)
-
-    # Apply water constraints (year-by-year hard cap)
-    cf_series = np.minimum(cf_series, water_constraints)
-    cf_series = np.maximum(cf_series, 0.0)
+    cf_series = np.maximum(base_cf_series, 0.0)
 
     # === GENERATION AND REVENUE ===
     # Potential generation (before outages)
@@ -182,7 +187,7 @@ def compute_cashflows_timeseries(
 
     # Actual generation (after outages reduce availability)
     # Outage = fraction of time plant is unavailable
-    actual_mwh = potential_mwh * (1 - outage_rates)
+    actual_mwh = potential_mwh * (1 - outage_rates) * (1 - water_temp_disruptions)
 
     # Revenue is based on ACTUAL generation (outages reduce revenue)
     if market_scenario:
@@ -218,6 +223,7 @@ def compute_cashflows_timeseries(
     # This is the revenue we would have earned but didn't due to outages
     # We track this separately for transparency, but it's already reflected in reduced revenue
     lost_revenue_from_outages = potential_mwh * outage_rates * prices  # Lost revenue from outages
+    lost_revenue_from_water_temp = potential_mwh * (1 - outage_rates) * water_temp_disruptions * prices
 
     total_costs = fuel_costs + variable_opex + fixed_opex + carbon_costs
     # Note: lost_revenue_from_outages NOT included in total_costs - it's informational only
@@ -251,6 +257,7 @@ def compute_cashflows_timeseries(
     interest_expense = np.zeros(n_years)
     balance = debt_amount
 
+    annual_ds = 0.0
     if debt_interest > 0 and debt_tenor > 0:
         # Calculate level annual payment (Annuity)
         annual_ds = -npf.pmt(debt_interest, debt_tenor, debt_amount)
@@ -295,6 +302,15 @@ def compute_cashflows_timeseries(
 
     fcf = nopat + depreciation - capex
 
+    # DSCR (second pass, after tax_expense and capex are both defined)
+    cfads = ebitda - tax_expense - capex
+    dscr_series = np.zeros(n_years)
+    if annual_ds > 0:
+        n_debt = min(n_years, debt_tenor)
+        dscr_series[:n_debt] = cfads[:n_debt] / annual_ds
+
+    final_cf_series = cf_series * (1 - outage_rates)
+
     return CashFlowTimeSeries(
         years=years,
         revenue=revenue,
@@ -312,7 +328,11 @@ def compute_cashflows_timeseries(
         capex=capex,
         free_cash_flow=fcf,
         capacity_factor=cf_series,
+        final_cf=final_cf_series,
         carbon_costs=carbon_costs,
+        dscr=dscr_series,
+        water_temp_disruption=water_temp_disruptions,
+        lost_revenue_from_water_temp=lost_revenue_from_water_temp,
     )
 
 
@@ -340,7 +360,7 @@ def compute_cashflows(
     fuel_price = float(plant_params.get("fuel_price_per_mmbtu", 3.2))
     fixed_opex = float(plant_params.get("fixed_opex_per_kw_year", 42))
     variable_opex = float(plant_params.get("variable_opex_per_mwh", 4.5))
-    cf = max(0.0, transition.capacity_factor * (1 - physical.capacity_derate))
+    cf = max(0.0, transition.capacity_factor)
 
     annual_mwh = capacity_mw * 8760 * cf
     fuel_cost = annual_mwh * heat_rate * fuel_price

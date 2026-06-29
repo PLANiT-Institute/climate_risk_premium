@@ -125,7 +125,7 @@ class RatingAssessment:
             "spread_bps": self.overall_rating.to_spread_bps(),
             "is_investment_grade": self.overall_rating.is_investment_grade,
             "is_distressed": self.overall_rating.is_distressed,
-            "capacity_rating": str(self.component_ratings["capacity"]),
+            "policy_industry_rating": str(self.component_ratings["policy_industry"]),
             "profitability_rating": str(self.component_ratings["profitability"]),
             "coverage_rating": str(self.component_ratings["coverage"]),
             "dscr_rating": str(self.component_ratings.get("dscr", "N/A")),
@@ -342,10 +342,10 @@ def assess_credit_rating(metrics: RatingMetrics) -> RatingAssessment:
 
     # Calculate component ratings with distress awareness
     component_ratings = {
-        "capacity": rate_capacity(metrics.capacity_mw),
+        "policy_industry": Rating.AA,  # fixed AA for all scenarios; not in weighted score
         "profitability": rate_profitability(metrics.ebitda_to_fixed_assets, is_ebitda_negative),
         "coverage": rate_coverage(metrics.ebitda_to_interest),
-        "dscr": rate_dscr(metrics.dscr),
+        "dscr": rate_dscr(metrics.dscr),  # distress override only; excluded from weights
         "net_debt_leverage": rate_net_debt_leverage(metrics.net_debt_to_ebitda, is_ebitda_negative),
         "equity_leverage": rate_equity_leverage(metrics.debt_to_equity),
         "asset_leverage": rate_asset_leverage(metrics.debt_to_assets),
@@ -354,13 +354,12 @@ def assess_credit_rating(metrics: RatingMetrics) -> RatingAssessment:
     # Weighted average approach for project finance
     # DSCR is most important (standard project finance practice)
     weights = {
-        "capacity": 0.05,  # Business scale
-        "profitability": 0.10,  # Operating efficiency
-        "coverage": 0.15,  # Interest coverage
-        "dscr": 0.35,  # PRIMARY: Debt service coverage
-        "net_debt_leverage": 0.15,  # Leverage
-        "equity_leverage": 0.10,  # Capital structure
-        "asset_leverage": 0.10,  # Balance sheet strength
+        "policy_industry": 0.50,  # Policy & industry risk (fixed AA)
+        "profitability": 0.10,    # Operating efficiency
+        "coverage": 0.12,         # Interest coverage
+        "net_debt_leverage": 0.12,  # Leverage
+        "asset_leverage": 0.08,   # Balance sheet strength
+        "equity_leverage": 0.08,  # Capital structure
     }
 
     # Calculate weighted score
@@ -372,28 +371,22 @@ def assess_credit_rating(metrics: RatingMetrics) -> RatingAssessment:
     rounded_score = round(weighted_score)
     rounded_score = max(1, min(10, rounded_score))  # Clamp to valid range
 
-    # Distress override: if any critical metric is in distress, ensure rating reflects it
-    critical_metrics = ["dscr", "coverage", "profitability"]
-    distress_ratings = [
-        component_ratings[m] for m in critical_metrics if component_ratings[m].value >= 7
-    ]
-
-    if distress_ratings:
-        # At least one critical metric is distressed
-        worst_distress = max(distress_ratings, key=lambda r: r.value)
-        # Weighted score cannot be better than worst distressed critical metric
-        rounded_score = max(rounded_score, worst_distress.value)
+    if metrics.dscr < 0:
+        rounded_score = Rating.D.value
+        rationale = f"Overall D: DSCR negative ({metrics.dscr:.3f})"
+    elif metrics.dscr < 1.0:
+        rounded_score = min(10, rounded_score + 1)
         overall_rating = Rating(rounded_score)
         rationale = (
-            f"Overall {overall_rating}: Distress-driven rating "
-            f"(critical metric in distress: {worst_distress.name})"
+            f"Overall {overall_rating}: Weighted average downgraded 1 notch "
+            f"(DSCR={metrics.dscr:.3f} < 1.0)"
         )
     else:
-        overall_rating = Rating(rounded_score)
         rationale = (
-            f"Overall {overall_rating}: Weighted average "
-            f"(DSCR={component_ratings['dscr']}, Coverage={component_ratings['coverage']})"
+            f"Overall {Rating(rounded_score)}: Weighted average "
+            f"(DSCR={metrics.dscr:.3f} ≥ 1.0, no override)"
         )
+    overall_rating = Rating(rounded_score)
 
     return RatingAssessment(
         overall_rating=overall_rating,

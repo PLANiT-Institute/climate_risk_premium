@@ -71,7 +71,7 @@ def baseline_scenario():
     """No-risk baseline scenario."""
     trans = TransitionScenario("Baseline", 0.0, 40)
     trans_adj = TransitionAdjustments(0.5, 30)
-    phys_adj = PhysicalAdjustments(0.0, 0.0, 0.0, 1.0)
+    phys_adj = PhysicalAdjustments(0.0, 0.0)
     return trans, trans_adj, phys_adj
 
 
@@ -88,21 +88,12 @@ class TestRevenueCalculation:
 
     def test_revenue_reduced_by_outages(self, zero_cost_plant, baseline_scenario):
         trans, trans_adj, _ = baseline_scenario
-        phys_adj = PhysicalAdjustments(0.10, 0.0, 0.0, 1.0)
+        phys_adj = PhysicalAdjustments(0.10, 0.0)
         cf = compute_cashflows_timeseries(zero_cost_plant, trans, trans_adj, phys_adj)
 
         # Revenue should be 90% of full (10% outage)
         full_revenue = 1000 * 8760 * 0.5 * 100
         expected_revenue = full_revenue * 0.90
-        assert np.allclose(cf.revenue, expected_revenue)
-
-    def test_revenue_reduced_by_capacity_derate(self, zero_cost_plant, baseline_scenario):
-        trans, trans_adj, _ = baseline_scenario
-        phys_adj = PhysicalAdjustments(0.0, 0.20, 0.0, 1.0)
-        cf = compute_cashflows_timeseries(zero_cost_plant, trans, trans_adj, phys_adj)
-
-        # CF reduced from 0.5 to 0.4 (20% derate)
-        expected_revenue = 1000 * 8760 * 0.4 * 100
         assert np.allclose(cf.revenue, expected_revenue)
 
     def test_capacity_factor_array(self, zero_cost_plant, baseline_scenario):
@@ -114,7 +105,7 @@ class TestRevenueCalculation:
 
     def test_lost_revenue_from_outages_tracking(self, zero_cost_plant, baseline_scenario):
         trans, trans_adj, _ = baseline_scenario
-        phys_adj = PhysicalAdjustments(0.10, 0.0, 0.0, 1.0)
+        phys_adj = PhysicalAdjustments(0.10, 0.0)
         cf = compute_cashflows_timeseries(zero_cost_plant, trans, trans_adj, phys_adj)
 
         # Lost revenue = potential_mwh * outage_rate * price
@@ -136,8 +127,8 @@ class TestCostCalculation:
 
     def test_fuel_costs_increase_with_efficiency_loss(self, base_plant_params, baseline_scenario):
         trans, trans_adj, _ = baseline_scenario
-        phys_adj_no_loss = PhysicalAdjustments(0.0, 0.0, 0.0, 1.0)
-        phys_adj_with_loss = PhysicalAdjustments(0.0, 0.0, 0.10, 1.0)
+        phys_adj_no_loss = PhysicalAdjustments(0.0, 0.0)
+        phys_adj_with_loss = PhysicalAdjustments(0.0, 0.10)
 
         cf_no_loss = compute_cashflows_timeseries(base_plant_params, trans, trans_adj, phys_adj_no_loss)
         cf_with_loss = compute_cashflows_timeseries(base_plant_params, trans, trans_adj, phys_adj_with_loss)
@@ -236,7 +227,7 @@ class TestYearlyAdjustments:
     def test_yearly_physical_adjustments(self, zero_cost_plant):
         trans = TransitionScenario("Test", 0, 40)
         trans_adj = TransitionAdjustments(0.5, 5)
-        phys_adj = PhysicalAdjustments(0, 0, 0, 1.0)
+        phys_adj = PhysicalAdjustments(0, 0)
 
         years = np.arange(2025, 2030)
         outage_rates = np.array([0.01, 0.02, 0.03, 0.04, 0.05])
@@ -244,9 +235,7 @@ class TestYearlyAdjustments:
         yearly = YearlyPhysicalAdjustments(
             years=years,
             outage_rates=outage_rates,
-            capacity_derates=np.zeros(5),
             efficiency_losses=np.zeros(5),
-            water_constraints=np.ones(5),
             scenario_name="test",
         )
 
@@ -262,7 +251,7 @@ class TestYearlyAdjustments:
     def test_yearly_transition_adjustments(self, zero_cost_plant):
         trans = TransitionScenario("Test", 0, 40)
         trans_adj = TransitionAdjustments(0.5, 5)
-        phys_adj = PhysicalAdjustments(0, 0, 0, 1.0)
+        phys_adj = PhysicalAdjustments(0, 0)
 
         years = np.arange(2025, 2030)
         cfs = np.array([0.80, 0.70, 0.60, 0.50, 0.40])
@@ -305,18 +294,6 @@ class TestMarketScenario:
             assert cf.revenue[i] > cf.revenue[i - 1]
 
 
-class TestWaterConstraints:
-    """Test water availability constraints."""
-
-    def test_water_constraint_caps_cf(self, zero_cost_plant, baseline_scenario):
-        trans, trans_adj, _ = baseline_scenario
-        # Water constraint of 0.3 should cap CF below 0.5
-        phys_adj = PhysicalAdjustments(0.0, 0.0, 0.0, 0.3)
-        cf = compute_cashflows_timeseries(zero_cost_plant, trans, trans_adj, phys_adj)
-
-        assert np.allclose(cf.capacity_factor, 0.3)
-
-
 class TestCashFlowTimeSeriesDataclass:
     """Test CashFlowTimeSeries dataclass methods."""
 
@@ -345,7 +322,7 @@ class TestLegacyCashflows:
     def test_compute_cashflows_returns_result(self):
         plant = {"capacity_mw": 1000, "power_price_per_mwh": 80}
         trans = TransitionAdjustments(0.5, 30)
-        phys = PhysicalAdjustments(0.02, 0.0, 0.0, 1.0)
+        phys = PhysicalAdjustments(0.02, 0.0)
 
         result = compute_cashflows(plant, trans, phys)
         assert isinstance(result, CashFlowResult)
@@ -357,8 +334,8 @@ class TestLegacyCashflows:
         plant = {"capacity_mw": 1000, "power_price_per_mwh": 80}
         trans = TransitionAdjustments(0.5, 30)
 
-        phys_no_outage = PhysicalAdjustments(0.0, 0.0, 0.0, 1.0)
-        phys_with_outage = PhysicalAdjustments(0.10, 0.0, 0.0, 1.0)
+        phys_no_outage = PhysicalAdjustments(0.0, 0.0)
+        phys_with_outage = PhysicalAdjustments(0.10, 0.0)
 
         r1 = compute_cashflows(plant, trans, phys_no_outage)
         r2 = compute_cashflows(plant, trans, phys_with_outage)
